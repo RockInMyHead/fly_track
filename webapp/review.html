@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fly_vo — проверка предложений</title>
+<style>
+  :root{
+    --bg:#0e1116; --panel:#161b22; --panel2:#1c2230; --line:#2a3141;
+    --txt:#e6edf3; --dim:#8b98a9; --accent:#4c8dff;
+    --left:#3fb950; --right:#c678dd; --good:#3fb950; --bad:#f85149; --warn:#d29922;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--bg); color:var(--txt);
+    font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  header{
+    display:flex;align-items:center;gap:14px;padding:10px 16px;
+    border-bottom:1px solid var(--line);background:var(--panel);flex:0 0 auto;
+  }
+  header h1{margin:0;font-size:14px;font-weight:600;letter-spacing:.03em}
+  .prog{color:var(--dim);font-size:12px}
+  .prog b{color:var(--txt)}
+  .spacer{flex:1}
+  button{
+    background:var(--panel2);color:var(--txt);border:1px solid var(--line);
+    border-radius:6px;padding:7px 13px;font:inherit;font-size:13px;cursor:pointer;
+  }
+  button:hover{border-color:#3d4759;background:#232b3a}
+  .skip{background:transparent;color:var(--dim)}
+  main{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 430px;min-height:0}
+  .stage{display:flex;flex-direction:column;min-width:0;background:#000}
+  video{width:100%;height:100%;object-fit:contain;background:#000}
+  aside{border-left:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;min-height:0;overflow:auto}
+  .sect{padding:14px 16px;border-bottom:1px solid var(--line)}
+  .verdictbox{border-radius:8px;padding:14px;border:2px solid var(--line);background:var(--panel2)}
+  .verdictbox .sys{font-size:11px;color:var(--dim);letter-spacing:.06em;text-transform:uppercase}
+  .verdictbox .dir{font-size:30px;font-weight:700;line-height:1.15;margin:4px 0}
+  .verdictbox .meta{font-size:12px;color:var(--dim);line-height:1.7}
+  .verdictbox .meta b{color:var(--txt)}
+  .bar{height:5px;border-radius:3px;background:#2a3141;margin-top:8px;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--accent)}
+  .q{display:flex;gap:8px;margin-top:12px}
+  .q button{flex:1;padding:14px 8px;font-size:15px;font-weight:600}
+  .yes{border-color:#2b6a33;color:var(--good)}
+  .yes:hover{background:#16261a}
+  .no{border-color:#7a2f2f;color:var(--bad)}
+  .no:hover{background:#2a1616}
+  .correction{display:none;gap:6px;margin-top:10px;flex-wrap:wrap}
+  .correction.on{display:flex}
+  .correction button{flex:1;min-width:86px;font-size:13px}
+  .correction button.sel{outline:2px solid var(--accent)}
+  .c-left{border-color:#2b6a33;color:var(--left)}
+  .c-right{border-color:#6a3b7a;color:var(--right)}
+  .c-fwd{border-color:#2b4f78;color:#58a6ff}
+  .c-none{border-color:#3a414d;color:var(--dim)}
+  .list{padding:10px 12px}
+  .row{
+    display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:6px;
+    border:1px solid transparent;font-size:12px;cursor:pointer;
+  }
+  .row:hover{background:var(--panel2)}
+  .row.cur{border-color:var(--accent);background:var(--panel2)}
+  .row .n{color:var(--dim);min-width:26px}
+  .row .tt{color:var(--dim);min-width:106px}
+  .row .dd{font-weight:600;min-width:62px}
+  .row .vv{margin-left:auto;font-size:11px}
+  .ok{color:var(--good)} .no2{color:var(--bad)} .sk{color:var(--dim)}
+  .hint{color:var(--dim);font-size:12px;line-height:1.65}
+  kbd{background:var(--panel2);border:1px solid var(--line);border-radius:3px;padding:1px 5px;font-size:11px}
+  .toast{
+    position:fixed;left:50%;bottom:24px;transform:translateX(-50%);
+    background:#1f3a6d;border:1px solid #2f5bab;color:#fff;padding:9px 18px;border-radius:6px;
+    font-size:13px;opacity:0;transition:opacity .16s;pointer-events:none;z-index:50;
+  }
+  .toast.on{opacity:1}
+  .empty{padding:40px;text-align:center;color:var(--dim)}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>проверка предложений</h1>
+  <span class="prog" id="prog">загрузка…</span>
+  <span class="spacer"></span>
+  <button id="btnPrev" class="skip">← назад</button>
+  <button id="btnNext" class="skip">вперёд →</button>
+  <button id="btnExport" class="skip">экспорт csv</button>
+</header>
+
+<main>
+  <section class="stage">
+    <video id="vid" preload="auto"></video>
+  </section>
+
+  <aside>
+    <div class="sect">
+      <div class="verdictbox" id="vbox">
+        <div class="sys">система предлагает</div>
+        <div class="dir" id="sysDir">—</div>
+        <div class="meta" id="sysMeta"></div>
+        <div class="bar"><i id="cohBar" style="width:0%"></i></div>
+      </div>
+      <div class="q">
+        <button class="yes" id="btnYes">верно  ✓</button>
+        <button class="no" id="btnNo">неверно  ✗</button>
+      </div>
+      <div class="correction" id="corr">
+        <div class="hint" style="width:100%;margin-bottom:2px">а что там на самом деле:</div>
+        <button class="c-left" data-act="LEFT">камера ЛЕВО</button>
+        <button class="c-right" data-act="RIGHT">камера ПРАВО</button>
+        <button class="c-fwd" data-act="FWD">едет ВПЕРЁД</button>
+        <button class="c-none" data-act="STATIC">НА МЕСТЕ</button>
+        <button class="c-none" data-act="UNCLEAR">непонятно</button>
+      </div>
+      <div class="hint" style="margin-top:12px">
+        смотри окно и жми <kbd>1</kbd> верно / <kbd>2</kbd> неверно ·
+        <kbd>←</kbd><kbd>→</kbd> между пунктами · <kbd>space</kbd> пауза ·
+        клип крутится сам, по кругу
+      </div>
+    </div>
+
+    <div class="sect">
+      <div class="hint" id="helpTxt">
+        <b>что проверяется.</b> Система прогнала всё видео своим оценщиком движения
+        и предложила список поворотов. Ты смотришь каждое окно и говоришь, совпадает
+        ли предложенное направление с тем, что видно.
+        <br><br>
+        Направление — куда повернулась <b>камера</b>. Для поворота картинка едет
+        в обратную сторону: если содержимое кадра уезжает к левому краю, камера
+        повернула вправо.
+        <br><br>
+        Если неверно — обязательно укажи, что там на самом деле. Это и есть та
+        разметка, которой не хватало.
+        <br><br>
+        <b>Можно не разбирать всё.</b> Пункты с высокой уверенностью обычно проще;
+        если окно совсем непонятное — это тоже ответ, жми «непонятно».
+      </div>
+    </div>
+
+    <div class="sect" style="padding:10px 0">
+      <div class="list" id="list"></div>
+    </div>
+  </aside>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const vid=document.getElementById("vid");
+let cands=[], verdicts={}, idx=0, pendingActual=null;
+
+const COLOR={LEFT:"var(--left)",RIGHT:"var(--right)",FWD:"#58a6ff",UNCLEAR:"var(--dim)",
+              STATIC:"#8b98a9",MIXED:"var(--warn)"};
+const RU={LEFT:"камера ВЛЕВО",RIGHT:"камера ВПРАВО",FWD:"едет ВПЕРЁД",
+          STATIC:"НА МЕСТЕ",MIXED:"непонятно",UNCLEAR:"непонятно"};
+
+function toast(m){const e=document.getElementById("toast");e.textContent=m;e.classList.add("on");
+  clearTimeout(e._h);e._h=setTimeout(()=>e.classList.remove("on"),1500);}
+
+function cur(){return cands[idx];}
+
+function playWindow(loop=true){
+  const c=cur(); if(!c)return;
+  vid.currentTime=c.t0;
+  vid.playbackRate=0.6;
+  vid.play().catch(()=>{});
+  vid.dataset.loopFrom=c.t0; vid.dataset.loopTo=c.t1;
+  vid.dataset.looping=loop?"1":"0";
+}
+
+vid.addEventListener("timeupdate",()=>{
+  if(vid.dataset.looping!=="1")return;
+  const to=parseFloat(vid.dataset.loopTo||"0");
+  if(to&&vid.currentTime>to){vid.currentTime=parseFloat(vid.dataset.loopFrom||"0");}
+});
+
+function renderQuestion(){
+  const c=cur();
+  const box=document.getElementById("vbox");
+  const dir=document.getElementById("sysDir");
+  const meta=document.getElementById("sysMeta");
+  const bar=document.getElementById("cohBar");
+  const corr=document.getElementById("corr");
+  corr.classList.remove("on"); pendingActual=null;
+  document.querySelectorAll("#corr button").forEach(b=>b.classList.remove("sel"));
+
+  if(!c){
+    dir.textContent="—";
+    meta.textContent="нет предложений: сначала прогони scripts/p02_scan_full.py";
+    bar.style.width="0%";
+    document.querySelectorAll(".q button").forEach(b=>b.disabled=true);
+    return;
+  }
+  document.querySelectorAll(".q button").forEach(b=>b.disabled=false);
+  const kind=c.kind||c.camera_direction;
+  const col=COLOR[kind]||"var(--txt)";
+  box.style.borderColor=col;
+  dir.style.color=col;
+  dir.textContent=RU[kind]||kind;
+  const coh=c.coherence||0;
+  const cls=c.kind?(
+    kind==="LEFT"||kind==="RIGHT" ? "камера повернулась" :
+    kind==="FWD" ? "камера ехала вперёд, поворота нет" :
+    kind==="STATIC" ? "ничего не двигалось" :
+    "ни один признак не доминирует") : "";
+  meta.innerHTML=
+    `окно <b>${c.t0.toFixed(2)}–${c.t1.toFixed(2)} с</b> (${c.duration_s.toFixed(2)} с)<br>`+
+    (cls?`что система утверждает: <b>${cls}</b><br>`:"")+
+    `уверенность <b>${c.confidence}</b> · однородная часть <b>${(c.a??0).toFixed(2)}</b>`+
+    (c.divergence!==undefined?` · расширение <b>${c.divergence.toFixed(2)}</b>`:"")+
+    `<br>локальное движение <b>${(c.activity??0).toFixed(2)}</b> px/кадр`;
+  bar.style.width=`${Math.min(coh/1.2,1)*100}%`;
+  bar.style.background=col;
+}
+
+function renderProgress(){
+  const done=Object.keys(verdicts).length;
+  const ok=Object.values(verdicts).filter(v=>v.verdict==="correct").length;
+  const bad=Object.values(verdicts).filter(v=>v.verdict==="wrong").length;
+  document.getElementById("prog").innerHTML=
+    `проверено <b>${done}</b> из <b>${cands.length}</b> · верно <b class="ok">${ok}</b> · `+
+    `неверно <b class="no2">${bad}</b>`;
+}
+
+function renderList(){
+  const el=document.getElementById("list");
+  el.innerHTML="";
+  cands.forEach((c,i)=>{
+    const v=verdicts[c.id];
+    const row=document.createElement("div");
+    row.className="row"+(i===idx?" cur":"");
+    const vv = !v ? "" : v.verdict==="correct" ? '<span class="ok">верно</span>'
+             : v.verdict==="wrong" ? `<span class="no2">неверно → ${RU[v.actual_direction]||v.actual_direction||"?"}</span>`
+             : '<span class="sk">пропущено</span>';
+    row.innerHTML=`<span class="n">${i+1}</span>
+      <span class="tt">${c.t0.toFixed(1)}–${c.t1.toFixed(1)} с</span>
+      <span class="dd" style="color:${COLOR[c.camera_direction]}">${RU[c.camera_direction]}</span>
+      <span class="vv">${vv}</span>`;
+    row.onclick=()=>{idx=i;renderQuestion();renderList();playWindow();};
+    el.appendChild(row);
+  });
+}
+
+/* Verdict submission.
+   Two guards, both needed. In the first review round the median interval between
+   verdicts was exactly 1.0 s over 37 windows, which is not enough time to watch
+   anything: key auto-repeat and rapid clicking were cascading through the list, so
+   verdicts were recorded for windows nobody had seen. */
+let lastVerdictAt=0, awaitingLoad=false;
+
+async function send(verdict, actual){
+  const c=cur(); if(!c)return;
+  const nowMs=performance.now();
+  if(nowMs-lastVerdictAt < 700){toast("слишком быстро — посмотри окно");return;}
+  if(awaitingLoad){toast("окно ещё загружается");return;}
+  lastVerdictAt=nowMs;
+  awaitingLoad=true;
+  const payload={
+    id:c.id, system_direction:c.camera_direction, system_kind:c.kind||null,
+    verdict, actual_direction:actual||null,
+    coherence:c.coherence, confidence:c.confidence,
+    t0:c.t0, t1:c.t1,
+  };
+  try{
+    const r=await fetch("/api/verdict",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(payload)});
+    const j=await r.json();
+    if(j.ok){
+      verdicts[c.id]=payload;
+      renderProgress(); renderList();
+      toast(verdict==="correct"?`верно: ${RU[c.camera_direction]}`:
+            `неверно: система сказала ${RU[c.camera_direction]}, на самом деле ${RU[actual]||"?"}`);
+      idx=Math.min(idx+1,cands.length-1);
+      renderQuestion(); renderList();
+      playWindow();
+    }
+  }catch(e){toast("не сохранилось: "+e.message);}
+  finally{awaitingLoad=false;}
+}
+
+document.getElementById("btnYes").onclick=()=>send("correct",null);
+document.getElementById("btnNo").onclick=()=>{
+  document.getElementById("corr").classList.add("on");
+  toast("укажи, что там на самом деле");
+};
+document.querySelectorAll("#corr button").forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll("#corr button").forEach(o=>o.classList.remove("sel"));
+    b.classList.add("sel");
+    send("wrong",b.dataset.act);
+  };
+});
+document.getElementById("btnPrev").onclick=()=>{idx=Math.max(0,idx-1);renderQuestion();renderList();playWindow();};
+document.getElementById("btnNext").onclick=()=>{idx=Math.min(cands.length-1,idx+1);renderQuestion();renderList();playWindow();};
+document.getElementById("btnExport").onclick=async()=>{
+  const r=await fetch("/api/verdict_export",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"});
+  const j=await r.json(); toast(`csv записан (${j.n})`);
+};
+
+window.addEventListener("keydown",e=>{
+  if(e.target.tagName==="INPUT")return;
+  if(e.key===" "){e.preventDefault();vid.paused?vid.play():vid.pause();}
+  else if(e.key==="1"){document.getElementById("btnYes").click();}
+  else if(e.key==="2"){document.getElementById("btnNo").click();}
+  else if(e.key==="ArrowRight"){document.getElementById("btnNext").click();}
+  else if(e.key==="ArrowLeft"){document.getElementById("btnPrev").click();}
+});
+
+(async function init(){
+  try{
+    const r=await fetch("/api/candidates");
+    const j=await r.json();
+    cands=j.candidates||[];
+    verdicts=j.verdicts||{};
+    // the server decides which clip these windows belong to; pairing one clip's
+    // timestamps with another clip's video would make every window wrong
+    if(j.video){ vid.src="/media/"+j.video; }
+    document.title="Разметка · "+((j.source_video||""));
+    // resume at the first unreviewed item
+    const firstOpen=cands.findIndex(c=>!verdicts[c.id]);
+    idx=firstOpen>=0?firstOpen:0;
+  }catch(e){
+    document.getElementById("prog").textContent="не загрузилось: "+e.message;
+    return;
+  }
+  renderProgress(); renderQuestion(); renderList(); playWindow();
+})();
+</script>
+</body>
+</html>

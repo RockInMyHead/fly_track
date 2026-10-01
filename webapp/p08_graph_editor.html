@@ -1,0 +1,2302 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>P08 — редактор графа проходов</title>
+<style>
+  :root{
+    --bg:#12141a; --panel:#1a1d26; --line:#2a2f3d; --fg:#e8eaf0; --dim:#8b93a7;
+    --sel:#ffd166; --node:#5cc8ff; --edge:#3d6b8f; --ok:#4ade80; --warn:#fbbf24;
+    --bad:#f87171; --start:#4ade80;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);
+    font:13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  #app{display:flex;flex-direction:column;height:100%}
+  header{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 10px;
+    background:var(--panel);border-bottom:1px solid var(--line)}
+  header .grp{display:flex;gap:4px;align-items:center;padding-right:8px;
+    border-right:1px solid var(--line);margin-right:4px}
+  header .grp:last-child{border-right:0}
+  button{background:#232838;color:var(--fg);border:1px solid var(--line);
+    border-radius:6px;padding:6px 11px;font-size:12px;cursor:pointer}
+  button:hover{background:#2b3145}
+  button.on{background:var(--sel);color:#1a1d26;border-color:var(--sel);font-weight:600}
+  button.danger:hover{background:#4a2222;border-color:var(--bad)}
+  #body{display:flex;flex:1;min-height:0}
+  #stage{position:relative;flex:1;min-width:0;background:#0c0e13;overflow:hidden}
+  canvas{display:block}
+  #hint{position:absolute;left:12px;bottom:12px;background:rgba(18,20,26,.9);
+    border:1px solid var(--line);border-radius:6px;padding:7px 11px;color:var(--dim);
+    font-size:12px;pointer-events:none}
+  #zoom{position:absolute;right:12px;bottom:12px;background:rgba(18,20,26,.9);
+    border:1px solid var(--line);border-radius:6px;padding:7px 11px;color:var(--dim);
+    font-size:12px;pointer-events:none}
+  aside{width:290px;flex:none;background:var(--panel);border-left:1px solid var(--line);
+    padding:12px;overflow:auto}
+  aside h3{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--dim)}
+  .box{border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:12px;
+    background:#151821}
+  .row{display:flex;justify-content:space-between;gap:8px;padding:2px 0}
+  .row span:last-child{color:var(--dim);font-variant-numeric:tabular-nums}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th,td{text-align:left;padding:3px 4px;border-bottom:1px solid #222634}
+  th{color:var(--dim);font-weight:500}
+  code{background:#0e1117;padding:1px 5px;border-radius:4px;color:#9ecbff}
+  input[type=number],input[type=text],select{background:#0e1117;color:var(--fg);
+    border:1px solid var(--line);border-radius:5px;padding:4px 7px;width:100px;font-size:12px}
+  .muted{color:var(--dim)}
+  .ok{color:var(--ok)} .bad{color:var(--bad)} .warn{color:var(--warn)}
+  .tabbar{display:flex;gap:4px;padding:6px 10px 0;background:var(--panel)}
+  .tab{padding:6px 14px;border:1px solid var(--line);border-bottom:none;
+    border-radius:7px 7px 0 0;background:#151821;color:var(--dim);cursor:pointer;font-size:12px}
+  .tab.on{background:var(--bg);color:var(--fg);font-weight:600}
+  #tracking{display:none;flex:1;min-height:0}
+  #tracking.on{display:flex}
+  #tvid{flex:1;min-width:0;background:#000;display:flex;align-items:center;justify-content:center}
+  #tvid video{max-width:100%;max-height:100%}
+  #tgraph{flex:1;min-width:0;position:relative;background:#0c0e13}
+  #tbar{position:absolute;left:12px;right:12px;bottom:12px;
+    background:rgba(18,20,26,.94);border:1px solid var(--line);border-radius:6px;
+    padding:6px 10px;display:flex;flex-direction:column;gap:5px}
+  .trow{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  .trow button{padding:4px 9px;font-size:11px}
+  #tinfo{position:absolute;left:12px;top:12px;background:rgba(18,20,26,.92);
+    border:1px solid var(--line);border-radius:6px;padding:8px 12px;font-size:12px;max-width:320px}
+  #tpanel{position:absolute;right:12px;top:12px;width:340px;max-height:72%;
+    background:rgba(18,20,26,.94);border:1px solid var(--line);border-radius:6px;
+    padding:8px 10px;display:flex;flex-direction:column;gap:6px;font-size:12px}
+  #tlist-body{overflow:auto}
+  #tList{overflow:auto;max-height:210px;font-family:ui-monospace,monospace;font-size:11px}
+  #tList .tr{display:flex;gap:6px;padding:1px 0;align-items:center}
+  #tList .tr:nth-child(odd){background:rgba(255,255,255,.03)}
+  #tList .tr .tm{color:#fbbf24;width:56px;flex:none;text-align:right;padding-right:6px}
+  #tList .tr .en{flex:1;color:#9ecbff;overflow:hidden;text-overflow:ellipsis;
+    white-space:nowrap}
+  #tList .tr .dl{color:#f87171;cursor:pointer;padding:0 2px 0 8px}
+  #tResult{max-height:190px;overflow:auto;white-space:pre-wrap;font-size:11px;
+    font-family:ui-monospace,monospace;color:#8b93a7}
+  #tvhelp{position:absolute;left:50%;transform:translateX(-50%);bottom:6px;
+    font-size:11px}
+  #tvid{position:relative}
+  #tinfo table{margin-top:6px}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="tabbar">
+    <div class="tab on" data-tab="edit">ГРАФ</div>
+    <div class="tab" data-tab="track">ТРЕКИНГ</div>
+  </div>
+
+  <div id="edit" style="display:flex;flex-direction:column;flex:1;min-height:0">
+    <header>
+      <div class="grp">
+        <label class="muted" style="margin-right:4px">план:</label>
+        <input type="file" id="planFile" accept="image/png,image/jpeg,image/jpg"
+               style="width:170px;padding:3px">
+        <label class="muted" style="margin:0 4px 0 8px">граф:</label>
+        <input type="file" id="graphFile" accept=".json,application/json"
+               style="width:170px;padding:3px">
+        <button id="dlGraph">Скачать граф</button>
+      </div>
+      <div class="grp">
+        <button id="mSelect" class="on">Выбор</button>
+        <button id="mAdd">Добавить точку</button>
+        <button id="mConnect">Соединить</button>
+        <button id="mDelete">Удалить</button>
+        <button id="mStart">Старт</button>
+        <button id="mTruth">Маршрут</button>
+        <button id="mLine">Линия</button>
+      </div>
+      <div class="grp">
+        <label style="display:flex;gap:5px;align-items:center;cursor:pointer">
+          <input type="checkbox" id="labels"> <span class="muted">подписи</span>
+        </label>
+        <label style="display:flex;gap:5px;align-items:center;cursor:pointer">
+          <input type="checkbox" id="snapChk" checked> <span class="muted">магнит к проходам</span>
+        </label>
+      </div>
+      <div class="grp">
+        <button id="zoomSel">К выбранному</button>
+      </div>
+      <div class="grp">
+        <button id="undo">Отменить</button>
+        <button id="clear" class="danger">Очистить</button>
+      </div>
+      <div class="grp">
+        <button id="tidy" title="удалить узлы, не соединённые ни с чем">Убрать одинокие</button>
+      </div>
+      <div class="grp">
+        <button id="save">Сохранить граф</button>
+        <button id="reload">Загрузить с диска</button>
+        <button id="fit">Вписать</button>
+      </div>
+      <div class="grp">
+        <span class="muted">старт:</span>
+        <span id="startChip" style="color:#f87171">не задан</span>
+      </div>
+      <div class="grp"><span id="status" class="muted">—</span></div>
+    </header>
+
+    <div id="body">
+      <div id="stage">
+        <canvas id="cv"></canvas>
+        <div id="hint"></div>
+        <div id="zoom"></div>
+      </div>
+
+      <aside>
+        <h3>Граф</h3>
+        <div class="box">
+          <div class="row"><span>план</span><span id="planName">не загружен</span></div>
+          <div class="row"><span>узлов</span><span id="nNodes">0</span></div>
+          <div class="row"><span>рёбер</span><span id="nEdges">0</span></div>
+          <div class="row"><span>старт</span><span id="startInfo">не задан</span></div>
+        </div>
+
+        <h3>Выделено</h3>
+        <div class="box" id="selBox"><span class="muted">ничего</span></div>
+
+        <h3>Старт</h3>
+        <div class="box">
+          <div class="muted" style="margin-bottom:6px">
+            режим «Старт»: клик по ребру — начало с ребра, повторный клик меняет
+            направление. клик по узлу — начало с узла.
+          </div>
+          <div class="muted" style="margin-bottom:6px">
+            или точнее: стоя в узле, придя со стороны соседа. так задаётся
+            направление движения в первом же узле.
+          </div>
+          <div class="row"><span>стою в узле</span>
+            <select id="startNode" style="flex:1"></select></div>
+          <div class="row"><span>пришёл от</span>
+            <select id="startFrom" style="flex:1"></select></div>
+          <button id="applyStart" style="width:100%;margin-top:6px">Задать старт</button>
+          <button id="clearStart" style="width:100%;margin-top:6px">Сбросить старт</button>
+        </div>
+
+        <h3>Настоящий маршрут</h3>
+        <div class="box">
+          <div class="muted" style="margin-bottom:6px">
+            режим «Маршрут»: кликай РЁБРА по порядку, как человек их проходил.
+            нужно 2–3 минуты видео, а не всё. Чтобы записались времена входа,
+            размечай в закладке ТРЕКИНГ.
+          </div>
+          <div class="row"><span>рёбер</span><span id="truthCount">0</span></div>
+          <div id="truthList" class="muted" style="max-height:90px;overflow:auto;
+            font-family:ui-monospace,monospace;font-size:11px;margin:4px 0"></div>
+          <button id="lineSnap" style="width:100%">Привязать к графу</button>
+          <div class="muted" id="lineInfo" style="font-size:11px;margin:3px 0"></div>
+          <button id="lineClear" style="width:100%;margin-bottom:4px">Стереть линию</button>
+          <button id="truthSave" style="width:100%">Сохранить маршрут</button>
+          <button id="truthCompare" style="width:100%;margin-top:6px">Сравнить с P08</button>
+          <button id="truthClear" style="width:100%;margin-top:6px">Очистить маршрут</button>
+          <div id="truthResult" style="margin-top:8px;font-size:11px;
+            white-space:pre-wrap;font-family:ui-monospace,monospace"></div>
+        </div>
+
+        <h3>Масштаб (необязательно)</h3>
+        <div class="box">
+          <div class="row"><span>метров на пиксель</span>
+            <input type="number" id="mpp" step="0.0001" min="0" placeholder="—"></div>
+          <div class="row" style="margin-top:8px"><span>известное расстояние</span></div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <select id="kdEdge" style="flex:1"></select>
+            <input type="number" id="kdMeters" step="0.1" min="0" placeholder="м" style="width:64px">
+            <button id="kdSet">ок</button>
+          </div>
+          <div class="muted" id="kdNote" style="margin-top:6px">
+            если не задан — работаем в условных единицах
+          </div>
+        </div>
+
+        <h3>Рёбра</h3>
+        <div class="box" style="padding:6px">
+          <table><thead><tr><th>ребро</th><th>одно- или двустороннее</th><th></th></tr></thead>
+            <tbody id="edgeTable"></tbody></table>
+        </div>
+
+        <h3>Узлы</h3>
+        <div class="box" style="padding:6px;max-height:220px;overflow:auto">
+          <table><thead><tr><th>id</th><th>x</th><th>y</th></tr></thead>
+            <tbody id="nodeTable"></tbody></table>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div id="tracking">
+    <div id="tvid">
+      <video id="video" controls preload="metadata"></video>
+      <div id="tvhelp" class="muted">
+        пробел — пауза · ← → ±1 с · shift+← → ±0.2 с · клик по видео — пауза
+      </div>
+    </div>
+    <div id="tgraph">
+      <canvas id="tcv"></canvas>
+      <div id="tinfo"><span class="muted">данных трекинга пока нет</span></div>
+      <div id="tbar">
+        <div class="trow"><span id="tStatus" class="muted" style="font-size:11px"></span></div>
+        <div class="trow">
+          <button id="tAnnotate">Размечать маршрут</button>
+          <button id="tLine" title="провести линию по плану, как шёл человек">Линия</button>
+          <button id="tSnap">Привязать к графу</button>
+          <button id="tFollow" title="план едет за положением, которое посчитал P08">Следить за P08</button>
+          <button id="tFit">Вписать</button>
+          <button id="tHere" title="приблизить то место, где сейчас видео">К текущему месту</button>
+          <button id="tWide" title="отдать плану больше места">План шире</button>
+          <button id="tZoomOut">−</button>
+          <button id="tZoomIn">+</button>
+          <input type="text" id="tGoNode" placeholder="узел" style="width:70px">
+          <button id="tGo">найти</button>
+        </div>
+        <div class="trow">
+          <span id="tScan" class="muted" style="font-size:11px"></span>
+          <span id="tHover" style="font-size:11px;color:#f0abfc"></span>
+          <span id="tZoomLabel" class="muted" style="font-size:11px;margin-left:auto"></span>
+        </div>
+        <div id="tFollowWarn" class="muted" style="font-size:11px;display:none"></div>
+      </div>
+      <div id="tpanel">
+        <div class="trow">
+          <span class="muted">рёбер размечено:</span><span id="tCount">0</span>
+          <button id="tUndo" style="margin-left:auto">Убрать последнее</button>
+        </div>
+        <div id="tList"></div>
+        <div class="trow">
+          <button id="tSave">Сохранить маршрут</button>
+          <button id="tCompare">Сравнить с P08</button>
+          <button id="tClear" class="danger">Очистить</button>
+        </div>
+        <div id="tResult"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ------------------------------------------------------------------ state */
+const S = {
+  nodes: [],          // {id, x, y}   x,y normalized 0..1 over the plan image
+  edges: [],          // {id, from, to, bidirectional}
+  start: null,        // {type:'node', node} or {type:'edge', edge, from, to}
+  image: null,        // HTMLImageElement
+  planName: "",
+  // The graph records the plan's pixel size. It is preferred over the image's own size so
+  // that geometry stays right even if the image is missing or was replaced by a different
+  // resolution.
+  imgW: null,
+  imgH: null,
+  showLabels: false,  // with a couple of hundred nodes labels are unreadable by default
+  meters_per_pixel: null,
+  known_distance: null,   // {edge, meters}
+  mode: "select",
+  sel: null,          // {type:'node'|'edge', id}
+  connectFrom: null,
+  snap: true,        // new nodes snap onto a nearby passage, Alt disables it for one click
+  hoverNode: null,   // node under the cursor, drawn larger so the target is obvious
+  undo: [],
+  // The route as a person walked it, one entry per passage: {edge, from, to, t}. Edges
+  // rather than nodes because a person watching the video recognises a passage, not a
+  // junction, and because a passage carries the direction of travel unambiguously. `t` is
+  // the moment the walker entered it, taken from the video when that is playing.
+  line: [],          // freehand line over the plan, in normalized coordinates
+  lineBusy: false,
+  truth: [],
+  truthSaved: false,
+  rawDoc: null,       // the file exactly as it arrived, so nothing is lost on save
+  rawNodes: {},       // id -> the original node object
+  rawEdges: {},       // id -> the original edge object
+  view: {scale: 1, ox: 0, oy: 0},
+  drag: null,
+  hover: null,
+};
+
+const cv = document.getElementById("cv");
+const ctx = cv.getContext("2d");
+const hint = document.getElementById("hint");
+const zoomBox = document.getElementById("zoom");
+const statusEl = document.getElementById("status");
+
+const HINTS = {
+  select:  "тяни точку — перетащить · тяни фон или средняя кнопка — сдвинуть план · колесо — масштаб · Delete — удалить выделенное",
+  add:     "клик — поставить узел · рядом с проходом узел встанет точно на него (Alt — без магнита) · колесо — масштаб",
+  connect: "клик по первой точке, затем по второй — ребро · магнит берёт ближайший узел в радиусе 22 пикселей · Esc — отмена",
+  delete:  "клик по точке или ребру — удалить · Delete — удалить выделенное",
+  start:   "подведи курсор к ребру (подсветится) и кликни — старт с ребра · повторный клик по нему же разворачивает направление · клик по узлу — старт с узла",
+  line:    "веди линию по плану, как человек шёл · «Привязать к графу» превратит линию в последовательность рёбер · Backspace убирает последнюю точку",
+  truth:   "кликай РЁБРА по порядку, как человек их проходил · сторона клика задаёт направление на первом ребре · повторный клик по последнему ребру убирает его · в закладке ТРЕКИНГ то же самое записывает время входа",
+};
+
+function setStatus(msg, cls) {
+  statusEl.textContent = msg;
+  statusEl.className = cls || "muted";
+  // the same line in the tracking panel, because the header that holds the first one is
+  // hidden while that tab is open
+  const ts = document.getElementById("tStatus");
+  if (ts) {
+    ts.textContent = msg;
+    ts.style.color = cls === "ok" ? "#4ade80" : cls === "warn" ? "#fbbf24"
+                    : cls === "bad" ? "#f87171" : "#8b93a7";
+  }
+}
+
+/* ------------------------------------------------------------- coordinates */
+function imgW() {
+  if (S.imgW) return S.imgW;
+  return S.image ? S.image.naturalWidth : 1000;
+}
+function imgH() {
+  if (S.imgH) return S.imgH;
+  return S.image ? S.image.naturalHeight : 700;
+}
+
+// Markers are a fixed size on screen whatever the zoom, so they stay visible and clickable.
+// They used to shrink to 3.2 px on a dense graph, which made a node a speck and left only
+// 1.3 percent of the canvas as a usable target: connecting two of them needed pixel aim.
+function nodeR() { return S.nodes.length > 120 ? 5.5 : S.nodes.length > 40 ? 7 : 8; }
+function labelR() { return S.nodes.length > 120 && !S.showLabels ? 0 : 9; }
+
+// How close a click has to be to count. These are deliberately much larger than the drawn
+// markers: a person aims at a node, not at its exact centre, and on a plan of a building the
+// nearest node is unambiguous even when the pointer is 16 pixels away.
+const HIT_NODE = 16;
+const HIT_EDGE = 12;
+const SNAP_NODE = 22;    // connect mode: within this distance the target node is taken
+const SNAP_EDGE = 16;    // add mode: within this distance a new node is put on the passage
+
+function toScreen(nx, ny) {
+  return {x: S.view.ox + S.view.scale * nx * imgW(),
+          y: S.view.oy + S.view.scale * ny * imgH()};
+}
+function toNorm(sx, sy) {
+  return {x: (sx - S.view.ox) / (S.view.scale * imgW()),
+          y: (sy - S.view.oy) / (S.view.scale * imgH())};
+}
+function nodeById(id) { return S.nodes.find(n => n.id === id); }
+function edgeById(id) { return S.edges.find(e => e.id === id); }
+
+/* -------------------------------------------------------------- undo stack */
+function snapshot() {
+  S.undo.push(JSON.stringify({nodes: S.nodes, edges: S.edges, start: S.start}));
+  if (S.undo.length > 200) S.undo.shift();
+}
+function undo() {
+  const prev = S.undo.pop();
+  if (!prev) { setStatus("отменять нечего"); return; }
+  const d = JSON.parse(prev);
+  S.nodes = d.nodes; S.edges = d.edges; S.start = d.start;
+  S.sel = null; S.connectFrom = null;
+  refresh();
+  setStatus("отменено");
+}
+
+/* ------------------------------------------------------------ id assigning */
+function nextNodeId() {
+  const used = new Set(S.nodes.map(n => n.id));
+  const L = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  for (let round = 0; round < 50; round++) {
+    for (const ch of L) {
+      const id = round === 0 ? ch : ch + round;
+      if (!used.has(id)) return id;
+    }
+  }
+  return "N" + S.nodes.length;
+}
+
+/* -------------------------------------------------------------- geometry */
+// angle of edge a->b in screen terms, image y grows downward so atan2 is taken
+// directly and the convention is "screen clock", which is what the drawing shows
+function edgeAngle(e) {
+  const a = nodeById(e.from), b = nodeById(e.to);
+  if (!a || !b) return 0;
+  return Math.atan2((b.y - a.y) * imgH(), (b.x - a.x) * imgW());
+}
+function turnSide(fromEdge, toEdge, reverse) {
+  // classify the turn from `fromEdge` onto `toEdge`, both leaving a common node.
+  // `reverse` flips the sign because on screen y points down: a positive rotation
+  // is visually clockwise, i.e. RIGHT.
+  let e1 = fromEdge, e2 = toEdge;
+  let a1 = edgeAngle(e1), a2 = edgeAngle(e2);
+  // orient e1 so it leaves the shared node
+  const shared = sharedNode(e1, e2);
+  if (!shared) return {side: "?", deg: 0};
+  if (e1.to !== shared) a1 += Math.PI;
+  if (e2.from !== shared) a2 += Math.PI;
+  let d = a2 - a1;
+  while (d > Math.PI) d -= 2 * Math.PI;
+  while (d < -Math.PI) d += 2 * Math.PI;
+  const deg = d * 180 / Math.PI * (reverse ? -1 : 1);
+  const ad = Math.abs(deg);
+  let side;
+  if (ad < 45) side = "STRAIGHT";
+  else if (ad > 135) side = "BACK";
+  else side = deg > 0 ? "RIGHT" : "LEFT";
+  return {side, deg: deg};
+}
+function sharedNode(e1, e2) {
+  for (const id of [e1.from, e1.to]) {
+    if (e2.from === id || e2.to === id) return id;
+  }
+  return null;
+}
+
+/* --------------------------------------------------------------- drawing */
+function resize() {
+  const stage = document.getElementById("stage");
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = Math.round(stage.clientWidth * dpr);
+  cv.height = Math.round(stage.clientHeight * dpr);
+  cv.style.width = stage.clientWidth + "px";
+  cv.style.height = stage.clientHeight + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  draw();
+}
+
+function fit() {
+  if (!S.image) {
+    S.view = {scale: 1, ox: 0, oy: 0};
+    return;
+  }
+  const stage = document.getElementById("stage");
+  const cw = stage.clientWidth, ch = stage.clientHeight;
+  const s = Math.min(cw / imgW(), ch / imgH()) * 0.96;
+  S.view = {scale: s, ox: (cw - s * imgW()) / 2, oy: (ch - s * imgH()) / 2};
+  draw();
+}
+
+function zoomToSelection() {
+  // The plan is 5298 px wide and the window shows a fraction of it, so a node can be
+  // invisible at fit scale. This centres the view on whatever is selected at a fixed
+  // working zoom, which is what makes setting a start on a dense graph practical.
+  let cx = null, cy = null;
+  if (S.sel && S.sel.type === "node") {
+    const n = nodeById(S.sel.id);
+    if (n) { cx = n.x; cy = n.y; }
+  } else if (S.sel && S.sel.type === "edge") {
+    const e = edgeById(S.sel.id);
+    if (e) {
+      const a = nodeById(e.from), b = nodeById(e.to);
+      cx = (a.x + b.x) / 2; cy = (a.y + b.y) / 2;
+    }
+  }
+  if (cx === null) { setStatus("сначала выберите узел или ребро", "warn"); return; }
+  const stage = document.getElementById("stage");
+  const target = 0.55;   // plan pixels to screen pixels
+  S.view.scale = target;
+  S.view.ox = stage.clientWidth / 2 - target * cx * imgW();
+  S.view.oy = stage.clientHeight / 2 - target * cy * imgH();
+  draw();
+  setStatus("центр на " + (S.sel.id) + ", масштаб " + Math.round(target * 100) + "%");
+}
+
+function draw() {
+  const stage = document.getElementById("stage");
+  ctx.clearRect(0, 0, stage.clientWidth, stage.clientHeight);
+  ctx.fillStyle = "#0c0e13";
+  ctx.fillRect(0, 0, stage.clientWidth, stage.clientHeight);
+
+  if (S.image) {
+    const p = toScreen(0, 0);
+    ctx.drawImage(S.image, p.x, p.y, S.view.scale * imgW(), S.view.scale * imgH());
+  } else {
+    ctx.fillStyle = "#454c60";
+    ctx.font = "15px -apple-system,sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("загрузите план помещения (PNG / JPG) — кнопка «план» вверху",
+                 stage.clientWidth / 2, stage.clientHeight / 2);
+    ctx.textAlign = "left";
+  }
+
+  // edges
+  ctx.lineCap = "round";
+  const dense = S.edges.length > 120;
+  for (const e of S.edges) {
+    const a = nodeById(e.from), b = nodeById(e.to);
+    if (!a || !b) continue;
+    const p = toScreen(a.x, a.y), q = toScreen(b.x, b.y);
+    const isStart = S.start && S.start.type === "edge" && S.start.edge === e.id;
+    const sel = S.sel && S.sel.type === "edge" && S.sel.id === e.id;
+    // With a dense graph the lines are thin and an edge is hard to aim at. Highlighting
+    // whatever is under the cursor shows what a click is about to select, which is what
+    // makes placing a start on a 205 edge graph practical.
+    const hov = S.hover === "e:" + e.id;
+    if (isStart)      { ctx.strokeStyle = "#4ade80"; ctx.lineWidth = dense ? 4 : 7; }
+    else if (sel)     { ctx.strokeStyle = "#ffd166"; ctx.lineWidth = dense ? 3.5 : 6; }
+    else if (hov)     { ctx.strokeStyle = "#ffd166"; ctx.lineWidth = dense ? 3.5 : 6; }
+    else              { ctx.strokeStyle = "#3d6b8f"; ctx.lineWidth = dense ? 2 : 4; }
+    ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+
+    // direction marker: a small tick near the `to` end, and dots on both ends when
+    // the edge is one-way
+    const ux = (q.x - p.x), uy = (q.y - p.y);
+    const len = Math.hypot(ux, uy) || 1;
+    const mx = p.x + ux * 0.62, my = p.y + uy * 0.62;
+    const nx = -uy / len, ny = ux / len;
+    ctx.strokeStyle = isStart ? "#4ade80" : "#6f9dc4";
+    ctx.lineWidth = 2;
+    if (e.bidirectional) {
+      ctx.beginPath();
+      ctx.moveTo(mx - ux / len * 6, my - uy / len * 6);
+      ctx.lineTo(mx + ux / len * 6, my + uy / len * 6);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(mx - ux / len * 6 + nx * 6, my - uy / len * 6 + ny * 6);
+      ctx.lineTo(mx - ux / len * 6 - nx * 6, my - uy / len * 6 - ny * 6);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(mx + ux / len * 6 + nx * 6, my + uy / len * 6 + ny * 6);
+      ctx.lineTo(mx + ux / len * 6 - nx * 6, my + uy / len * 6 - ny * 6);
+      ctx.stroke();
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(mx - ux / len * 7 + nx * 7, my - uy / len * 7 + ny * 7);
+      ctx.lineTo(mx + ux / len * 7, my + uy / len * 7);
+      ctx.lineTo(mx - ux / len * 7 - nx * 7, my - uy / len * 7 - ny * 7);
+      ctx.stroke();
+    }
+
+    if (sel) {
+      ctx.fillStyle = "#ffd166";
+      ctx.font = "11px ui-monospace,monospace";
+      ctx.fillText(e.id, (p.x + q.x) / 2 + 8, (p.y + q.y) / 2 - 8);
+    }
+  }
+
+  // edges leaving the start node, marked with a small arrow so the start is visible
+  if (S.start && S.start.type === "node") {
+    const n = nodeById(S.start.node);
+    if (n) {
+      const p = toScreen(n.x, n.y);
+      ctx.strokeStyle = "#4ade80"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(p.x, p.y, 17, 0, 2 * Math.PI); ctx.stroke();
+    }
+  }
+
+  // nodes
+  const R = nodeR();
+  for (const n of S.nodes) {
+    const p = toScreen(n.x, n.y);
+    const sel = S.sel && S.sel.type === "node" && S.sel.id === n.id;
+    const cf = S.connectFrom === n.id;
+    const isStart = S.start && S.start.type === "node" && S.start.node === n.id;
+    const hov = S.hoverNode === n.id;
+    const deg = S.edges.filter(e => e.from === n.id || e.to === n.id).length;
+    // The node under the cursor grows, so that in connect mode it is obvious which one a
+    // click is about to take before the click is made.
+    if (hov) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, R + 7, 0, 2 * Math.PI);
+      ctx.fillStyle = "rgba(240,171,252,0.25)";
+      ctx.fill();
+    }
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, sel || cf || isStart ? R + 2.5 : hov ? R + 2 : R, 0, 2 * Math.PI);
+    ctx.fillStyle = sel ? "#ffd166" : isStart ? "#4ade80" : cf ? "#fbbf24"
+                  : hov ? "#f0abfc" : deg >= 3 ? "#f87171" : "#5cc8ff";
+    ctx.fill();
+    if (R > 4.5) {
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#0c0e13";
+      ctx.stroke();
+    }
+
+    // labels: all of them when asked for, otherwise only the junctions, which are the
+    // only nodes a person needs to name when setting a start
+    const want = S.showLabels || (S.nodes.length > 120 && deg >= 3);
+    if (want) {
+      ctx.fillStyle = sel || isStart ? "#ffd166" : deg >= 3 ? "#ffd9d9" : "#cfe4f5";
+      ctx.font = (R > 4.5 ? "12px" : "10px") + " ui-monospace,monospace";
+      ctx.fillText(n.id, p.x + R + 3, p.y - R - 1);
+    }
+  }
+
+  // the drawn route, drawn last so it sits above everything else
+  if (S.truth.length) {
+    ctx.lineWidth = 5;
+    ctx.strokeStyle = S.truthSaved ? "#22c55e" : "#fbbf24";
+    ctx.setLineDash(S.truthSaved ? [] : [10, 6]);
+    ctx.beginPath();
+    S.truth.forEach((r, k) => {
+      const a = nodeById(r.from), b = nodeById(r.to);
+      if (!a || !b) return;
+      const pa = toScreen(a.x, a.y), pb = toScreen(b.x, b.y);
+      if (k === 0) ctx.moveTo(pa.x, pa.y);
+      ctx.lineTo(pb.x, pb.y);
+    });
+    ctx.stroke();
+    ctx.setLineDash([]);
+    S.truth.forEach((r, k) => {
+      const b = nodeById(r.to);
+      if (!b) return;
+      const p = toScreen(b.x, b.y);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 11, 0, 2 * Math.PI);
+      ctx.fillStyle = "rgba(20,22,30,0.85)";
+      ctx.fill();
+      ctx.fillStyle = "#86efac";
+      ctx.font = "bold 11px ui-monospace,monospace";
+      ctx.textAlign = "center";
+      ctx.fillText(String(k + 1), p.x, p.y + 4);
+      ctx.textAlign = "left";
+    });
+  }
+
+  // the rubber band: while connecting, a line follows the cursor so the connection being
+  // made is visible before it exists
+  if (S.mode === "connect" && S.connectFrom && S.cursorScr) {
+    const a = nodeById(S.connectFrom);
+    if (a) {
+      const pa = toScreen(a.x, a.y);
+      const target = S.hoverNode ? nodeById(S.hoverNode) : null;
+      const pb = target ? toScreen(target.x, target.y) : S.cursorScr;
+      ctx.save();
+      ctx.setLineDash([7, 5]);
+      ctx.strokeStyle = target ? "#4ade80" : "#8b93a7";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(pa.x, pa.y); ctx.lineTo(pb.x, pb.y); ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  // the snap preview: where a new node would land while adding near a passage
+  if (S.mode === "add" && S.snapPreview) {
+    const p = toScreen(S.snapPreview.x, S.snapPreview.y);
+    ctx.strokeStyle = "#4ade80";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, R + 6, 0, 2 * Math.PI);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(p.x - R - 12, p.y); ctx.lineTo(p.x + R + 12, p.y);
+    ctx.moveTo(p.x, p.y - R - 12); ctx.lineTo(p.x, p.y + R + 12);
+    ctx.stroke();
+  }
+
+  // the freehand line, drawn while it is being made and after
+  if (S.line.length > 1) {
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = "#2563eb";
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    S.line.forEach((p, k) => {
+      const q = toScreen(p[0], p[1]);
+      if (k === 0) ctx.moveTo(q.x, q.y); else ctx.lineTo(q.x, q.y);
+    });
+    ctx.stroke();
+    ctx.fillStyle = "#2563eb";
+    S.line.forEach(p => {
+      const q = toScreen(p[0], p[1]);
+      ctx.beginPath(); ctx.arc(q.x, q.y, 2.5, 0, 2 * Math.PI); ctx.fill();
+    });
+  }
+
+  hint.textContent = HINTS[S.mode];
+  zoomBox.textContent = "масштаб " + (S.view.scale * 100).toFixed(0) + "%";
+}
+
+/* ------------------------------------------------- true route (P08.2) */
+// The route a person walked, built by clicking passages in order. Kept in one function so
+// that the graph tab and the tracking tab build exactly the same thing; the tracking tab
+// additionally passes the moment the walker entered the passage, read from the video.
+function appendTruth(edge, x, y, t) {
+  if (!edge) { setStatus("кликать нужно по рёбрам", "warn"); return false; }
+  const last = S.truth.length ? S.truth[S.truth.length - 1] : null;
+
+  // clicking the passage just added removes it, which is the undo a person expects
+  if (last && last.edge === edge.id) {
+    S.truth.pop();
+    S.truthSaved = false;
+    setStatus(`ребро ${edge.id} убрано, рёбер в маршруте ${S.truth.length}`);
+    return true;
+  }
+
+  let frm, to;
+  if (last) {
+    // the passage being added has to continue from where the last one ended, in either
+    // direction, or the drawing jumps and cannot be compared with anything
+    if (edge.from === last.to) { frm = edge.from; to = edge.to; }
+    else if (edge.to === last.to) { frm = edge.to; to = edge.from; }
+    else {
+      setStatus(`ребро ${edge.id} не связано с ${last.to}: прошлый проход кончился там`,
+                "warn");
+      return false;
+    }
+  } else {
+    // first passage: which way along it is decided by which half was clicked, so the
+    // direction of travel is stated by the drawing rather than guessed
+    const a = nodeById(edge.from), b = nodeById(edge.to);
+    const pa = toScreen(a.x, a.y), pb = toScreen(b.x, b.y);
+    const dx = pb.x - pa.x, dy = pb.y - pa.y;
+    const len2 = dx * dx + dy * dy || 1;
+    let u = ((x - pa.x) * dx + (y - pa.y) * dy) / len2;
+    u = Math.max(0, Math.min(1, u));
+    if (u < 0.5) { frm = edge.from; to = edge.to; }
+    else { frm = edge.to; to = edge.from; }
+  }
+  S.truth.push({edge: edge.id, from: frm, to: to, t: (t === null ? null : +t.toFixed(2))});
+  S.truthSaved = false;
+  const tail = S.truth.slice(-4).map(r => r.edge).join(" → ");
+  setStatus(`маршрут: ${S.truth.length} рёбер, конец ${frm} → ${to}`
+            + (S.truth.length > 4 ? `  (…${tail})` : `  (${tail})`), "ok");
+  return true;
+}
+
+function truthPayload() {
+  return {
+    edges: S.truth.map(r => ({edge: r.edge, from: r.from, to: r.to, t: r.t})),
+    note: "нарисовано в редакторе P08, режим «Маршрут»",
+  };
+}
+
+/* --------------------------------------------------------------- picking */
+// Both pickers return the distance as well as the object. Choosing between them by which
+// is nearer is what makes a dense graph usable: with nodes and edges a few pixels apart,
+// giving nodes priority means a click intended for a passage selects a node instead, which
+// is how the first attempt at setting a start failed.
+function nearNode(sx, sy, limit) {
+  let best = null, bestD = limit || HIT_NODE;
+  for (const n of S.nodes) {
+    const p = toScreen(n.x, n.y);
+    const d = Math.hypot(p.x - sx, p.y - sy);
+    if (d < bestD) { bestD = d; best = n; }
+  }
+  return best ? {node: best, dist: bestD} : null;
+}
+function nearEdge(sx, sy, limit) {
+  let best = null, bestD = limit || HIT_EDGE;
+  for (const e of S.edges) {
+    const a = nodeById(e.from), b = nodeById(e.to);
+    if (!a || !b) continue;
+    const p = toScreen(a.x, a.y), q = toScreen(b.x, b.y);
+    const dx = q.x - p.x, dy = q.y - p.y;
+    const len2 = dx * dx + dy * dy || 1;
+    let t = ((sx - p.x) * dx + (sy - p.y) * dy) / len2;
+    t = Math.max(0, Math.min(1, t));
+    const d = Math.hypot(p.x + t * dx - sx, p.y + t * dy - sy);
+    if (d < bestD) { bestD = d; best = e; }
+  }
+  return best ? {edge: best, dist: bestD} : null;
+}
+// The point on an edge closest to the cursor, for snapping a new node onto a corridor. A
+// node placed by eye sits a few pixels off the line, and a few pixels here is a quarter of a
+// metre; snapping removes that error without any extra effort from the person drawing.
+function projectOnEdge(e, sx, sy) {
+  const a = nodeById(e.from), b = nodeById(e.to);
+  if (!a || !b) return null;
+  const p = toScreen(a.x, a.y), q = toScreen(b.x, b.y);
+  const dx = q.x - p.x, dy = q.y - p.y;
+  const len2 = dx * dx + dy * dy || 1;
+  let t = ((sx - p.x) * dx + (sy - p.y) * dy) / len2;
+  t = Math.max(0, Math.min(1, t));
+  const px = p.x + t * dx, py = p.y + t * dy;
+  const n = toNorm(px, py);
+  return {x: clamp01(n.x), y: clamp01(n.y), dist: Math.hypot(px - sx, py - sy), t};
+}
+
+function pickAt(sx, sy) {
+  const n = nearNode(sx, sy), e = nearEdge(sx, sy);
+  if (n && e) return n.dist <= e.dist ? {kind: "node", node: n.node} : {kind: "edge", edge: e.edge};
+  if (n) return {kind: "node", node: n.node};
+  if (e) return {kind: "edge", edge: e.edge};
+  return {kind: "none"};
+}
+function pickNode(sx, sy) {
+  const r = nearNode(sx, sy);
+  return r ? r.node : null;
+}
+function pickEdge(sx, sy) {
+  const r = nearEdge(sx, sy);
+  return r ? r.edge : null;
+}
+
+/* ---------------------------------------------------------------- events */
+function canvasPos(ev) {
+  const r = cv.getBoundingClientRect();
+  return {x: ev.clientX - r.left, y: ev.clientY - r.top};
+}
+
+cv.addEventListener("mousedown", ev => {
+  const {x, y} = canvasPos(ev);
+  const panning = ev.button === 1 || ev.shiftKey || ev.code === "Space";
+
+  if (panning) {
+    S.drag = {kind: "pan", sx: x, sy: y, ox: S.view.ox, oy: S.view.oy};
+    ev.preventDefault();
+    return;
+  }
+  if (ev.button !== 0) return;
+
+  const hit = pickAt(x, y);
+  let node = hit.kind === "node" ? hit.node : null;
+  const edge = hit.kind === "edge" ? hit.edge : null;
+
+  if (S.mode === "add") {
+    let pos = toNorm(x, y);
+    let snapped = null;
+    // A new node landing near an existing passage is put exactly on it, so that a corridor
+    // drawn by eye is straight rather than a millimetre off in every direction.
+    if (S.snap && !ev.altKey) {
+      const near = nearEdge(x, y, SNAP_EDGE);
+      if (near) {
+        const p = projectOnEdge(near.edge, x, y);
+        if (p) { pos = {x: p.x, y: p.y}; snapped = near.edge; }
+      }
+    }
+    snapshot();
+    const id = nextNodeId();
+    S.nodes.push({id, x: clamp01(pos.x), y: clamp01(pos.y)});
+    S.rawNodes[id] = {id};
+    S.sel = {type: "node", id};
+    refresh();
+    setStatus("узел " + id
+      + (snapped ? ` (на ребре ${snapped.id})` : "")
+      + `  ${(pos.x * imgW()).toFixed(0)}, ${(pos.y * imgH()).toFixed(0)} px`,
+      "ok");
+    return;
+  }
+
+  if (S.mode === "connect") {
+    // Snap to the nearest node even when the click lands a little way off it. Without this
+    // the second click of every connection has to hit a speck, which is what made joining
+    // two nodes impractical on a plan with a hundred of them.
+    if (!node) {
+      const nn = nearNode(x, y, SNAP_NODE);
+      if (nn) node = nn.node;
+    }
+    if (node) {
+      if (!S.connectFrom) {
+        S.connectFrom = node.id;
+        setStatus("первая точка " + node.id + ", теперь клик по второй (Alt — без магнита)");
+      } else if (S.connectFrom !== node.id) {
+        const id = S.connectFrom + "_" + node.id;
+        const dup = S.edges.some(e =>
+          (e.from === S.connectFrom && e.to === node.id) ||
+          (e.to === S.connectFrom && e.from === node.id));
+        if (dup) {
+          setStatus(`ребро ${S.connectFrom}–${node.id} уже есть; веду дальше от ${node.id}`,
+                    "warn");
+        } else {
+          snapshot();
+          S.edges.push({id, from: S.connectFrom, to: node.id, bidirectional: true});
+          S.rawEdges[id] = {id, from: S.connectFrom, to: node.id};
+          const a = nodeById(S.connectFrom), b = nodeById(node.id);
+          const metres = a && b && S.meters_per_pixel
+            ? Math.hypot((b.x - a.x) * imgW(), (b.y - a.y) * imgH()) * S.meters_per_pixel
+            : null;
+          setStatus(`ребро ${id}` + (metres ? ` — ${metres.toFixed(2)} м` : "")
+                    + `; продолжаю от ${node.id}, Esc — закончить`, "ok");
+          refresh();
+        }
+        // A corridor is drawn as a chain, so the node just connected becomes the start of
+        // the next edge. Otherwise every connection costs two clicks and a corridor of ten
+        // nodes costs twenty, which is half the work of drawing a floor by hand.
+        S.connectFrom = node.id;
+      }
+    } else {
+      const had = S.connectFrom;
+      S.connectFrom = null;
+      setStatus(had ? `цепочка от ${had} закончена` : "нужно кликнуть по точке", "ok");
+    }
+    draw();
+    return;
+  }
+
+  if (S.mode === "delete") {
+    if (node) {
+      snapshot();
+      S.nodes = S.nodes.filter(n => n.id !== node.id);
+      S.edges = S.edges.filter(e => e.from !== node.id && e.to !== node.id);
+      if (S.start && ((S.start.type === "node" && S.start.node === node.id) ||
+                      (S.start.type === "edge" &&
+                       !S.edges.some(e => e.id === S.start.edge)))) S.start = null;
+      S.sel = null;
+      refresh();
+      setStatus("удалён узел " + node.id);
+    } else if (edge) {
+      snapshot();
+      S.edges = S.edges.filter(e => e.id !== edge.id);
+      if (S.start && S.start.type === "edge" && S.start.edge === edge.id) S.start = null;
+      S.sel = null;
+      refresh();
+      setStatus("удалено ребро " + edge.id);
+    }
+    return;
+  }
+
+  if (S.mode === "line") {
+    S.line = [toNorm(x, y)];
+    S.lineBusy = true;
+    const norm = S.line[0];
+    S.line[0] = {x: clamp01(norm.x), y: clamp01(norm.y)};
+    setStatus("линия начата");
+    draw();
+    return;
+  }
+
+  if (S.mode === "truth") {
+    appendTruth(edge, x, y, null);
+    refresh();
+    draw();
+    return;
+  }
+
+  if (S.mode === "start") {
+    if (node) {
+      snapshot();
+      S.start = {type: "node", node: node.id};
+      refresh();
+      setStatus("старт с узла " + node.id);
+    } else if (edge) {
+      snapshot();
+      const same = S.start && S.start.type === "edge" && S.start.edge === edge.id;
+      if (same) {
+        // click again on the same edge flips the direction of travel. The swap has to
+        // be taken from the current start rather than from the edge's own endpoints,
+        // otherwise swapping twice lands back on the first value and the toggle does
+        // nothing.
+        S.start = {type: "edge", edge: edge.id, from: S.start.to, to: S.start.from};
+        setStatus("направление " + S.start.from + " → " + S.start.to);
+      } else {
+        S.start = {type: "edge", edge: edge.id, from: edge.from, to: edge.to};
+        setStatus("старт с ребра " + edge.from + " → " + edge.to);
+      }
+      refresh();
+    }
+    return;
+  }
+
+  // select mode
+  if (node) {
+    S.sel = {type: "node", id: node.id};
+    S.drag = {kind: "node", id: node.id, moved: false};
+  } else if (edge) {
+    S.sel = {type: "edge", id: edge.id};
+  } else {
+    S.sel = null;
+    S.drag = {kind: "pan", sx: x, sy: y, ox: S.view.ox, oy: S.view.oy};
+  }
+  refresh();
+});
+
+cv.addEventListener("mousemove", ev => {
+  const {x, y} = canvasPos(ev);
+  if (S.drag) {
+    if (S.drag.kind === "pan") {
+      S.view.ox = S.drag.ox + (x - S.drag.sx);
+      S.view.oy = S.drag.oy + (y - S.drag.sy);
+    } else if (S.lineBusy) {
+      const n = toNorm(x, y);
+      const last = S.line[S.line.length - 1];
+      // a point is only kept once the pointer has moved a few pixels, so the line does not
+      // become a thousand samples of one place
+      if (!last || Math.hypot(n.x - last.x, n.y - last.y) * imgW() > 3) {
+        S.line.push({x: clamp01(n.x), y: clamp01(n.y)});
+      }
+      draw();
+      return;
+    } else if (S.drag.kind === "node") {
+      if (!S.drag.moved) { snapshot(); S.drag.moved = true; }
+      const n = toNorm(x, y);
+      const node = nodeById(S.drag.id);
+      if (node) {
+        // nodes are allowed to sit outside the plan while being placed, they are
+        // clamped on mouse-up so a drag may pass beyond the edge without sticking
+        node.x = n.x; node.y = n.y;
+      }
+    }
+    draw();
+    return;
+  }
+  const hit = pickAt(x, y);
+  const h = hit.kind === "node" ? "n:" + hit.node.id
+          : hit.kind === "edge" ? "e:" + hit.edge.id : null;
+  S.cursorScr = {x, y};
+  // In connect mode the nearest node within the snap radius counts as hovered even when the
+  // pointer is a little way off, so the highlight matches what a click would take.
+  let hoverNode = hit.kind === "node" ? hit.node.id : null;
+  if (S.mode === "connect" && !hoverNode) {
+    const nn = nearNode(x, y, SNAP_NODE);
+    if (nn) hoverNode = nn.node.id;
+  }
+  // In add mode, show where a node would land if it snaps onto a passage.
+  let snapPrev = null;
+  if (S.mode === "add" && S.snap && !ev.altKey) {
+    const ne = nearEdge(x, y, SNAP_EDGE);
+    if (ne) {
+      const pr = projectOnEdge(ne.edge, x, y);
+      if (pr) snapPrev = {x: pr.x, y: pr.y};
+    }
+  }
+  const changed = h !== S.hover || hoverNode !== S.hoverNode
+                  || JSON.stringify(snapPrev) !== JSON.stringify(S.snapPreview);
+  S.hover = h;
+  S.hoverNode = hoverNode;
+  S.snapPreview = snapPrev;
+  if (changed) {
+    cv.style.cursor = hit.kind !== "none" || hoverNode ? "pointer"
+                    : (S.mode === "add" ? "crosshair" : "default");
+    draw();
+  }
+});
+
+window.addEventListener("mouseup", () => {
+  if (S.lineBusy) {
+    S.lineBusy = false;
+    // thin the line before it is sent: a hand produces far more points than the reading
+    // needs, and the reading resamples anyway
+    if (S.line.length > 40) {
+      const keep = [S.line[0]];
+      for (let k = 1; k < S.line.length - 1; k++) {
+        if (k % 3 === 0) keep.push(S.line[k]);
+      }
+      keep.push(S.line[S.line.length - 1]);
+      S.line = keep;
+    }
+    setStatus(`линия: ${S.line.length} точек · нажми «Привязать к графу»`, "ok");
+    return;
+  }
+  if (S.drag && S.drag.kind === "node") {
+    const node = nodeById(S.drag.id);
+    if (node) { node.x = clamp01(node.x); node.y = clamp01(node.y); }
+    if (S.drag.moved) refresh(); else draw();
+  }
+  S.drag = null;
+});
+
+// Ctrl or Cmd with the wheel: browsers report wheel deltas in different units, so
+// the factor is taken from the sign only and applied in fixed steps. Zooming is
+// anchored at the cursor, which is what keeps a small feature in place while the
+// scale changes.
+cv.addEventListener("wheel", ev => {
+  ev.preventDefault();
+  const {x, y} = canvasPos(ev);
+  const before = toNorm(x, y);
+  const f = ev.deltaY < 0 ? 1.12 : 1 / 1.12;
+  S.view.scale = Math.max(0.03, Math.min(40, S.view.scale * f));
+  S.view.ox = x - before.x * S.view.scale * imgW();
+  S.view.oy = y - before.y * S.view.scale * imgH();
+  draw();
+}, {passive: false});
+
+window.addEventListener("keydown", ev => {
+  if (ev.target.tagName === "INPUT" || ev.target.tagName === "SELECT") return;
+  if (ev.key === "Escape") {
+    S.connectFrom = null; S.drag = null;
+    setStatus("отменено");
+    draw();
+  } else if ((ev.key === "Delete" || ev.key === "Backspace") && S.sel) {
+    ev.preventDefault();
+    if (S.sel.type === "node") {
+      snapshot();
+      S.nodes = S.nodes.filter(n => n.id !== S.sel.id);
+      S.edges = S.edges.filter(e => e.from !== S.sel.id && e.to !== S.sel.id);
+    } else {
+      snapshot();
+      S.edges = S.edges.filter(e => e.id !== S.sel.id);
+    }
+    S.sel = null;
+    refresh();
+    setStatus("удалено");
+  } else if (ev.key === "1") setMode("select");
+  else if (ev.key === "2") setMode("add");
+  else if (ev.key === "3") setMode("connect");
+  else if (ev.key === "4") setMode("delete");
+  else if (ev.key === "5") setMode("start");
+  else if (ev.key === "6") setMode("truth");
+});
+
+function clamp01(v) { return Math.max(0, Math.min(1, v)); }
+
+/* ------------------------------------------------------------------- modes */
+const MODE_BTN = {select: "mSelect", add: "mAdd", connect: "mConnect",
+                  delete: "mDelete", start: "mStart", truth: "mTruth",
+                  line: "mLine"};
+function setMode(m) {
+  S.mode = m;
+  S.connectFrom = null;
+  for (const [k, id] of Object.entries(MODE_BTN)) {
+    document.getElementById(id).classList.toggle("on", k === m);
+  }
+  draw();
+}
+for (const [m, id] of Object.entries(MODE_BTN)) {
+  document.getElementById(id).addEventListener("click", () => setMode(m));
+}
+
+/* ------------------------------------------------------------ side panel */
+function refresh() {
+  document.getElementById("nNodes").textContent = S.nodes.length;
+  document.getElementById("nEdges").textContent = S.edges.length;
+  document.getElementById("planName").textContent = S.planName || "не загружен";
+
+  const si = document.getElementById("startInfo");
+  if (!S.start) si.textContent = "не задан";
+  else if (S.start.type === "node") si.textContent = "узел " + S.start.node;
+  else si.textContent = S.start.from + " → " + S.start.to;
+
+  // the same reading in the toolbar, so a click in start mode is confirmed where the eye
+  // already is rather than only in the side panel
+  const chip = document.getElementById("startChip");
+  if (chip) {
+    if (!S.start) {
+      chip.textContent = "не задан";
+      chip.style.color = "#f87171";
+    } else if (S.start.type === "node") {
+      chip.textContent = "узел " + S.start.node;
+      chip.style.color = "#4ade80";
+    } else {
+      chip.textContent = S.start.from + " → " + S.start.to +
+        (S.start.hypothesis ? " (гипотеза)" : "");
+      chip.style.color = S.start.hypothesis ? "#fbbf24" : "#4ade80";
+    }
+  }
+
+  const sb = document.getElementById("selBox");
+  if (!S.sel) sb.innerHTML = '<span class="muted">ничего</span>';
+  else if (S.sel.type === "node") {
+    const n = nodeById(S.sel.id);
+    if (!n) sb.innerHTML = '<span class="muted">ничего</span>';
+    else sb.innerHTML =
+      `<div class="row"><span>узел</span><span><code>${n.id}</code></span></div>` +
+      `<div class="row"><span>x</span><span>${n.x.toFixed(4)}</span></div>` +
+      `<div class="row"><span>y</span><span>${n.y.toFixed(4)}</span></div>` +
+      `<div class="row"><span>рёбер</span><span>${S.edges.filter(e => e.from === n.id || e.to === n.id).length}</span></div>` +
+      (S.start ? "" : `<button id="setStartNode" style="width:100%;margin-top:6px">сделать стартом</button>`);
+    const b = document.getElementById("setStartNode");
+    if (b) b.addEventListener("click", () => {
+      snapshot(); S.start = {type: "node", node: n.id}; refresh(); setStatus("старт с узла " + n.id);
+    });
+  } else {
+    const e = edgeById(S.sel.id);
+    if (!e) sb.innerHTML = '<span class="muted">ничего</span>';
+    else {
+      const a = nodeById(e.from), b = nodeById(e.to);
+      const dxm = a && b ? Math.hypot((b.x - a.x) * imgW(), (b.y - a.y) * imgH()) : 0;
+      const rec = (S.rawEdges[e.id] || {}).length_meters;
+      sb.innerHTML =
+        `<div class="row"><span>ребро</span><span><code>${e.id}</code></span></div>` +
+        `<div class="row"><span>от</span><span>${e.from}</span></div>` +
+        `<div class="row"><span>до</span><span>${e.to}</span></div>` +
+        `<div class="row"><span>длина, px</span><span>${dxm.toFixed(1)}</span></div>` +
+        (rec != null
+          ? `<div class="row"><span>длина из файла</span><span>${Number(rec).toFixed(2)} м</span></div>`
+          : "") +
+        (S.meters_per_pixel
+          ? `<div class="row"><span>длина, м</span><span>${(dxm * S.meters_per_pixel).toFixed(2)}</span></div>`
+          : `<div class="row"><span>длина, м</span><span class="muted">масштаб не задан</span></div>`) +
+        `<div class="row"><span>тип</span><span>${e.bidirectional ? "двустороннее" : "одностороннее"}</span></div>`;
+    }
+  }
+
+  const et = document.getElementById("edgeTable");
+  et.innerHTML = "";
+  for (const e of S.edges) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td><code>${e.from}→${e.to}</code></td>` +
+      `<td><input type="checkbox" ${e.bidirectional ? "checked" : ""}></td>`;
+    tr.querySelector("input").addEventListener("change", ev => {
+      snapshot();
+      e.bidirectional = ev.target.checked;
+      refresh();
+      setStatus("ребро " + e.id + ": " + (e.bidirectional ? "двустороннее" : "одностороннее"));
+    });
+    et.appendChild(tr);
+  }
+
+  const nt = document.getElementById("nodeTable");
+  nt.innerHTML = "";
+  for (const n of S.nodes) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td><code>${n.id}</code></td><td>${n.x.toFixed(3)}</td><td>${n.y.toFixed(3)}</td>`;
+    tr.style.cursor = "pointer";
+    tr.addEventListener("click", () => { S.sel = {type: "node", id: n.id}; refresh(); });
+    nt.appendChild(tr);
+  }
+
+  const tc = document.getElementById("truthCount");
+  if (tc) {
+    tc.textContent = S.truth.length;
+    const tl = document.getElementById("truthList");
+    tl.textContent = S.truth.length
+      ? S.truth.map((r, k) => (r.t === null ? "" : `${r.t.toFixed(1)}с `) + r.edge).join("\n")
+      : "";
+    tl.style.color = S.truthSaved ? "#4ade80" : "#fbbf24";
+  }
+
+  fillStartSelects();
+
+  const ks = document.getElementById("kdEdge");
+  const keep = ks.value;
+  ks.innerHTML = "";
+  for (const e of S.edges) {
+    const o = document.createElement("option");
+    o.value = e.id; o.textContent = e.id;
+    ks.appendChild(o);
+  }
+  if (keep && S.edges.some(e => e.id === keep)) ks.value = keep;
+
+  // reflect the current start in the two selects
+  const sn = document.getElementById("startNode");
+  const sf = document.getElementById("startFrom");
+  if (sn && S.start) {
+    if (S.start.type === "at_node") { sn.value = S.start.node; sf.value = S.start.from_node || ""; }
+    else if (S.start.type === "node") { sn.value = S.start.node; sf.value = ""; }
+  }
+
+  const note = document.getElementById("kdNote");
+  if (S.known_distance) {
+    const e = edgeById(S.known_distance.edge);
+    if (e) {
+      const a = nodeById(e.from), b = nodeById(e.to);
+      const px = Math.hypot((b.x - a.x) * imgW(), (b.y - a.y) * imgH());
+      note.innerHTML = `задано: <code>${S.known_distance.edge}</code> = ` +
+        `${S.known_distance.meters} м, отсюда ` +
+        `<code>${(S.known_distance.meters / px).toFixed(5)}</code> м/пиксель`;
+      return;
+    }
+  }
+  note.innerHTML = S.meters_per_pixel
+    ? `задано напрямую: <code>${S.meters_per_pixel}</code> м/пиксель`
+    : "если не задан — работаем в условных единицах";
+}
+
+document.getElementById("mpp").addEventListener("change", ev => {
+  const v = parseFloat(ev.target.value);
+  S.meters_per_pixel = isFinite(v) && v > 0 ? v : null;
+  if (S.meters_per_pixel) S.known_distance = null;
+  refresh();
+});
+document.getElementById("kdSet").addEventListener("click", () => {
+  const id = document.getElementById("kdEdge").value;
+  const m = parseFloat(document.getElementById("kdMeters").value);
+  if (!id || !isFinite(m) || m <= 0) { setStatus("нужно ребро и положительное расстояние", "warn"); return; }
+  S.known_distance = {edge: id, meters: m};
+  const e = edgeById(id), a = nodeById(e.from), b = nodeById(e.to);
+  const px = Math.hypot((b.x - a.x) * imgW(), (b.y - a.y) * imgH());
+  S.meters_per_pixel = m / px;
+  refresh();
+  setStatus(`масштаб из ${id} = ${m} м: ${S.meters_per_pixel.toFixed(5)} м/пиксель`, "ok");
+});
+function fillStartSelects() {
+  const ns = document.getElementById("startNode");
+  const fs = document.getElementById("startFrom");
+  if (!ns || !fs) return;
+  const keepN = ns.value, keepF = fs.value;
+  ns.innerHTML = '<option value="">—</option>';
+  for (const n of [...S.nodes].sort((a, b) => a.id.localeCompare(b.id))) {
+    const o = document.createElement("option");
+    o.value = n.id; o.textContent = n.id;
+    // a start is nearly always at a junction; the option is marked so it can be found
+    o.textContent = n.id + (S.edges.filter(e => e.from === n.id || e.to === n.id).length >= 3
+      ? " ·развилка" : "");
+    ns.appendChild(o);
+  }
+  ns.value = keepN;
+  const refreshFrom = () => {
+    const at = ns.value;
+    fs.innerHTML = '<option value="">—</option>';
+    if (at) {
+      const nb = [];
+      for (const e of S.edges) {
+        if (e.from === at) nb.push(e.to);
+        else if (e.to === at) nb.push(e.from);
+      }
+      for (const id of [...new Set(nb)].sort()) {
+        const o = document.createElement("option");
+        o.value = id; o.textContent = id;
+        fs.appendChild(o);
+      }
+    }
+    fs.value = keepF;
+  };
+  refreshFrom();
+  ns.onchange = () => { keepF = ""; refreshFrom(); };
+}
+
+document.getElementById("applyStart").addEventListener("click", () => {
+  const at = document.getElementById("startNode").value;
+  const frm = document.getElementById("startFrom").value;
+  if (!at) { setStatus("выберите узел, где стоит человек", "warn"); return; }
+  snapshot();
+  S.start = frm
+    ? {type: "at_node", node: at, from_node: frm}
+    : {type: "node", node: at};
+  refresh();
+  draw();
+  setStatus(frm
+    ? `старт: в узле ${at}, пришёл со стороны ${frm}`
+    : `старт: узел ${at}, направление по первому ребру (менее точно)`, "ok");
+});
+
+/* --------------------------------------------------------- loading a graph */
+// Reading a graph file. Two formats arrive: the editor's own, where coordinates are
+// fractions of the plan, and the source format used to draw the plan, where they are pixels
+// of that image. Both are accepted, because the graph of a building is usually produced by
+// another program and re-typing it by hand would defeat the point of having a plan at all.
+//
+// Edges marked `enabled: false` are dropped: they are passages the source says are closed,
+// and keeping them would offer the tracker routes through walls. Nodes that end up with no
+// edge go too, since nothing can reach them. Two nodes joined twice are merged with a note,
+// because a passage the system cannot tell apart from its twin creates a choice where the
+// building has none — that defect cost real time on this very graph.
+function graphFromJson(doc) {
+  const out = {nodes: [], edges: [], problems: [], notes: [], merged: [], dropped: 0};
+  if (!doc || typeof doc !== "object") {
+    out.problems.push("файл не похож на граф: это не объект JSON");
+    return out;
+  }
+  const rawNodes = doc.nodes || [];
+  const rawEdges = doc.edges || [];
+  if (!rawNodes.length) { out.problems.push("в файле нет узлов (nodes)"); return out; }
+
+  const W = +(doc.width || doc.img_w || imgW());
+  const H = +(doc.height || doc.img_h || imgH());
+  const looksPixel = !!(doc.width && doc.height)
+    || rawNodes.some(n => Math.abs(+n.x) > 1.0001 || Math.abs(+n.y) > 1.0001);
+  out.pixelSpace = looksPixel;
+  out.img_w = W;
+  out.img_h = H;
+
+  const seen = new Set();
+  for (const n of rawNodes) {
+    const id = String(n.id);
+    if (n.enabled === false) { out.dropped++; continue; }
+    if (seen.has(id)) { out.problems.push(`узел ${id} встречается дважды`); continue; }
+    seen.add(id);
+    const x = +n.x, y = +n.y;
+    if (!isFinite(x) || !isFinite(y)) { out.problems.push(`у узла ${id} нет координат`); continue; }
+    const nx = looksPixel ? x / W : x;
+    const ny = looksPixel ? y / H : y;
+    if (nx < -0.001 || nx > 1.001 || ny < -0.001 || ny > 1.001) {
+      out.problems.push(`узел ${id} вне плана: ${nx.toFixed(3)}, ${ny.toFixed(3)}`);
+      continue;
+    }
+    out.nodes.push({id, x: Math.max(0, Math.min(1, nx)), y: Math.max(0, Math.min(1, ny)),
+                    _orig: n});
+  }
+
+  const ids = new Set(out.nodes.map(n => n.id));
+  const byPair = new Map();
+  const edgeIds = new Set();
+  for (const e of rawEdges) {
+    if (e.enabled === false) { out.dropped++; continue; }
+    const id = String(e.id || `${e.from}_${e.to}`);
+    const a = String(e.from), b = String(e.to);
+    if (!ids.has(a) || !ids.has(b)) { out.problems.push(`ребро ${id} ссылается на неизвестный узел`); continue; }
+    if (a === b) { out.problems.push(`ребро ${id} соединяет узел сам с собой`); continue; }
+    if (edgeIds.has(id)) { out.problems.push(`ребро ${id} встречается дважды`); continue; }
+    edgeIds.add(id);
+    const key = [a, b].sort().join("|");
+    if (byPair.has(key)) {
+      out.merged.push([byPair.get(key).id, id]);
+      continue;
+    }
+    const rec = {id, from: a, to: b, bidirectional: e.bidirectional !== false, _orig: e};
+    byPair.set(key, rec);
+    out.edges.push(rec);
+  }
+
+  // drop nodes nothing can reach
+  const used = new Set();
+  for (const e of out.edges) { used.add(e.from); used.add(e.to); }
+  const before = out.nodes.length;
+  out.nodes = out.nodes.filter(n => used.has(n.id));
+  out.orphans = before - out.nodes.length;
+
+  const st = doc.start;
+  if (st && (st.node || st.edge || st.from_node)) out.start = st;
+  const mpp = doc.meters_per_pixel;
+  if (mpp) out.meters_per_pixel = +mpp;
+  if (doc.known_distance) out.known_distance = doc.known_distance;
+  out.image = doc.image || null;
+  return out;
+}
+
+function loadGraphFile(file) {
+  const rd = new FileReader();
+  rd.onload = () => {
+    let doc;
+    try {
+      doc = JSON.parse(rd.result);
+    } catch (err) {
+      setStatus("файл графа не разобрался: " + err.message, "bad");
+      return;
+    }
+    const g = graphFromJson(doc);
+    const summary = `${g.nodes.length} узлов, ${g.edges.length} рёбер`
+      + (g.pixelSpace ? ", координаты были в пикселях плана — пересчитаны" : "")
+      + (g.merged.length ? `, слито дублей: ${g.merged.length}` : "")
+      + (g.orphans ? `, отброшено одиноких узлов: ${g.orphans}` : "")
+      + (g.dropped ? `, пропущено отключённых: ${g.dropped}` : "");
+
+    if (!g.nodes.length || !g.edges.length) {
+      setStatus("в файле не нашлось пригодных узлов и рёбер. " + g.problems.slice(0, 2).join("; "),
+                "bad");
+      return;
+    }
+    if (g.problems.length) {
+      console.warn("замечания к файлу:", g.problems);
+    }
+
+    if (S.nodes.length || S.edges.length) {
+      const ok = confirm(
+        `В редакторе уже есть граф: ${S.nodes.length} узлов, ${S.edges.length} рёбер.\n\n`
+        + `Заменить его на загруженный (${g.nodes.length} узлов, ${g.edges.length} рёбер)?\n\n`
+        + `Отменить это будет нельзя, если не сохранён текущий.`);
+      if (!ok) { setStatus("загрузка отменена, граф не тронут"); return; }
+    }
+
+    snapshot();
+    S.rawNodes = {};
+    S.rawEdges = {};
+    for (const n of g.nodes) S.rawNodes[n.id] = n._orig;
+    for (const e of g.edges) S.rawEdges[e.id] = e._orig;
+    S.nodes = g.nodes.map(n => ({id: n.id, x: n.x, y: n.y}));
+    S.edges = g.edges.map(e => ({id: e.id, from: e.from, to: e.to,
+                                 bidirectional: e.bidirectional}));
+    if (g.img_w) S.imgW = g.img_w;
+    if (g.img_h) S.imgH = g.img_h;
+    S.meters_per_pixel = g.meters_per_pixel || null;
+    S.known_distance = g.known_distance || null;
+    if (g.image) S.planName = g.image;
+    // a start naming nodes that no longer exist is dropped rather than kept dangling
+    const have = new Set(S.nodes.map(n => n.id));
+    S.start = null;
+    if (g.start) {
+      const st = g.start;
+      if (st.node && have.has(st.node)) S.start = {type: "node", node: st.node};
+      else if (st.edge && S.edges.some(e => e.id === st.edge)) {
+        S.start = {type: "edge", edge: st.edge, from: st.from, to: st.to};
+      } else if (st.from_node && st.node && have.has(st.node) && have.has(st.from_node)) {
+        S.start = {type: "at_node", node: st.node, from_node: st.from_node};
+      }
+    }
+    S.truth = [];
+    S.truthSaved = false;
+    S.rawDoc = null;   // the file as saved will be rebuilt from what was loaded
+    fit();
+    refresh();
+    setStatus("граф загружен: " + summary
+      + (g.start ? "" : " · старт не задан, укажите его вручную"), "ok");
+  };
+  rd.onerror = () => setStatus("не удалось прочитать файл", "bad");
+  rd.readAsText(file);
+}
+
+document.getElementById("graphFile").addEventListener("change", ev => {
+  const f = ev.target.files && ev.target.files[0];
+  if (f) loadGraphFile(f);
+  ev.target.value = "";   // so the same file can be loaded again after editing it
+});
+
+document.getElementById("dlGraph").addEventListener("click", () => {
+  if (!S.nodes.length) { setStatus("нечего скачивать: графа нет", "warn"); return; }
+  const blob = new Blob([JSON.stringify(graphDoc(), null, 2)],
+                        {type: "application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `graph_${(S.planName || "plan").replace(/\\.[a-z]+$/i, "")}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  setStatus(`скачано: ${S.nodes.length} узлов, ${S.edges.length} рёбер`, "ok");
+});
+
+document.getElementById("clearStart").addEventListener("click", () => {
+  snapshot(); S.start = null; refresh(); setStatus("старт сброшен");
+});
+
+/* -------------------------------------------------------------- toolbar */
+document.getElementById("lineClear").addEventListener("click", () => {
+  S.line = [];
+  document.getElementById("lineInfo").textContent = "";
+  draw();
+  setStatus("линия стёрта");
+});
+
+document.getElementById("lineSnap").addEventListener("click", async () => {
+  const info = document.getElementById("lineInfo");
+  if (S.line.length < 2) { setStatus("сначала проведи линию по плану", "warn"); return; }
+  info.textContent = "привязываю…";
+  try {
+    const r = await fetch("/api/p08/snap", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({points: S.line.map(p => [p.x, p.y])}),
+    });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || j.reason || "не удалось");
+    const t = (document.getElementById("video") || {}).currentTime;
+    const t0 = TANNOT && isFinite(t) ? t : null;
+    S.truth = j.edges.map(e => ({edge: e.edge, from: e.from, to: e.to, t: t0}));
+    S.truthSaved = false;
+    refreshTruthPanel();
+    refresh();
+    draw();
+    const bad = (j.unreachable || []).length;
+    info.innerHTML =
+      `прочитано ${j.n_edges} рёбер, разных ${j.distinct}`
+      + `<br>совпадение с проходами ${j.mean_dist_to_graph_px} px`
+      + `<br>перезахватов ${j.reanchors}, связок ${j.bridges_inserted}`
+      + (j.dropped_off_graph ? `<br>точек вне графа отброшено ${j.dropped_off_graph}` : "")
+      + (bad ? `<br><span style="color:#f87171">разрывов ${bad}</span>` : "");
+    setStatus(`линия привязана: ${j.n_edges} рёбер`, bad ? "warn" : "ok");
+  } catch (err) {
+    info.textContent = "";
+    setStatus("привязка не удалась: " + err.message, "bad");
+  }
+});
+
+document.getElementById("truthSave").addEventListener("click", async () => {
+  if (S.truth.length < 2) { setStatus("нужно хотя бы два ребра", "warn"); return; }
+  try {
+    const r = await fetch("/api/p08/truth", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(truthPayload()),
+    });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || "save failed");
+    S.truthSaved = true;
+    draw();
+    refresh();
+    setStatus(`маршрут сохранён: ${j.edges} рёбер`, "ok");
+  } catch (err) {
+    setStatus("ошибка сохранения маршрута: " + err.message, "bad");
+  }
+});
+document.getElementById("truthCompare").addEventListener("click", async () => {
+  const boxes = [document.getElementById("truthResult"),
+                 document.getElementById("tResult")].filter(Boolean);
+  for (const b of boxes) { b.textContent = "сравниваю…"; b.style.color = "#8b93a7"; }
+  try {
+    const r = await fetch("/api/p08/compare");
+    const j = await r.json();
+    const bad = j.first_divergence !== null && j.first_divergence !== undefined
+                && j.first_divergence < (j.truth_edges || 0);
+    const col = j.ok === false ? "#f87171" : bad ? "#fbbf24" : "#4ade80";
+    for (const b of boxes) { b.style.color = col; b.textContent = (j.lines || []).join("\n"); }
+    if (bad && j.junction_rows) {
+      // show where it happened: the node and both outgoing passages
+      const firstBad = j.junction_rows.find(r => r.status === "ошибка");
+      const at = firstBad ? firstBad.at : (j.divergence && j.divergence.at_node);
+      const n = nodeById(at);
+      if (n) {
+        const stage = document.getElementById("stage");
+        const target = 0.55;
+        S.view.scale = target;
+        S.view.ox = stage.clientWidth / 2 - target * n.x * imgW();
+        S.view.oy = stage.clientHeight / 2 - target * n.y * imgH();
+        S.sel = {type: "node", id: at};
+        setMode("select");
+        draw();
+      }
+    }
+    setStatus(bad ? "есть расхождение — показано ниже" : "расхождений нет",
+              bad ? "warn" : "ok");
+  } catch (err) {
+    box.style.color = "#f87171";
+    box.textContent = "не удалось сравнить: " + err.message;
+  }
+});
+document.getElementById("truthClear").addEventListener("click", () => {
+  if (!S.truth.length) return;
+  S.truth = [];
+  S.truthSaved = false;
+  document.getElementById("truthResult").textContent = "";
+  refresh();
+  draw();
+  setStatus("маршрут очищен");
+});
+document.getElementById("tidy").addEventListener("click", () => {
+  const used = new Set();
+  for (const e of S.edges) { used.add(e.from); used.add(e.to); }
+  const lonely = S.nodes.filter(n => !used.has(n.id));
+  if (!lonely.length) { setStatus("одиноких узлов нет", "ok"); return; }
+  const preview = lonely.slice(0, 8).map(n => n.id).join(", ");
+  if (!confirm(`Удалить ${lonely.length} узлов, не соединённых ни с чем?\n\n${preview}`
+    + (lonely.length > 8 ? " …" : ""))) return;
+  snapshot();
+  S.nodes = S.nodes.filter(n => used.has(n.id));
+  for (const n of lonely) delete S.rawNodes[n.id];
+  S.sel = null;
+  refresh();
+  draw();
+  setStatus(`удалено одиноких узлов: ${lonely.length}`, "ok");
+});
+
+document.getElementById("undo").addEventListener("click", undo);
+document.getElementById("fit").addEventListener("click", fit);
+document.getElementById("labels").addEventListener("change", ev => {
+  S.showLabels = ev.target.checked;
+  draw();
+});
+document.getElementById("snapChk").addEventListener("change", ev => {
+  S.snap = ev.target.checked;
+  setStatus(S.snap
+    ? "магнит включён: новые узлы встают точно на ближайший проход"
+    : "магнит выключен: узлы ставятся туда, где кликнул");
+  draw();
+});
+document.getElementById("zoomSel").addEventListener("click", zoomToSelection);
+document.getElementById("clear").addEventListener("click", () => {
+  if (!S.nodes.length && !S.edges.length) return;
+  if (!confirm("Очистить весь граф? Точки и рёбра будут удалены.")) return;
+  snapshot();
+  S.nodes = []; S.edges = []; S.start = null; S.sel = null; S.connectFrom = null;
+  S.rawNodes = {}; S.rawEdges = {};
+  refresh();
+  setStatus("граф очищен");
+});
+
+function graphDoc() {
+  // Fields the editor does not manage are carried through untouched. The imported graph
+  // has more on each edge than the editor draws — a measured length in metres, the id it
+  // came from, a width — and an earlier version of this function wrote only the four
+  // fields it knows about, so saving from the editor silently stripped the measured
+  // lengths off all 205 edges. Saving must not lose anything the file arrived with.
+  const keepNode = n => Object.assign({}, S.rawNodes[n.id] || {}, {
+    id: n.id, x: +n.x.toFixed(6), y: +n.y.toFixed(6),
+  });
+  const keepEdge = e => Object.assign({}, S.rawEdges[e.id] || {}, {
+    id: e.id, from: e.from, to: e.to, bidirectional: !!e.bidirectional,
+  });
+  return {
+    // unknown top-level fields survive as well, for the same reason
+    ...Object.assign({}, S.rawDoc || {}, {
+      image: S.planName || "plan.png",
+      img_w: imgW(),
+      img_h: imgH(),
+      nodes: S.nodes.map(keepNode),
+      edges: S.edges.map(keepEdge),
+      start: S.start,
+      meters_per_pixel: S.meters_per_pixel,
+      known_distance: S.known_distance,
+    }),
+  };
+}
+
+document.getElementById("save").addEventListener("click", async () => {
+  if (!S.nodes.length) { setStatus("нечего сохранять: нет точек", "warn"); return; }
+  try {
+    const r = await fetch("/api/p08/save", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify(graphDoc()),
+    });
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || "save failed");
+    setStatus(`сохранено: ${j.nodes} узлов, ${j.edges} рёбер → ${j.path}`
+              + (j.stale_output ? "  ·  " + j.stale_output : ""),
+              j.stale_output ? "warn" : "ok");
+  } catch (err) {
+    setStatus("ошибка сохранения: " + err.message, "bad");
+  }
+});
+
+document.getElementById("reload").addEventListener("click", loadFromDisk);
+
+document.getElementById("planFile").addEventListener("change", async ev => {
+  const f = ev.target.files && ev.target.files[0];
+  if (!f) return;
+  const img = new Image();
+  const url = URL.createObjectURL(f);
+  await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
+  S.image = img;
+  S.planName = "plan" + (f.type === "image/png" ? ".png" : ".jpg");
+  fit();
+  refresh();
+  // upload so the plan survives a reload; the editor works either way
+  try {
+    const b64 = await new Promise(res => {
+      const fr = new FileReader();
+      fr.onload = () => res(fr.result);
+      fr.readAsDataURL(f);
+    });
+    const r = await fetch("/api/p08/plan", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({name: f.name, data: b64}),
+    });
+    const j = await r.json();
+    if (j.ok) { S.planName = j.saved_as; setStatus("план загружен: " + j.saved_as, "ok"); }
+    else setStatus("план показан, но не сохранился: " + (j.error || "?"), "warn");
+  } catch (err) {
+    setStatus("план показан локально, сервер недоступен", "warn");
+  }
+  refresh();
+});
+
+async function loadFromDisk() {
+  try {
+    const r = await fetch("/api/p08/state");
+    const j = await r.json();
+    const g = j.graph || {};
+    S.rawDoc = g;
+    S.rawNodes = {};
+    for (const n of (g.nodes || [])) S.rawNodes[n.id] = n;
+    S.rawEdges = {};
+    for (const e of (g.edges || [])) S.rawEdges[e.id] = e;
+    S.nodes = (g.nodes || []).map(n => ({id: n.id, x: +n.x, y: +n.y}));
+    S.edges = (g.edges || []).map(e => ({id: e.id, from: e.from, to: e.to,
+                                         bidirectional: e.bidirectional !== false}));
+    S.start = g.start || null;
+    // the graph's own pixel size wins: it keeps the geometry right if the image is
+    // missing or has been replaced by a different resolution
+    S.imgW = g.img_w || null;
+    S.imgH = g.img_h || null;
+    S.meters_per_pixel = g.meters_per_pixel || null;
+    S.known_distance = g.known_distance || null;
+    S.undo = [];
+    if (j.plan_url) {
+      const img = new Image();
+      await new Promise(res => {
+        img.onload = res; img.onerror = res;
+        img.src = j.plan_url + "?t=" + Date.now();
+      });
+      if (img.naturalWidth) { S.image = img; S.planName = g.image || "plan.png"; }
+    }
+    try {
+      const tr = await fetch("/api/p08/truth");
+      const tj = await tr.json();
+      if (tj && tj.edges && tj.edges.length) {
+        S.truth = tj.edges.map(r => ({edge: r.edge, from: r.from, to: r.to,
+                                      t: (r.t === null || r.t === undefined) ? null : +r.t}));
+        S.truthSaved = true;
+      }
+    } catch (err) { /* the drawn route is optional */ }
+    if (S.image) fit(); else draw();
+    refresh();
+    setStatus(`загружено с диска: ${S.nodes.length} узлов, ${S.edges.length} рёбер`
+      + (j.graph_exists ? "" : " (файла на диске не было)")
+      + (S.start && S.start.hypothesis
+         ? " · ВНИМАНИЕ: старт помечен как гипотеза, укажите настоящий и сохраните"
+         : ""),
+      S.start && S.start.hypothesis ? "warn" : "muted");
+  } catch (err) {
+    setStatus("не удалось загрузить: " + err.message, "bad");
+  }
+}
+
+/* ---------------------------------------------------------- tracking tab */
+document.querySelectorAll(".tab").forEach(t => {
+  t.addEventListener("click", () => {
+    const which = t.dataset.tab;
+    document.querySelectorAll(".tab").forEach(x => x.classList.toggle("on", x === t));
+    document.getElementById("edit").style.display = which === "edit" ? "flex" : "none";
+    document.getElementById("tracking").classList.toggle("on", which === "track");
+    if (which === "track") { loadTracking(); sizeTracking(); }
+    else resize();
+  });
+});
+
+let TRACK = null;
+// The tracking view has its own transform, independent of the graph tab's. Without it the
+// whole 5298 by 3743 plan is squeezed into half the window and an edge is a couple of
+// pixels long, which is what made marking a route impractical: there was nothing to aim at.
+let TV = {sc: 1, ox: 0, oy: 0, fitted: false};
+let TVIEW = {sc: 1, ox: 0, oy: 0};   // what the last draw used, for hit testing
+let TANNOT = false;                  // clicks on the tracking plan mark the route
+let TLINE = false;                   // dragging on the tracking plan draws a free line
+let TFOLLOW = false;                 // the view follows the position P08 computed
+let THOVER = null;                   // edge id under the cursor
+let TDRAG = null;
+
+function tW() { return imgW(); }
+function tH() { return imgH(); }
+function tScreen(nx, ny) {
+  return {x: TV.ox + TV.sc * nx * tW(), y: TV.oy + TV.sc * ny * tH()};
+}
+function tNorm(sx, sy) {
+  return {x: (sx - TV.ox) / (TV.sc * tW()), y: (sy - TV.oy) / (TV.sc * tH())};
+}
+function tFit() {
+  const box = document.getElementById("tgraph");
+  const k = Math.min(box.clientWidth / tW(), box.clientHeight / tH()) * 0.94;
+  TV.sc = k;
+  TV.ox = (box.clientWidth - k * tW()) / 2;
+  TV.oy = (box.clientHeight - k * tH()) / 2;
+}
+function tZoomAt(sx, sy, factor) {
+  const before = tNorm(sx, sy);
+  TV.sc = Math.max(0.05, Math.min(60, TV.sc * factor));
+  TV.ox = sx - before.x * TV.sc * tW();
+  TV.oy = sy - before.y * TV.sc * tH();
+}
+function tCenterOn(nx, ny, sc) {
+  const box = document.getElementById("tgraph");
+  if (sc) TV.sc = sc;
+  TV.ox = box.clientWidth / 2 - TV.sc * nx * tW();
+  TV.oy = box.clientHeight / 2 - TV.sc * ny * tH();
+}
+function tScreenToNode(id) {
+  const n = nodeById(id);
+  return n ? tScreen(n.x, n.y) : null;
+}
+// which of the three is the best candidate for a click at this point. Returns the screen
+// distance too, so a node does not steal a click meant for a passage right beside it.
+function tPickEdge(sx, sy) {
+  let best = null, bestD = Math.max(10, 7 / 1) ;
+  bestD = 14;
+  for (const e of S.edges) {
+    const a = nodeById(e.from), b = nodeById(e.to);
+    if (!a || !b) continue;
+    const p = tScreen(a.x, a.y), q = tScreen(b.x, b.y);
+    const dx = q.x - p.x, dy = q.y - p.y;
+    const len2 = dx * dx + dy * dy || 1;
+    let u = ((sx - p.x) * dx + (sy - p.y) * dy) / len2;
+    u = Math.max(0, Math.min(1, u));
+    const d = Math.hypot(p.x + u * dx - sx, p.y + u * dy - sy);
+    if (d < bestD) { bestD = d; best = e; }
+  }
+  return best ? {edge: best, dist: bestD} : null;
+}
+
+async function loadTracking() {
+  const r = await fetch("/api/p08/tracking");
+  const j = await r.json();
+  TRACK = j;
+  const info = document.getElementById("tinfo");
+  // The clip belongs to the recording, not to the tracking data. It used to be attached after
+  // the availability check, so a recording whose tracker had not been run yet showed no video at
+  // all — which is exactly the state a new recording starts in, and exactly when the video is
+  // needed to see where the walk began. Attach it first, then report on the tracking.
+  const v = document.getElementById("video");
+  if (j.video && v.getAttribute("src") !== j.video) v.src = j.video;
+  if (!j.available) {
+    info.innerHTML = `<b>${j.video_name || ""}</b><br>` +
+      '<span class="muted">данных трекинга пока нет — маршрут ещё не построен. ' +
+      'Видео доступно, размечайте старт в закладке ГРАФ (кнопка «Старт»).</span>';
+    return;
+  }
+  info.innerHTML = `<b>${j.video_name || ""}</b><br>` +
+    `рёбер в последовательности: ${j.edge_sequence.length}<br>` +
+    `<table id="tstate"></table>`;
+  if (!TV.fitted) { tFit(); TV.fitted = true; }
+  refreshTruthPanel();
+  drawTracking();
+}
+
+function sizeTracking() {
+  const box = document.getElementById("tgraph");
+  const c = document.getElementById("tcv");
+  const dpr = window.devicePixelRatio || 1;
+  c.width = Math.round(box.clientWidth * dpr);
+  c.height = Math.round(box.clientHeight * dpr);
+  c.style.width = box.clientWidth + "px";
+  c.style.height = box.clientHeight + "px";
+  c.getContext("2d").setTransform(dpr, 0, 0, dpr, 0, 0);
+  if (!TV.fitted) { tFit(); TV.fitted = true; }
+  drawTracking();
+}
+
+window.addEventListener("resize", () => {
+  if (document.getElementById("tracking").classList.contains("on")) sizeTracking();
+  else resize();
+});
+
+function drawTruthOnTracking(ctx2, P) {
+  if (!S.truth.length) return;
+  ctx2.lineWidth = Math.max(2, Math.min(12, TV.sc * 9));
+  ctx2.strokeStyle = S.truthSaved ? "#22c55e" : "#fbbf24";
+  ctx2.setLineDash(S.truthSaved ? [] : [9, 5]);
+  ctx2.beginPath();
+  S.truth.forEach((r2, k) => {
+    const a = nodeById(r2.from), b = nodeById(r2.to);
+    if (!a || !b) return;
+    const pa = P(a), pb = P(b);
+    if (k === 0) ctx2.moveTo(pa.x, pa.y);
+    ctx2.lineTo(pb.x, pb.y);
+  });
+  ctx2.stroke();
+  ctx2.setLineDash([]);
+}
+
+function drawTracking() {
+  const c = document.getElementById("tcv");
+  const ctx2 = c.getContext("2d");
+  const box = document.getElementById("tgraph");
+  const cw = box.clientWidth, ch = box.clientHeight;
+  const dpr = window.devicePixelRatio || 1;
+  ctx2.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx2.clearRect(0, 0, cw, ch);
+  ctx2.fillStyle = "#0c0e13";
+  ctx2.fillRect(0, 0, cw, ch);
+  if (!TRACK || !TRACK.available) return;
+
+  const sc = TV.sc, ox = TV.ox, oy = TV.oy;
+  const P = (n) => ({x: ox + sc * n.x * tW(), y: oy + sc * n.y * tH()});
+  TVIEW = {sc, ox, oy};
+
+  if (S.image) ctx2.drawImage(S.image, ox, oy, sc * tW(), sc * tH());
+
+  const vt = document.getElementById("video").currentTime || 0;
+  const seq = TRACK.edge_sequence || [];
+  let current = null;
+  for (const s of seq) { if (vt >= s.time_start && vt <= s.time_end) { current = s; break; } }
+  const doneSet = new Set();
+  if (current) { for (const s of seq) { if (s.time_end <= current.time_start) doneSet.add(s.edge); } }
+
+  // the line width follows the zoom, so at high zoom a passage is a corridor rather than a
+  // thread: at fit scale everything is a few pixels and nothing can be aimed at
+  const lw = (k) => Math.max(1.0, Math.min(22, k * sc * 12));
+  for (const e of S.edges) {
+    const a = nodeById(e.from), b = nodeById(e.to);
+    if (!a || !b) continue;
+    const p = P(a), q = P(b);
+    const isCur = current && (current.edge === e.id);
+    const hov = THOVER === e.id;
+    const inTruth = S.truth.some(r => r.edge === e.id);
+    ctx2.strokeStyle = isCur ? "#ffd166" : hov ? "#f0abfc"
+                     : inTruth ? "#22c55e" : doneSet.has(e.id) ? "#4ade80" : "#3d6b8f";
+    ctx2.lineWidth = isCur ? lw(2.4) : hov ? lw(2.2) : inTruth ? lw(2.0) : lw(1.0);
+    ctx2.beginPath(); ctx2.moveTo(p.x, p.y); ctx2.lineTo(q.x, q.y); ctx2.stroke();
+  }
+
+  for (const n of S.nodes) {
+    const p = P(n);
+    const rr = Math.max(2, Math.min(9, sc * 3.2));
+    ctx2.beginPath(); ctx2.arc(p.x, p.y, rr, 0, 2 * Math.PI);
+    ctx2.fillStyle = "#5cc8ff"; ctx2.fill();
+    if (sc > 0.35) {
+      ctx2.fillStyle = "#cfe4f5";
+      ctx2.font = "11px ui-monospace,monospace";
+      ctx2.fillText(n.id, p.x + rr + 3, p.y - rr - 2);
+    }
+  }
+
+  // the freehand line, in the tracking tab too, because that is where the video is and
+  // therefore where a person can actually watch the walk while drawing it
+  if (S.line.length > 1) {
+    ctx2.lineWidth = 4;
+    ctx2.strokeStyle = "#2563eb";
+    ctx2.beginPath();
+    S.line.forEach((p, k) => {
+      const q = {x: ox + sc * p[0] * tW(), y: oy + sc * p[1] * tH()};
+      if (k === 0) ctx2.moveTo(q.x, q.y); else ctx2.lineTo(q.x, q.y);
+    });
+    ctx2.stroke();
+  }
+
+  drawTruthOnTracking(ctx2, P);
+
+  if (current) {
+    const a = nodeById(current.from), b = nodeById(current.to);
+    if (a && b) {
+      const t = Math.max(0, Math.min(1, (vt - current.time_start) /
+        Math.max(current.time_end - current.time_start, 1e-6)));
+      const p = P(a), q = P(b);
+      const x = p.x + (q.x - p.x) * t, y = p.y + (q.y - p.y) * t;
+      ctx2.beginPath(); ctx2.arc(x, y, Math.max(6, Math.min(14, sc * 6)), 0, 2 * Math.PI);
+      ctx2.fillStyle = "#ffd166"; ctx2.fill();
+      ctx2.lineWidth = 2; ctx2.strokeStyle = "#12141a"; ctx2.stroke();
+    }
+  }
+
+  const st = document.getElementById("tstate");
+  if (st) {
+    if (current) {
+      const a = nodeById(current.from), b = nodeById(current.to);
+      const t = Math.max(0, Math.min(1, (vt - current.time_start) /
+        Math.max(current.time_end - current.time_start, 1e-6)));
+      st.innerHTML =
+        `<tr><th>текущее ребро</th><td><code>${current.edge}</code></td></tr>` +
+        `<tr><th>откуда → куда</th><td>${current.from} → ${current.to}</td></tr>` +
+        `<tr><th>прогресс</th><td>${(t * 100).toFixed(0)}%</td></tr>` +
+        `<tr><th>t</th><td>${vt.toFixed(1)} с</td></tr>`;
+    } else {
+      st.innerHTML = `<tr><th>t</th><td>${vt.toFixed(1)} с — вне последовательности</td></tr>`;
+    }
+  }
+  const zl = document.getElementById("tZoomLabel");
+  if (zl) zl.textContent = `масштаб ${(sc * 100).toFixed(0)}%`;
+  if (TFOLLOW) followSystem(vt);
+}
+
+// The view eases towards where the system says the walker is. It is a navigation aid and
+// nothing more: it decides nothing and the marked route is still whatever is clicked.
+function followSystem(vt) {
+  const seq = (TRACK && TRACK.edge_sequence) || [];
+  for (const s of seq) {
+    if (vt >= s.time_start && vt <= s.time_end) {
+      const a = nodeById(s.from), b = nodeById(s.to);
+      if (!a || !b) return;
+      const t = (vt - s.time_start) / Math.max(s.time_end - s.time_start, 1e-6);
+      const nx = a.x + (b.x - a.x) * t, ny = a.y + (b.y - a.y) * t;
+      const want = 1.1;
+      if (Math.abs(TV.sc - want) > 1e-6) TV.sc = want;
+      tCenterOn(nx, ny);
+      return;
+    }
+  }
+}
+
+/* ------------------------------------------------------- tracking: mouse */
+document.getElementById("tcv").addEventListener("wheel", ev => {
+  ev.preventDefault();
+  const r = ev.currentTarget.getBoundingClientRect();
+  tZoomAt(ev.clientX - r.left, ev.clientY - r.top, ev.deltaY < 0 ? 1.15 : 1 / 1.15);
+  if (TFOLLOW) TFOLLOW = false, setFollow(false);
+  drawTracking();
+}, {passive: false});
+
+document.getElementById("tcv").addEventListener("mousedown", ev => {
+  const r = ev.currentTarget.getBoundingClientRect();
+  const x = ev.clientX - r.left, y = ev.clientY - r.top;
+  if (TLINE && ev.button === 0 && !ev.shiftKey) {
+    const n = tNorm(x, y);
+    S.line = [{x: Math.max(0, Math.min(1, n.x)), y: Math.max(0, Math.min(1, n.y))}];
+    S.lineBusy = true;
+    drawTracking();
+    return;
+  }
+  if (ev.button === 1 || ev.shiftKey || ev.code === "Space" || (!TANNOT && !TLINE)) {
+    // dragging pans; with annotation off a plain drag also pans, which is what a person
+    // expects when the marking mode is not active
+    TDRAG = {sx: x, sy: y, ox: TV.ox, oy: TV.oy};
+    ev.preventDefault();
+  }
+});
+
+document.getElementById("tcv").addEventListener("mousemove", ev => {
+  const r = ev.currentTarget.getBoundingClientRect();
+  const x = ev.clientX - r.left, y = ev.clientY - r.top;
+  if (S.lineBusy && TLINE) {
+    const n = tNorm(x, y);
+    const last = S.line[S.line.length - 1];
+    const nn = {x: Math.max(0, Math.min(1, n.x)), y: Math.max(0, Math.min(1, n.y))};
+    if (!last || Math.hypot(nn.x - last.x, nn.y - last.y) * imgW() > 3) S.line.push(nn);
+    drawTracking();
+    return;
+  }
+  if (TDRAG) {
+    TV.ox = TDRAG.ox + (x - TDRAG.sx);
+    TV.oy = TDRAG.oy + (y - TDRAG.sy);
+    drawTracking();
+    return;
+  }
+  const hit = tPickEdge(x, y);
+  const id = hit ? hit.edge.id : null;
+  if (id !== THOVER) {
+    THOVER = id;
+    ev.currentTarget.style.cursor = id ? "crosshair" : "grab";
+    const hv = document.getElementById("tHover");
+    if (hv) {
+      hv.textContent = hit
+        ? `под курсором: ${hit.edge.from} → ${hit.edge.to} · ${hit.edge.id}` : "";
+    }
+    drawTracking();
+  }
+});
+
+window.addEventListener("mouseup", () => {
+  TDRAG = null;
+  if (S.lineBusy) {
+    S.lineBusy = false;
+    if (S.line.length > 40) {
+      const keep = [S.line[0]];
+      for (let k = 1; k < S.line.length - 1; k++) if (k % 3 === 0) keep.push(S.line[k]);
+      keep.push(S.line[S.line.length - 1]);
+      S.line = keep;
+    }
+    setStatus(`линия: ${S.line.length} точек · нажми «Привязать к графу»`, "ok");
+    drawTracking();
+  }
+});
+
+document.getElementById("tcv").addEventListener("click", ev => {
+  if (!TANNOT) return;
+  const r = ev.currentTarget.getBoundingClientRect();
+  const x = ev.clientX - r.left, y = ev.clientY - r.top;
+  const hit = tPickEdge(x, y);
+  if (!hit) { setStatus("близко нет ребра графа — приблизь масштаб", "warn"); return; }
+  const v = document.getElementById("video");
+  const t = v && isFinite(v.currentTime) ? v.currentTime : 0;
+  if (appendTruth(hit.edge, x, y, t)) {
+    refreshTruthPanel();
+    drawTracking();
+  }
+});
+
+/* --------------------------------------------------- tracking: controls */
+document.getElementById("tAnnotate").addEventListener("click", () => {
+  TANNOT = !TANNOT;
+  const b = document.getElementById("tAnnotate");
+  b.classList.toggle("on", TANNOT);
+  b.textContent = TANNOT ? "Разметка идёт — клик по ребру" : "Размечать маршрут";
+  document.getElementById("tScan").textContent = TANNOT
+    ? "смотри видео и кликай ребро в момент входа · повторный клик убирает последнее"
+    : (TRACK && TRACK.available ? "колесо — масштаб · тяни, чтобы сдвинуть план" : "");
+  drawTracking();
+});
+
+document.getElementById("tLine").addEventListener("click", () => {
+  TLINE = !TLINE;
+  const b = document.getElementById("tLine");
+  b.classList.toggle("on", TLINE);
+  if (TLINE) {
+    TANNOT = false;
+    TFOLLOW = false;
+    setFollow(false);
+    document.getElementById("tAnnotate").classList.remove("on");
+    document.getElementById("tAnnotate").textContent = "Размечать маршрут";
+    S.line = [];
+    setStatus("режим линии: веди курсор по плану, как человек шёл", "ok");
+  } else {
+    setStatus("режим линии выключен");
+  }
+  document.getElementById("tScan").textContent = TLINE
+    ? "веди линию по плану · «Привязать к графу» превратит её в последовательность рёбер"
+    : "";
+  drawTracking();
+});
+
+document.getElementById("tSnap").addEventListener("click", () => {
+  document.getElementById("lineSnap").click();
+});
+
+function setFollow(on) {
+  TFOLLOW = on;
+  const b = document.getElementById("tFollow");
+  const w = document.getElementById("tFollowWarn");
+  b.classList.toggle("on", on);
+  w.style.display = on ? "block" : "none";
+  if (on) {
+    w.innerHTML = "План едет за положением, которое посчитал P08. Это только навигация: " +
+      "размечать всё равно нужно то, что видно на видео, иначе сравнение будет " +
+      "сравнением P08 с самим собой.";
+  }
+}
+document.getElementById("tFollow").addEventListener("click", () => setFollow(!TFOLLOW));
+document.getElementById("tFit").addEventListener("click", () => {
+  tFit(); TV.fitted = true;
+  if (TFOLLOW) setFollow(false);
+  drawTracking();
+});
+document.getElementById("tZoomIn").addEventListener("click", () => {
+  const box = document.getElementById("tgraph");
+  tZoomAt(box.clientWidth / 2, box.clientHeight / 2, 1.3);
+  drawTracking();
+});
+document.getElementById("tZoomOut").addEventListener("click", () => {
+  const box = document.getElementById("tgraph");
+  tZoomAt(box.clientWidth / 2, box.clientHeight / 2, 1 / 1.3);
+  drawTracking();
+});
+// How much of the window the plan gets. Marking needs a large plan and a small video;
+// watching needs the opposite, so the ratio is switchable rather than fixed.
+const TLAYOUTS = [
+  {name: "50/50", vid: 1, plan: 1},
+  {name: "видео 1 : план 1.8", vid: 1, plan: 1.8},
+  {name: "видео 1 : план 3.2", vid: 1, plan: 3.2},
+];
+let tLayout = 0;
+document.getElementById("tWide").addEventListener("click", () => {
+  tLayout = (tLayout + 1) % TLAYOUTS.length;
+  const L = TLAYOUTS[tLayout];
+  document.getElementById("tvid").style.flex = L.vid;
+  document.getElementById("tgraph").style.flex = L.plan;
+  document.getElementById("tWide").textContent =
+    L.name === "50/50" ? "План шире" : `Раскладка: ${L.name}`;
+  sizeTracking();
+  setStatus(`раскладка ${L.name}`, "ok");
+});
+
+// Bring the part of the plan the video is showing into view. This is navigation only: it
+// says nothing about which passage was walked.
+document.getElementById("tHere").addEventListener("click", () => {
+  if (!TRACK || !TRACK.available) { setStatus("данных трекинга нет", "warn"); return; }
+  const v = document.getElementById("video");
+  const vt = v.currentTime || 0;
+  const seq = TRACK.edge_sequence || [];
+  let cur = null;
+  for (const s2 of seq) { if (vt >= s2.time_start && vt <= s2.time_end) { cur = s2; break; } }
+  if (!cur) { setStatus(`на ${vt.toFixed(0)} с система вне последовательности`, "warn"); return; }
+  const a = nodeById(cur.from), b = nodeById(cur.to);
+  if (!a || !b) return;
+  tCenterOn((a.x + b.x) / 2, (a.y + b.y) / 2, 1.3);
+  if (TFOLLOW) setFollow(false);
+  drawTracking();
+  setStatus(`показано место P08: ${cur.edge} (${cur.from} → ${cur.to})`, "ok");
+});
+
+document.getElementById("tGo").addEventListener("click", () => {
+  const want = document.getElementById("tGoNode").value.trim();
+  if (!want) return;
+  if (!nodeById(want)) { setStatus(`узла ${want} нет в графе`, "warn"); return; }
+  if (!TV.fitted) { tFit(); TV.fitted = true; }
+  const n = nodeById(want);
+  tCenterOn(n.x, n.y, 1.4);
+  if (TFOLLOW) setFollow(false);
+  drawTracking();
+  setStatus(`центр на узле ${want}, масштаб 140%`, "ok");
+});
+
+/* the marked route, editable: a wrong click can be removed without starting over */
+function refreshTruthPanel() {
+  const list = document.getElementById("tList");
+  const cnt = document.getElementById("tCount");
+  if (!list) return;
+  cnt.textContent = S.truth.length;
+  list.innerHTML = "";
+  S.truth.forEach((r, i) => {
+    const row = document.createElement("div");
+    row.className = "tr";
+    const tm = r.t === null || r.t === undefined ? "—" : r.t.toFixed(1);
+    row.innerHTML = `<span class="tm">${tm}с</span>` +
+      `<span class="en">${r.from} → ${r.to} · ${r.edge}</span>` +
+      `<span class="dl" title="убрать это ребро">убрать</span>`;
+    row.querySelector(".dl").addEventListener("click", () => {
+      S.truth.splice(i, 1);
+      S.truthSaved = false;
+      refreshTruthPanel();
+      drawTracking();
+      setStatus(`убрано, рёбер осталось ${S.truth.length}`);
+    });
+    list.appendChild(row);
+  });
+  list.scrollTop = list.scrollHeight;
+}
+
+document.getElementById("tUndo").addEventListener("click", () => {
+  if (!S.truth.length) return;
+  S.truth.pop();
+  S.truthSaved = false;
+  refreshTruthPanel();
+  drawTracking();
+  setStatus(`убрано, рёбер осталось ${S.truth.length}`);
+});
+document.getElementById("tSave").addEventListener("click", () => document.getElementById("truthSave").click());
+document.getElementById("tCompare").addEventListener("click", () => document.getElementById("truthCompare").click());
+document.getElementById("tClear").addEventListener("click", () => document.getElementById("truthClear").click());
+
+/* ---------------------------------------------------- video shortcuts */
+document.getElementById("video").addEventListener("keydown", ev => {
+  const v = ev.currentTarget;
+  const step = ev.shiftKey ? 0.2 : 1.0;
+  if (ev.code === "Space") { ev.preventDefault(); v.paused ? v.play() : v.pause(); }
+  else if (ev.key === "ArrowLeft") { ev.preventDefault(); v.currentTime = Math.max(0, v.currentTime - step); }
+  else if (ev.key === "ArrowRight") { ev.preventDefault(); v.currentTime = v.currentTime + step; }
+  else if (ev.key === "Backspace") {
+    ev.preventDefault();
+    if (S.truth.length) {
+      S.truth.pop();
+      S.truthSaved = false;
+      refreshTruthPanel();
+      drawTracking();
+    }
+  }
+});
+document.getElementById("video").addEventListener("click", ev => {
+  // a click on the picture pauses, so a passage can be marked without racing the playhead
+  if (!ev.target.controls) { ev.target.paused ? ev.target.play() : ev.target.pause(); }
+});
+
+/* ------------------------------------------------------------------- init */
+window.addEventListener("resize", resize);
+setMode("select");
+resize();
+loadFromDisk();
+</script>
+</body>
+</html>

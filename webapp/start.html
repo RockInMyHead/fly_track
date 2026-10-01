@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Старт VID00001</title>
+<style>
+  :root{
+    --bg:#0b0d12; --panel:#141821; --line:#252b3a; --fg:#eef2f8; --dim:#8a94a8;
+    --accent:#5b8def; --ok:#22c55e; --warn:#f59e0b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--fg);
+    font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  #app{display:flex;flex-direction:column;height:100%}
+  header{display:flex;align-items:center;gap:14px;padding:10px 14px;background:var(--panel);
+    border-bottom:1px solid var(--line)}
+  header h1{font-size:15px;font-weight:600}
+  header a{color:var(--accent);font-size:13px}
+  #note{color:var(--dim);font-size:12px}
+  main{display:grid;grid-template-columns:minmax(280px,0.8fr) 1.3fr;flex:1;min-height:0}
+  .pane{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line)}
+  .pane:last-child{border-right:none}
+  .pane h2{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--dim);
+    padding:8px 12px;border-bottom:1px solid var(--line)}
+  #videoWrap{flex:1;display:flex;align-items:center;justify-content:center;background:#000;min-height:0}
+  video{max-width:100%;max-height:100%}
+  #wait{color:var(--dim);padding:24px;text-align:center}
+  #planWrap{flex:1;position:relative;background:#06080c;min-height:0;cursor:crosshair;touch-action:none}
+  canvas{display:block;width:100%;height:100%}
+  #hint{position:absolute;left:8px;bottom:8px;max-width:380px;padding:8px 10px;
+    background:rgba(10,12,18,.88);border:1px solid var(--line);border-radius:8px;
+    font-size:12px;color:var(--dim);pointer-events:none;line-height:1.45}
+  #hint b{color:var(--fg)}
+  #bar{padding:10px 12px;border-top:1px solid var(--line);background:var(--panel);
+    display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  button{font:inherit;color:var(--fg);background:#1a1f2b;border:1px solid var(--line);
+    border-radius:8px;padding:6px 10px;cursor:pointer}
+  button.on{background:#163a24;border-color:var(--ok);color:#fff}
+  button:disabled{opacity:.45;cursor:default}
+  #go{background:#1e3a6e;border-color:var(--accent);color:#fff;font-weight:600}
+  #go:disabled{background:#1a1f2b;border-color:var(--line);font-weight:400}
+  #readout{flex:1;min-width:220px;font-size:13px;color:var(--dim)}
+  #readout b{color:var(--fg)}
+  #log{max-height:140px;overflow:auto;padding:8px 12px;font:12px/1.4 ui-monospace,monospace;
+    color:var(--dim);white-space:pre-wrap;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>Старт VID00001</h1>
+    <span id="note"></span>
+    <a href="/final">К траекториям</a>
+  </header>
+  <main>
+    <section class="pane">
+      <h2>Видео</h2>
+      <div id="videoWrap"><div id="wait">Собираю видео для браузера…</div>
+        <video id="vid" controls playsinline hidden></video></div>
+    </section>
+    <section class="pane">
+      <h2>Точка и направление на графе</h2>
+      <div id="planWrap">
+        <canvas id="plan"></canvas>
+        <div id="hint"><b>Клик по линии графа</b> ставит старт. Потом выберите, куда человек идёт.
+          Колёсико — масштаб, пробел и мышь — сдвиг.</div>
+      </div>
+      <div id="bar">
+        <button type="button" id="fit">Вся карта</button>
+        <button type="button" id="dirA" hidden></button>
+        <button type="button" id="dirB" hidden></button>
+        <button type="button" id="go" disabled>Старт</button>
+        <div id="readout">Кликните на ребро графа.</div>
+      </div>
+      <div id="log" hidden></div>
+    </section>
+  </main>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+let graph = null, planImg = null, segs = [];
+let scale = 1, offX = 0, offY = 0, space = false, panning = false, lastPan = null;
+let click = null, place = null, toward = null, polling = null, route = [];
+
+function indexGraph(g){
+  const nodes = {};
+  const raw = Array.isArray(g.nodes) ? g.nodes : Object.values(g.nodes || {});
+  for(const n of raw) if(n && n.id) nodes[n.id] = n;
+  const edges = Array.isArray(g.edges) ? g.edges : Object.values(g.edges || {});
+  return {nodes, edges, img_w: g.img_w || 5298, img_h: g.img_h || 3743};
+}
+function planSize(){
+  const iw = (planImg && planImg.naturalWidth) || (graph && +graph.img_w) || 5298;
+  const ih = (planImg && planImg.naturalHeight) || (graph && +graph.img_h) || 3743;
+  return {iw, ih};
+}
+function buildSegs(){
+  const {iw, ih} = planSize();
+  segs = [];
+  for(const e of graph.edges){
+    const a = graph.nodes[e.from], b = graph.nodes[e.to];
+    if(!a || !b) continue;
+    segs.push({id: e.id, ax: a.x * iw, ay: a.y * ih, bx: b.x * iw, by: b.y * ih});
+  }
+}
+function fit(){
+  const wrap = $('planWrap');
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  if(w < 10 || h < 10) return;
+  const {iw, ih} = planSize();
+  scale = Math.min(w / iw, h / ih) * 0.98;
+  offX = (w - iw * scale) / 2;
+  offY = (h - ih * scale) / 2;
+  draw();
+}
+function toPlan(e){
+  const r = $('plan').getBoundingClientRect();
+  return {x: (e.clientX - r.left - offX) / scale, y: (e.clientY - r.top - offY) / scale};
+}
+function draw(){
+  const c = $('plan'), wrap = $('planWrap');
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  if(w < 10 || h < 10 || !graph) return;
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#06080c';
+  ctx.fillRect(0, 0, w, h);
+  const {iw, ih} = planSize();
+  ctx.save();
+  ctx.translate(offX, offY);
+  ctx.scale(scale, scale);
+  if(planImg && planImg.complete && planImg.naturalWidth){
+    ctx.globalAlpha = 0.9;
+    ctx.drawImage(planImg, 0, 0, iw, ih);
+    ctx.globalAlpha = 1;
+  }
+  ctx.strokeStyle = 'rgba(180,190,210,0.85)';
+  ctx.lineWidth = Math.max(1, 1.4 / scale);
+  for(const s of segs){
+    ctx.beginPath(); ctx.moveTo(s.ax, s.ay); ctx.lineTo(s.bx, s.by); ctx.stroke();
+  }
+  if(route.length){
+    ctx.strokeStyle = '#1f77ff';
+    ctx.lineWidth = Math.max(2.4, 4.5 / scale);
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    let prev = null;
+    for(const p of route){
+      const jump = prev && Math.hypot(p[0] - prev[0], p[1] - prev[1]) > 30;
+      if(!prev || jump){
+        if(prev) ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(p[0], p[1]);
+      } else ctx.lineTo(p[0], p[1]);
+      prev = p;
+    }
+    ctx.stroke();
+  }
+  if(place){
+    const ends = place.ends || [];
+    const dest = ends.find(n => n.id === toward);
+    if(dest){
+      ctx.strokeStyle = '#22c55e';
+      ctx.lineWidth = Math.max(2.5, 4 / scale);
+      ctx.beginPath(); ctx.moveTo(place.x, place.y); ctx.lineTo(dest.x, dest.y); ctx.stroke();
+    }
+    ctx.fillStyle = '#f59e0b';
+    ctx.beginPath();
+    ctx.arc(place.x, place.y, Math.max(5, 9 / scale), 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = Math.max(1.5, 2 / scale);
+    ctx.beginPath();
+    ctx.arc(place.x, place.y, Math.max(10, 16 / scale), 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+function showDirs(p){
+  const buttons = [$('dirA'), $('dirB')];
+  (p.ends || []).forEach((n, i) => {
+    const b = buttons[i];
+    b.hidden = false;
+    b.textContent = 'Идти к ' + n.id;
+    b.dataset.id = n.id;
+    b.classList.toggle('on', n.id === toward);
+  });
+}
+function readout(){
+  if(!place){ $('readout').textContent = 'Кликните на ребро графа.'; return; }
+  if(!toward){
+    $('readout').innerHTML = `Ребро <b>${place.edge}</b>. Выберите, куда идёт человек.`;
+    return;
+  }
+  const behind = place.start_from;
+  $('readout').innerHTML = `Ребро <b>${place.edge}</b>, идёт к <b>${toward}</b>, `
+    + `<b>${place.progress_m} м</b> от ${behind}.`;
+}
+async function commit(x, y, dir){
+  const r = await fetch('/api/start/place', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({x, y, toward: dir || ''})});
+  const j = await r.json();
+  if(!j.ok){ $('readout').textContent = j.error || 'мимо графа'; return; }
+  place = j;
+  if(dir) toward = dir;
+  showDirs(j);
+  $('go').disabled = !toward;
+  readout();
+  draw();
+}
+async function poll(){
+  const r = await fetch('/api/start/status');
+  const j = await r.json();
+  $('log').hidden = false;
+  $('log').textContent = j.log || j.error || j.state;
+  if(j.state === 'running') return;
+  clearInterval(polling);
+  polling = null;
+  $('go').disabled = false;
+  if(j.state === 'done'){
+    await loadRoute();
+    $('readout').innerHTML = 'Готово, линия на плане. <a href="/final?clip=VID00001&full=1" style="color:#5b8def">Только это видео</a>';
+  } else {
+    $('readout').textContent = j.error || 'трекер остановился';
+  }
+}
+async function loadRoute(){
+  const r = await fetch('/api/final/tracks');
+  const data = await r.json();
+  const tr = (data.tracks || []).find(t => t.id === 'VID00001');
+  route = tr && tr.points ? tr.points : [];
+  draw();
+}
+$('fit').onclick = fit;
+$('dirA').onclick = () => { if(click){ toward = $('dirA').dataset.id; commit(click.x, click.y, toward); } };
+$('dirB').onclick = () => { if(click){ toward = $('dirB').dataset.id; commit(click.x, click.y, toward); } };
+$('go').onclick = async () => {
+  if(!click || !toward) return;
+  $('go').disabled = true;
+  route = [];
+  draw();
+  $('readout').textContent = 'Запускаю трекер…';
+  const r = await fetch('/api/start/run', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({x: click.x, y: click.y, toward})});
+  const j = await r.json();
+  if(!j.ok){ $('go').disabled = false; $('readout').textContent = j.error || 'не запустилось'; return; }
+  if(polling) clearInterval(polling);
+  polling = setInterval(poll, 1000);
+  poll();
+};
+const canvas = $('plan');
+canvas.addEventListener('mousedown', e => {
+  if(e.button === 1 || (space && e.button === 0)){ panning = true; lastPan = [e.clientX, e.clientY]; return; }
+  if(e.button !== 0 || !graph) return;
+  const p = toPlan(e);
+  click = p;
+  toward = null;
+  $('go').disabled = true;
+  commit(p.x, p.y, null);
+});
+window.addEventListener('mousemove', e => {
+  if(!panning || !lastPan) return;
+  offX += e.clientX - lastPan[0];
+  offY += e.clientY - lastPan[1];
+  lastPan = [e.clientX, e.clientY];
+  draw();
+});
+window.addEventListener('mouseup', () => { panning = false; lastPan = null; });
+window.addEventListener('keydown', e => { if(e.code === 'Space'){ space = true; e.preventDefault(); } });
+window.addEventListener('keyup', e => { if(e.code === 'Space') space = false; });
+canvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const r = canvas.getBoundingClientRect();
+  const px = e.clientX - r.left, py = e.clientY - r.top;
+  const next = scale * (e.deltaY < 0 ? 1.12 : 1/1.12);
+  const k = next / scale;
+  offX = px - (px - offX) * k;
+  offY = py - (py - offY) * k;
+  scale = next;
+  draw();
+}, {passive:false});
+window.addEventListener('resize', fit);
+
+async function loadVideo(){
+  const r = await fetch('/api/start/state');
+  const j = await r.json();
+  $('note').textContent = j.note || '';
+  if(!j.video_url){ setTimeout(loadVideo, 2000); return; }
+  $('wait').hidden = true;
+  const v = $('vid');
+  v.hidden = false;
+  v.src = j.video_url;
+  v.load();
+}
+async function boot(){
+  const [gs] = await Promise.all([
+    fetch('/api/p08/state').then(r => r.json()),
+    loadVideo(),
+  ]);
+  graph = indexGraph(gs.graph || {});
+  planImg = new Image();
+  planImg.src = '/api/p08/plan';
+  await new Promise((res, rej) => { planImg.onload = res; planImg.onerror = rej; });
+  buildSegs();
+  fit();
+  await loadRoute();
+}
+boot();
+</script>
+</body>
+</html>

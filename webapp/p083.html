@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Проверка развилок</title>
+<style>
+  :root{
+    --bg:#0b0d12; --panel:#141821; --panel2:#1a1f2b; --line:#252b3a;
+    --fg:#eef2f8; --dim:#8a94a8; --accent:#5b8def;
+    --ok:#22c55e; --bad:#ef4444; --warn:#f59e0b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--fg);
+    font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    overflow:hidden}
+  #app{display:flex;flex-direction:column;height:100%}
+
+  header{display:flex;align-items:center;gap:14px;padding:10px 16px;
+    background:var(--panel);border-bottom:1px solid var(--line);flex:none}
+  .title{font-weight:600}
+  .counter{color:var(--dim)}
+  .spacer{flex:1}
+  .dots{display:flex;gap:4px}
+  .dot{width:12px;height:12px;border-radius:50%;background:#2c3344;cursor:pointer;
+    transition:transform .12s}
+  .dot:hover{transform:scale(1.35)}
+  .dot.ok{background:var(--ok)} .dot.bad{background:var(--bad)}
+  .dot.unc{background:#4b5563} .dot.cur{outline:2px solid var(--fg);outline-offset:1px}
+  button{font:inherit;color:var(--fg);background:var(--panel2);border:1px solid var(--line);
+    border-radius:8px;padding:7px 13px;cursor:pointer;transition:background .12s,border-color .12s}
+  button:hover{background:#232a39;border-color:#333c50}
+  button.icon{padding:7px 11px;font-size:15px;line-height:1}
+  button.toggle.on{background:var(--accent);border-color:var(--accent);color:#08172e;font-weight:600}
+
+  main{display:flex;flex:1;min-height:0}
+  #left{flex:1 1 52%;min-width:0;display:flex;flex-direction:column;
+    background:#06080c;border-right:1px solid var(--line);overflow:hidden}
+  #right{flex:1 1 48%;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+
+  /* The whole task — watch, answer, see the result — sits in one column, because the answer
+     comes from the clip and nothing else. The first version split it: the video on the left,
+     the question on the right under the plan. A reader then has to decide which of two
+     pictures to look at before they can even start, which is the question that got asked:
+     "where should I be looking, at the plan or at the video?". */
+  #task{display:flex;flex-direction:column;height:100%;min-height:0;gap:8px;
+    padding:8px 10px 12px;overflow:auto}
+
+  .steps{display:flex;gap:6px;flex:none;font-size:11px;color:var(--dim)}
+  .step{display:flex;align-items:center;gap:5px;background:var(--panel);
+    border:1px solid var(--line);border-radius:20px;padding:3px 10px 3px 5px}
+  .step b{display:flex;align-items:center;justify-content:center;width:16px;height:16px;
+    border-radius:50%;background:#2c3344;color:var(--fg);font-size:10px;flex:none}
+  .step.on{color:var(--fg);border-color:#3d4a63}
+  .step.on b{background:var(--accent);color:#08172e}
+
+  #videoWrap{position:relative;flex:1;min-height:170px;display:flex;align-items:center;
+    justify-content:center}
+  video{max-width:100%;max-height:100%;border-radius:8px;background:#000}
+  #vlabel{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);
+    background:rgba(10,12,18,.88);border:1px solid var(--line);border-radius:20px;
+    padding:4px 13px;font-size:12px;color:var(--dim);pointer-events:none}
+
+  #strip{display:flex;gap:2px;flex:none}
+  #strip canvas{flex:1;min-width:0;border-radius:5px;border:1px solid var(--line);
+    cursor:pointer;opacity:.6;transition:opacity .12s;height:auto}
+  #strip canvas:hover{opacity:1}
+  #strip canvas.now{opacity:1;border-color:var(--bad);
+    box-shadow:0 0 0 2px rgba(239,68,68,.35)}
+
+  /* When the recording stops just after the decision there is nothing to watch, and the reader
+     is left thinking they missed something. Saying so is the difference between "I cannot tell"
+     and "there is nothing to tell". */
+  .clipnote{display:none;align-items:flex-start;gap:8px;font-size:12px;color:#ffd9a0;
+    background:#241a0c;border:1px solid #7a5518;border-radius:9px;padding:8px 11px;
+    line-height:1.45;flex:none}
+  .clipnote.show{display:flex}
+  .clipnote b{color:#ffc46b}
+
+  /* The plan is evidence, not part of the task, so it is framed as a picture rather than as a
+     working surface, and it is titled so its role is plain. */
+  #mapBox{position:relative;flex:none;background:#0a0d13;border:1px solid var(--line);
+    border-radius:12px;overflow:hidden}
+  #map{display:block;width:100%}
+  #map.grab{cursor:grab}
+  #map.grab:active{cursor:grabbing}
+  .maphead{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--dim);
+    padding:0 2px}
+  .maphead > span:first-child{flex:1;min-width:0}
+  .zoomer{display:flex;gap:4px;flex:none}
+  .zb{font:inherit;font-size:11px;padding:3px 9px;border-radius:7px;background:var(--panel);
+    border:1px solid var(--line);color:var(--dim);cursor:pointer;line-height:1.4}
+  .zb:hover{background:#232a39;border-color:#3d4a63;color:var(--fg)}
+
+  /* Everything that used to be printed over the plan is now a strip underneath it. Text lying
+     on the picture covered the very corridors the reader is trying to follow. */
+  #mapLegend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:var(--dim);
+    padding:0 2px}
+  .lg{display:inline-flex;align-items:center;gap:6px}
+  .lg.note{opacity:.75}
+  .lg i{width:11px;height:11px;border-radius:3px;flex:none}
+  .lg i.ln{height:3px;border-radius:2px;background:#22c55e}
+  .lg i.dot{border-radius:50%;background:#22c55e;
+    box-shadow:0 0 0 2px #0a0d13 inset, 0 0 0 1px #22c55e}
+  .lg i.dash{height:3px;border-radius:2px;background:#f59e0b;
+    background-image:linear-gradient(90deg,#f59e0b 60%,transparent 60%);
+    background-size:5px 3px}
+  .lg i.pal{background:linear-gradient(90deg,#ef4444 33%,#5b8def 33% 66%,#c084fc 66%)}
+
+  #info{flex:1;min-height:0;overflow:auto;padding:12px 14px 24px;display:flex;
+    flex-direction:column;gap:12px}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px}
+  .card h3{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--dim);
+    font-weight:600;margin-bottom:8px}
+  .row{display:flex;align-items:baseline;gap:10px;padding:4px 0}
+  .row + .row{border-top:1px solid #1e2330}
+  .row .lbl{color:var(--dim);flex:none;width:132px;font-size:13px}
+  .row .val{flex:1;font-size:15px}
+  .row .val b{font-weight:600}
+  .note{margin-top:9px;font-size:11px;color:var(--dim);line-height:1.45}
+  .lock{font-size:13px;color:var(--dim);font-style:italic}
+  #systemCard.locked{border-style:dashed}
+  .details .body .r .n{width:10px;height:10px;border-radius:3px;display:inline-block;
+    margin-top:5px}
+  .big{font-size:19px;font-weight:600}
+  .c-left{color:#7fb0ff} .c-right{color:#ff9a9a} .c-straight{color:#c8d3e8}
+  .c-none{color:var(--dim);font-weight:400}
+
+  .ask{flex:none;background:linear-gradient(180deg,#16233a,#141821);
+    border:1px solid #2b4a72}
+  .ask .q{font-size:19px;font-weight:600;margin-bottom:10px}
+
+  /* The answer is a path, not a direction. Naming a turn "left" or "straight" means naming it
+     relative to the walker, and the reader then has to hold two frames in mind at once: the
+     plan, which does not turn, and the video, which does. Colouring the paths removes the
+     translation — the reader matches a colour to a colour. */
+  .paths{display:grid;gap:8px}
+  .pth{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:11px;
+    border:2px solid var(--line);background:var(--panel);cursor:pointer;font:inherit;
+    color:var(--fg);text-align:left;transition:transform .12s,border-color .12s;width:100%}
+  .pth:hover{transform:translateY(-1px);border-color:var(--c)}
+  .pth .sw{width:18px;height:18px;border-radius:5px;background:var(--c);flex:none;
+    box-shadow:0 0 0 2px rgba(255,255,255,.08) inset}
+  .pth .tx{flex:1;min-width:0}
+  .pth .tx b{display:block;font-size:14px;font-weight:600;color:var(--c)}
+  .pth .tx small{display:block;color:var(--dim);font-size:11px}
+  .pth.on{border-color:var(--c);background:#1c2330;
+    box-shadow:0 0 0 1px var(--c) inset}
+
+  .alt{margin-top:11px;border-top:1px solid #1e2330;padding-top:10px}
+  .alt .cap{font-size:11px;color:var(--dim);margin-bottom:7px}
+  .dirs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .d{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px 7px;
+    border-radius:9px;border:1.5px solid var(--line);background:var(--panel2);
+    cursor:pointer;transition:all .12s;user-select:none}
+  .d:hover{border-color:#3d4a63}
+  .d svg{width:19px;height:19px;stroke:#c8d3e8;stroke-width:2.4;fill:none;
+    stroke-linecap:round;stroke-linejoin:round}
+  .d .lb{font-size:11px;font-weight:600}
+  .d .hint{font-size:9px;color:var(--dim);height:11px}
+  .d.on{border-color:var(--accent);background:#16233a}
+  .d.on svg{stroke:var(--accent)}
+  .d.off{opacity:.4}
+
+  .foot{margin-top:10px}
+  .none{width:100%;padding:9px;border-radius:10px;font-size:13px}
+  .none.on{background:#2a2110;border-color:var(--warn);color:var(--warn);font-weight:600}
+  .ask .help{margin-top:10px;font-size:12px;color:var(--dim);line-height:1.45}
+
+  .verdict{flex:none;border-radius:12px;padding:13px 15px;font-size:15px;display:none;
+    border:2px solid var(--line);background:var(--panel)}
+  .verdict.show{display:block}
+  .verdict .hd{font-size:17px;font-weight:700;display:flex;align-items:center;gap:9px;
+    margin-bottom:4px}
+  .verdict .why{font-size:13px;color:#c8d3e8}
+  .verdict.ok{background:#0f2a1a;border-color:var(--ok)}
+  .verdict.ok .hd{color:#4ade80}
+  .verdict.bad{background:#2a1012;border-color:var(--bad)}
+  .verdict.bad .hd{color:#ff8f8f}
+  .verdict.unc{background:#20242e;border-color:#4b5563}
+  .verdict.unc .hd{color:#c8d3e8;font-size:15px}
+  .verdict .fix{margin-top:7px;font-size:13px}
+  .verdict .fix code{background:#00000055;border:1px solid var(--line);border-radius:5px;
+    padding:2px 7px;font-size:12px}
+
+  .details{font-size:12px;color:var(--dim)}
+  .details summary{cursor:pointer;color:var(--dim);padding:2px 0;user-select:none}
+  .details summary:hover{color:var(--fg)}
+  .details .body{padding-top:8px;display:flex;flex-direction:column;gap:4px}
+  .details .body .r{display:flex;gap:8px}
+  .details .body .r .n{width:16px;flex:none;color:#4b5563}
+
+  #summary{font-size:13px;color:var(--dim);display:flex;gap:16px;flex-wrap:wrap}
+  #summary b{color:var(--fg)}
+  .empty{display:flex;align-items:center;justify-content:center;height:100%;color:var(--dim);
+    flex-direction:column;gap:8px;text-align:center}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <span class="title">Проверка развилок</span>
+    <span class="counter" id="counter">—</span>
+    <div class="dots" id="dots"></div>
+    <span class="spacer"></span>
+    <span class="counter" id="navHint">← → — листать · 1–3 — путь · 0 — не разобрать · пробел — пауза</span>
+    <button class="toggle" id="onlyVisible">только где поворот явный</button>
+    <button class="icon" id="prev" title="назад">←</button>
+    <button class="icon" id="next" title="вперёд">→</button>
+  </header>
+
+  <main>
+    <div id="left">
+      <div id="task">
+        <div class="steps">
+          <span class="step on"><b>1</b> посмотри видео</span>
+          <span class="step"><b>2</b> нажми, куда муха ушла</span>
+          <span class="step"><b>3</b> узнаешь, угадала ли система</span>
+        </div>
+
+        <div id="videoWrap">
+          <video id="vid" preload="auto" muted playsinline controls></video>
+          <div id="vlabel">решение системы — на 3-й секунде</div>
+        </div>
+        <div id="strip"></div>
+        <div id="clipNote" class="clipnote"></div>
+
+        <div class="card ask">
+          <div class="q">По какому пути муха ушла?</div>
+          <div class="paths" id="paths"></div>
+          <div class="alt">
+            <div class="cap">или ушла иначе — не по нарисованным путям</div>
+            <div class="dirs" id="dirs"></div>
+          </div>
+          <div class="foot"><button class="none" id="noneBtn">не разобрать</button></div>
+          <div class="help">На плане справа каждый путь своего цвета. Смотри видео и нажми
+            тот цвет, по которому муха ушла, — считать «влево-вправо» не нужно. Что выбрала
+            система, план покажет после ответа, чтобы не подсказывать.</div>
+        </div>
+
+        <div class="verdict" id="verdict"></div>
+      </div>
+    </div>
+
+    <div id="right">
+      <div id="info">
+        <div class="card" id="systemCard"></div>
+
+        <div class="maphead">
+          <span>весь план · стрелки показывают коридоры у развилки</span>
+          <span class="zoomer">
+            <button class="zb" id="zoomOut" title="уменьшить">−</button>
+            <button class="zb" id="zoomReset" title="показать весь план">весь план</button>
+            <button class="zb" id="zoomIn" title="увеличить">+</button>
+          </span>
+        </div>
+        <div id="mapBox">
+          <canvas id="map"></canvas>
+        </div>
+        <div id="mapLegend">
+          <span class="lg"><i class="ln"></i> пройденный путь</span>
+          <span class="lg"><i class="dot"></i> муха здесь</span>
+          <span class="lg"><i class="dash"></i> пришла отсюда</span>
+          <span class="lg"><i class="pal"></i> пути на выбор</span>
+          <span class="lg note">цвет пути на плане = цвет кнопки в ответе</span>
+        </div>
+
+        <details class="details">
+          <summary>какие коридоры были на выбор</summary>
+          <div class="body" id="opts"></div>
+        </details>
+
+        <div id="summary"></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+"use strict";
+let ALL = [], ITEMS = [], IDX = 0, ONLY_VISIBLE = false;
+let GRAPH = null, PLAN = null, PLAN_SMALL = null, TRAJ = null;
+let SHOW_TOKEN = 0;
+
+const $ = id => document.getElementById(id);
+
+const SIDE_RU = {STRAIGHT: "прямо", LEFT: "влево", RIGHT: "вправо", BACK: "назад"};
+const SIDE_BIG = {STRAIGHT: "ПРЯМО", LEFT: "ВЛЕВО", RIGHT: "ВПРАВО", BACK: "НАЗАД"};
+
+/* Why the system went the way it did, in plain words.
+
+   Translating the reason codes one-to-one is not enough. "STRAIGHT" covers two different
+   situations: sometimes the fly gave no signal at all, and sometimes it gave a clear one
+   pointing at a passage the graph does not contain, so the system fell back on shape. The
+   second case is the interesting one — it is where a real turn gets ignored — and a flat
+   translation hides it. "DELAYED_DECISION" is also not about a weak signal: it is set when the
+   top two candidates are too close to separate, and it overwrites the reason that was found
+   before it, so the wording here names the closeness rather than claiming to know which way
+   the system leaned. The reading therefore looks at the signal and at what was on offer. */
+function whyText(it) {
+  const sig = it.male_direction;
+  const r = it.reason || "";
+  const offered = split(it.candidate_sides);
+  const side = sig ? (SIDE_RU[sig] || sig.toLowerCase()) : "";
+
+  if (sig && !offered.includes(sig) && r !== "MALE_LEFT" && r !== "MALE_RIGHT") {
+    return `муха показывала поворот ${side}, но такого коридора на схеме нет — ` +
+           "система выбрала из того, что было";
+  }
+
+  const head = sig ? `муха показывала поворот ${side}` : "сигнала от мухи не было";
+  const tail = {
+    MALE_LEFT: "и система ей поверила",
+    MALE_RIGHT: "и система ей поверила",
+    BACK: "и система развернула её назад",
+    DELAYED_DECISION: "но два варианта были почти равны, выбор отложен",
+    STRAIGHT: "система решила по форме коридоров: прямо",
+    GEOMETRY: "система решила по форме коридоров",
+    NOVELTY: "система выбрала путь, которым ещё не ходила",
+    ONLY_OPTION: "другого коридора здесь не было",
+    RECOVERY: "система восстанавливала маршрут после сбоя",
+  }[r] || "система решила по форме коридоров";
+
+  return `${head}, ${tail}`;
+}
+
+/* ------------------------------------------------------------------ data */
+async function boot() {
+  const [list, state, traj] = await Promise.all([
+    fetch("/api/p083/list").then(r => r.json()),
+    fetch("/api/p08/state").then(r => r.json()),
+    fetch("/api/p08/trajectory").then(r => r.json())
+      .catch(() => ({t: [], x: [], y: []})),
+  ]);
+  GRAPH = state.graph;
+  TRAJ = traj;
+  ALL = list.items || [];
+  ITEMS = ALL.slice();
+
+  if (!ALL.length) {
+    $("info").innerHTML = '<div class="empty">Развилок пока нет.<br>' +
+      "Сначала запустите scripts/p083_route_audit.py</div>";
+    return;
+  }
+
+  // Two sizes of the same plan, because they answer different questions: the whole plan says
+  // where in the building this is, and the full-resolution one is what the lens magnifies. The
+  // whole-plan picture has to come from the server, prepared, because drawing the full plan
+  // straight into that space averages its thin walls away and leaves a blank sheet.
+  const load = src => new Promise(res => {
+    const im = new Image();
+    im.onload = () => res(im);
+    im.onerror = () => res(null);
+    im.src = src;
+  });
+  [PLAN, PLAN_SMALL] = await Promise.all([load("/api/p08/plan"),
+                                          load("/api/p08/plan_overview")]);
+  layout();
+  show(0);
+}
+
+/* ------------------------------------------------------- graph helpers */
+const nodeById = id => (GRAPH.nodes || []).find(n => n.id === id);
+const edgeById = id => (GRAPH.edges || []).find(e => e.id === id);
+const nodePos = id => {
+  const n = nodeById(id);
+  return {x: n.x * GRAPH.img_w, y: n.y * GRAPH.img_h};
+};
+const other = (eid, node) => {
+  const e = edgeById(eid);
+  return e.from === node ? e.to : e.from;
+};
+const pretty = eid => String(eid).replace("__", " → ");
+const split = s => String(s || "").split("|").filter(Boolean);
+
+/* Which way the system sent the fly, as a side name, looked up through the candidate list so
+   that duplicate sides (two "прямо" options) stay distinguishable in the data. */
+function sidesByEdge(it) {
+  const out = {};
+  const e = split(it.candidate_edges), s = split(it.candidate_sides);
+  for (let k = 0; k < e.length; k++) out[e[k]] = s[k] || "";
+  return out;
+}
+
+/* The view over the plan: fit-to-panel, plus a zoom and a pan.
+
+   The whole plan has to be visible to say where in the building this is, and a passage a few
+   pixels wide has to be readable to say which way it goes. Those two want opposite scales, so
+   the scale is the reader's: fit by default, wheel or the +/− buttons to magnify, drag to move
+   around. Panning is clamped so the plan cannot be lost off the edge of the panel. */
+const VIEW = {zoom: 1, panX: 0, panY: 0};
+const ZOOM_MIN = 1, ZOOM_MAX = 9;
+
+function viewTransform(W, H) {
+  const sf0 = Math.min(W / GRAPH.img_w, H / GRAPH.img_h);
+  const k = sf0 * VIEW.zoom;
+  const iw = GRAPH.img_w * k, ih = GRAPH.img_h * k;
+  return {k, iw, ih, ox: (W - iw) / 2 + VIEW.panX, oy: (H - ih) / 2 + VIEW.panY};
+}
+
+/* Keeping the plan on the panel: the offset may not exceed half the overhang, so at fit scale
+   the plan stays centred and when magnified its edge cannot be pulled inside the panel. */
+function clampView(W, H) {
+  const v = viewTransform(W, H);
+  const limX = Math.max(0, (v.iw - W) / 2);
+  const limY = Math.max(0, (v.ih - H) / 2);
+  VIEW.panX = Math.max(-limX, Math.min(limX, VIEW.panX));
+  VIEW.panY = Math.max(-limY, Math.min(limY, VIEW.panY));
+}
+
+function canvasSize() {
+  const cv = $("map");
+  const dpr = window.devicePixelRatio || 1;
+  return {W: cv.width / dpr, H: cv.height / dpr};
+}
+
+/* Zoom about a point, so that whatever is under the cursor stays under the cursor. Zooming
+   about the centre instead makes the thing being looked at slide away, which is the usual
+   reason a zoom feels wrong. */
+function zoomAt(mx, my, factor) {
+  const {W, H} = canvasSize();
+  const before = viewTransform(W, H);
+  const px = (mx - before.ox) / before.k;
+  const py = (my - before.oy) / before.k;
+
+  VIEW.zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, VIEW.zoom * factor));
+  const after = viewTransform(W, H);
+  VIEW.panX = mx - px * after.k - (W - after.iw) / 2;
+  VIEW.panY = my - py * after.k - (H - after.ih) / 2;
+  clampView(W, H);
+}
+
+function zoomBy(factor) {
+  const {W, H} = canvasSize();
+  zoomAt(W / 2, H / 2, factor);
+}
+
+function resetView() {
+  VIEW.zoom = 1; VIEW.panX = 0; VIEW.panY = 0;
+}
+
+/* When the reader is magnified and moves to the next junction, the new one has to be brought
+   into view: at zoom 4 a junction elsewhere in the building is off the panel, and the arrows
+   would be drawn where nobody can see them. */
+function centerOnPlan(px, py) {
+  if (VIEW.zoom <= 1.001) { VIEW.panX = 0; VIEW.panY = 0; return; }
+  const {W, H} = canvasSize();
+  const v = viewTransform(W, H);
+  VIEW.panX = W / 2 - px * v.k - (W - v.iw) / 2;
+  VIEW.panY = H / 2 - py * v.k - (H - v.ih) / 2;
+  clampView(W, H);
+}
+
+function layout() {
+  const box = $("mapBox");
+  const w = box.clientWidth;
+  // the panel keeps the plan's own aspect, so the whole building fits without letterboxing
+  const ar = GRAPH ? GRAPH.img_h / GRAPH.img_w : 0.71;
+  const h = Math.round(Math.max(240, Math.min(600, w * ar)));
+  const dpr = window.devicePixelRatio || 1;
+  const cv = $("map");
+  cv.width = Math.round(w * dpr);
+  cv.height = Math.round(h * dpr);
+  cv.style.height = h + "px";
+  cv.getContext("2d").setTransform(dpr, 0, 0, dpr, 0, 0);
+  if (GRAPH) clampView(w, h);
+}
+
+/* The whole plan is the map, and the junction is drawn over it.
+
+   Showing a crop around the junction left the reader with no idea where in the building they
+   were, and showing the whole plan at the width of the panel used to be impossible: the thin
+   walls averaged away to a blank sheet. That is what p08_plan_overview exists to fix, so the
+   whole plan can be the background — and it is cut at 2400 px rather than at the panel width so
+   that magnifying it still shows walls rather than mush.
+
+   Past that width the prepared picture is upscaled and goes soft, so the full-resolution plan
+   takes over: drawn at its own size or above, its walls are crisp again. */
+const OVERVIEW_W = 2400;
+
+function drawMap(it) {
+  const cv = $("map"), ctx = cv.getContext("2d");
+  const dpr = window.devicePixelRatio || 1;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const W = cv.width / dpr, H = cv.height / dpr;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = "#0a0d13";
+  ctx.fillRect(0, 0, W, H);
+  if (!GRAPH || !ITEMS.length) return;
+
+  const v = viewTransform(W, H);
+  const S = p => ({x: v.ox + p.x * v.k, y: v.oy + p.y * v.k});
+
+  // ---- the whole plan ----
+  // The alpha only lifts the walls, not the paper: the source is inverted first, so the sheet
+  // becomes near-black and the ink becomes near-white, and drawing it translucent over this
+  // background scales the ink up while leaving the sheet dark. At 0.62 the walls landed around
+  // a hundred grey and read as smudge; brighter keeps them clearly above the background.
+  const bg = (v.iw > OVERVIEW_W * 0.98 && PLAN) ? PLAN : PLAN_SMALL;
+  if (bg) {
+    ctx.save();
+    ctx.filter = "invert(1) hue-rotate(180deg) contrast(1.05)";
+    ctx.globalAlpha = 0.85;
+    ctx.drawImage(bg, v.ox, v.oy, v.iw, v.ih);
+    ctx.restore();
+  }
+
+  // ---- the route walked up to this decision ----
+  if (TRAJ && TRAJ.t && TRAJ.t.length) {
+    const upto = parseFloat(it.time);
+    ctx.strokeStyle = "rgba(34,197,94,0.95)";
+    ctx.lineWidth = Math.max(2, 2.5);
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    let drew = false;
+    for (let k = 0; k < TRAJ.t.length; k++) {
+      if (TRAJ.t[k] > upto) break;
+      const p = S({x: TRAJ.x[k], y: TRAJ.y[k]});
+      if (drew) ctx.lineTo(p.x, p.y);
+      else { ctx.moveTo(p.x, p.y); drew = true; }
+    }
+    if (drew) ctx.stroke();
+  }
+
+  // ---- the junction, marked on the plan ----
+  const jn = nodePos(it.node);
+  const jp = S(jn);
+  ctx.beginPath();
+  ctx.arc(jp.x, jp.y, 9, 0, 2 * Math.PI);
+  ctx.fillStyle = "#22c55e";
+  ctx.fill();
+  ctx.lineWidth = 2.5;
+  ctx.strokeStyle = "#06210f";
+  ctx.stroke();
+
+  drawJunction(ctx, W, H, it, jp);
+}
+
+/* Wheel and drag. Bound once, outside drawMap, so that the handlers do not multiply as the
+   junction changes. */
+(function bindMapGestures() {
+  const cv = $("map");
+  let dragging = false, lastX = 0, lastY = 0, moved = 0;
+
+  const ready = () => GRAPH && ITEMS.length;
+
+  cv.addEventListener("wheel", ev => {
+    ev.preventDefault();
+    if (!ready()) return;
+    const r = cv.getBoundingClientRect();
+    const factor = Math.exp(-ev.deltaY * 0.0018);
+    zoomAt(ev.clientX - r.left, ev.clientY - r.top, factor);
+    if (item()) drawMap(item());
+  }, {passive: false});
+
+  cv.addEventListener("pointerdown", ev => {
+    if (!ready() || VIEW.zoom <= 1.001) return;   // nothing to pan at fit scale
+    dragging = true; moved = 0;
+    lastX = ev.clientX; lastY = ev.clientY;
+    cv.setPointerCapture(ev.pointerId);
+    cv.classList.add("grab");
+  });
+
+  cv.addEventListener("pointermove", ev => {
+    if (!dragging) return;
+    const dx = ev.clientX - lastX, dy = ev.clientY - lastY;
+    lastX = ev.clientX; lastY = ev.clientY;
+    moved += Math.abs(dx) + Math.abs(dy);
+    const {W, H} = canvasSize();
+    VIEW.panX += dx; VIEW.panY += dy;
+    clampView(W, H);
+    if (item()) drawMap(item());
+  });
+
+  const stop = ev => {
+    if (!dragging) return;
+    dragging = false;
+    cv.classList.remove("grab");
+    try { cv.releasePointerCapture(ev.pointerId); } catch (e) {}
+  };
+  cv.addEventListener("pointerup", stop);
+  cv.addEventListener("pointercancel", stop);
+
+  // double click to fit again, but only when it was not the end of a drag
+  cv.addEventListener("dblclick", () => {
+    if (!ready()) return;
+    resetView();
+    drawMap(item());
+  });
+
+  const zoomBtn = (id, f) => $(id).addEventListener("click", () => {
+    if (!ready()) return;
+    f();
+    drawMap(item());
+  });
+  zoomBtn("zoomIn", () => zoomBy(1.5));
+  zoomBtn("zoomOut", () => zoomBy(1 / 1.5));
+  zoomBtn("zoomReset", () => resetView());
+})();
+
+/* The junction, drawn on the plan at screen size.
+
+   There is no magnified inset. The whole plan stays the background, and the passages at the
+   junction are drawn over it at a fixed screen size rather than at the plan's own scale: a
+   corridor a few pixels wide is unreadable when the building is 565 px across, but the
+   direction it leaves the junction in is exact, so a fixed-length arrow carries the meaning
+   without a second frame of reference to translate against.
+
+   Left and right are named on the arrows. They come from the tracker's reading of the turn
+   (p08_graph.turn), which is the walker's own left and right — the same frame as the video. */
+function drawJunction(ctx, W, H, it, jp) {
+  const node = it.node, arrival = it.arrival_edge;
+  const cands = split(it.candidate_edges);
+  const sides = split(it.candidate_sides);
+
+  // the direction of a passage as it leaves the junction. Taken from plan coordinates, which
+  // is where the angles are exact, and then used unchanged on the screen: the plan is only
+  // scaled and centred, never rotated, so an angle carries over as it is.
+  const here = nodePos(node);
+  const dirTo = nid => {
+    const p = nodePos(nid);
+    return Math.atan2(p.y - here.y, p.x - here.x);
+  };
+
+  // the way in: a dashed tail, so it is plain which corridor the fly arrived along
+  if (arrival && edgeById(arrival)) {
+    const a = dirTo(other(arrival, node));
+    const back = 62;
+    ctx.strokeStyle = "#f59e0b";
+    ctx.lineWidth = 4;
+    ctx.setLineDash([7, 6]);
+    ctx.lineCap = "butt";
+    ctx.beginPath();
+    ctx.moveTo(jp.x, jp.y);
+    ctx.lineTo(jp.x - Math.cos(a) * back, jp.y - Math.sin(a) * back);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.lineCap = "round";
+  }
+
+  // the options: a fixed-length arrow each, in its own colour, and the same colours on the
+  // answer buttons. Nothing here says which one the system took until there is an answer.
+  const done = answered(it);
+  for (const eid of cands) {
+    if (!edgeById(eid)) continue;
+    const isSys = done && eid === it.chosen_edge;
+    const col = colorOf(it, eid).c;
+    const a = dirTo(other(eid, node));
+    const len = 66;
+    const q = {x: jp.x + Math.cos(a) * len, y: jp.y + Math.sin(a) * len};
+
+    if (isSys) {          // a halo, so the system's path stands out from the same-coloured rest
+      ctx.strokeStyle = "rgba(255,255,255,0.9)";
+      ctx.lineWidth = 11;
+      ctx.beginPath();
+      ctx.moveTo(jp.x + Math.cos(a) * 11, jp.y + Math.sin(a) * 11);
+      ctx.lineTo(q.x, q.y);
+      ctx.stroke();
+    }
+    ctx.strokeStyle = col;
+    ctx.lineWidth = isSys ? 6 : 4.5;
+    ctx.beginPath();
+    ctx.moveTo(jp.x + Math.cos(a) * 11, jp.y + Math.sin(a) * 11);
+    ctx.lineTo(q.x, q.y);
+    ctx.stroke();
+    arrowHead(ctx, q, jp, isSys ? 17 : 13, col);
+
+    const txt = `→ ${other(eid, node)}`;
+    ctx.font = `600 ${isSys ? 13 : 12}px -apple-system,sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    const tw = ctx.measureText(txt).width;
+
+    // The label goes just beyond the arrow head, and is moved to fit inside the picture. A name
+    // that ran off the edge would leave a colour with nothing to match against — and a clamp
+    // alone is not enough: at the left edge of the plan the clamped spot lands on top of the
+    // arrow's own shaft and hides it, which is a colour the reader can no longer see. So when
+    // the natural spot does not fit, the label steps sideways off the line instead.
+    const fit = (x, y) => {
+      const fx = Math.max(tw / 2 + 6, Math.min(W - tw / 2 - 6, x));
+      const fy = Math.max(12, Math.min(H - 12, y));
+      return {x: fx, y: fy, moved: Math.abs(fx - x) > 0.5 || Math.abs(fy - y) > 0.5};
+    };
+    let L = fit(q.x + Math.cos(a) * (tw / 2 + 14), q.y + Math.sin(a) * (tw / 2 + 14));
+    if (L.moved) {
+      const nx = -Math.sin(a), ny = Math.cos(a);          // a quarter turn from the arrow
+      const mid = {x: (jp.x + q.x) / 2, y: (jp.y + q.y) / 2};
+      const side = [1, -1].map(s => fit(mid.x + nx * 26 * s, mid.y + ny * 26 * s));
+      L = side.find(c => !c.moved) || side[0];
+    }
+
+    ctx.fillStyle = "rgba(8,11,17,0.82)";
+    ctx.beginPath();
+    ctx.roundRect(L.x - tw / 2 - 6, L.y - 10, tw + 12, 20, 6);
+    ctx.fill();
+    ctx.fillStyle = col;
+    ctx.fillText(txt, L.x, L.y);
+  }
+
+  ctx.textBaseline = "alphabetic";
+
+  // the walker, ringed so it reads against whatever the plan has underneath
+  ctx.beginPath();
+  ctx.arc(jp.x, jp.y, 9, 0, 2 * Math.PI);
+  ctx.fillStyle = "#22c55e";
+  ctx.fill();
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = "#06210f";
+  ctx.stroke();
+}
+
+function arrowHead(ctx, tip, from, size, col) {
+  const a = Math.atan2(tip.y - from.y, tip.x - from.x);
+  ctx.save();
+  ctx.translate(tip.x, tip.y);
+  ctx.rotate(a);
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(-size, size * 0.55);
+  ctx.lineTo(-size, -size * 0.55);
+  ctx.closePath();
+  ctx.fillStyle = col;
+  ctx.fill();
+  ctx.restore();
+}
+
+/* ---------------------------------------------------------------- answer */
+const ARROW = '<path d="M12 20 L12 6"/><path d="M6 12 L12 6 L18 12"/>';
+
+/* One colour per passage on offer, assigned by position in the candidate list and carrying no
+   meaning of its own. The same colours are used on the plan and on the answer buttons, so the
+   reader matches a colour to a colour.
+
+   Deliberately NOT keyed to which passage the system chose: if the red path were always the
+   system's choice, the colour would answer the question for the reader, and the audit would
+   measure agreement rather than accuracy. The choice is marked on the plan only after the
+   reader has answered. */
+// `ru` is the colour named on a button, `dat` the same in the dative case: the verdict reads
+// "муха ушла по красному пути", and "по красный пути" is not Russian.
+const PALETTE = [
+  {c: "#ef4444", ru: "красный", dat: "красному"},
+  {c: "#5b8def", ru: "синий", dat: "синему"},
+  {c: "#c084fc", ru: "фиолетовый", dat: "фиолетовому"},
+];
+
+const DIRS = [
+  {k: "LEFT", lb: "влево", rot: -90},
+  {k: "STRAIGHT", lb: "прямо", rot: 0},
+  {k: "RIGHT", lb: "вправо", rot: 90},
+  {k: "BACK", lb: "назад", rot: 180},
+];
+
+const candsOf = it => split(it.candidate_edges);
+const colorOf = (it, eid) => {
+  const k = candsOf(it).indexOf(eid);
+  return k >= 0 && k < PALETTE.length ? PALETTE[k]
+                                       : {c: "#8a94a8", ru: "серый", dat: "серому"};
+};
+/* Which way the system went, as a passage. Before the reader answers this is not shown: the
+   plan colours the way in and the ways out, and nothing else. */
+const answered = it => Boolean(it.truth_edge || it.truth_side);
+
+function item() { return ITEMS[IDX]; }
+
+/* The steps light up as the reader moves through them, so the flow does not have to be
+   guessed: watch, answer, read the result. */
+function markSteps() {
+  const it = item();
+  const done = it && answered(it);
+  const steps = document.querySelectorAll(".step");
+  steps.forEach((s, k) => s.classList.toggle("on", done ? k === 2 : k <= 1));
+}
+
+function show(i) {
+  IDX = Math.max(0, Math.min(ITEMS.length - 1, i));
+  const it = item();
+  if (!it) return;
+
+  const v = $("vid");
+  v.src = "/p083v/" + it.clip_file;
+  v.load();
+  // Autoplay: the clip is eight seconds and the decision is at the third, so the reader should
+  // only have to watch. Muted, otherwise the browser refuses to start it without a gesture.
+  v.muted = true;
+  v.play().catch(() => {});
+  // Where autoplay is refused there would otherwise be a black or opening frame. Parking the
+  // playhead just before the decision leaves the relevant moment on screen either way. A token
+  // guards against this firing after the reader has already moved to another junction.
+  const token = ++SHOW_TOKEN;
+  setTimeout(() => {
+    if (token !== SHOW_TOKEN) return;
+    if (v.paused && v.currentTime < 0.2) {
+      v.currentTime = DECISION_IN_CLIP - 1.0;
+      highlight(nearestTile());
+    }
+  }, 900);
+
+  $("counter").textContent = `${IDX + 1} / ${ITEMS.length}` +
+    (ONLY_VISIBLE ? `   (в полном списке №${it.n})` : "");
+
+  drawPaths(it);
+  drawDirs(it);
+  drawSystemCard(it);
+  drawVerdict(it);
+  drawOptions(it, candsOf(it), split(it.candidate_sides), split(it.candidate_angles));
+
+  drawStrip(it);
+  // magnified, the new junction has to be brought into view; at fit scale this recentres
+  const nd = nodePos(it.node);
+  centerOnPlan(nd.x, nd.y);
+  drawMap(it);
+  drawDots();
+  drawSummary();
+  markSteps();
+}
+
+/* One button per passage on offer, in that passage's own colour. The button repeats the
+   destination the plan shows, so a colour on the screen and a colour on the button can be
+   matched without reading anything. */
+function drawPaths(it) {
+  const cands = candsOf(it);
+  const angs = split(it.candidate_angles);
+  $("paths").innerHTML = cands.map((eid, k) => {
+    const p = colorOf(it, eid);
+    const deg = angs[k] ? `, ${angs[k]}°` : "";
+    return `<div class="pth ${it.truth_edge === eid ? "on" : ""}" data-edge="${eid}"
+      style="--c:${p.c}">
+      <span class="sw"></span>
+      <span class="tx"><b>${p.ru}</b>
+        <small>путь ${pretty(eid)}${deg}</small></span>
+    </div>`;
+  }).join("") || '<div class="pth">вариантов не записано</div>';
+  for (const b of $("paths").querySelectorAll(".pth[data-edge]")) {
+    b.addEventListener("click", () => setAnswer(b.dataset.edge, "path"));
+  }
+}
+
+/* The four directions stay reachable, because the fly does sometimes leave along a passage the
+   graph does not have, and that is the most interesting outcome of all: it is a hole in the
+   plan rather than a wrong choice. They are kept quiet — small and below a rule — so the
+   ordinary answer stays the colour. */
+function drawDirs(it) {
+  $("dirs").innerHTML = DIRS.map(a => {
+    const on = !it.truth_edge && it.truth_side === a.k;
+    return `<div class="d ${on ? "on" : ""}" data-k="${a.k}">
+      <svg viewBox="0 0 24 24" style="transform:rotate(${a.rot}deg)">${ARROW}</svg>
+      <span class="lb">${a.lb}</span></div>`;
+  }).join("");
+  for (const d of $("dirs").querySelectorAll(".d")) {
+    d.addEventListener("click", () => setAnswer(d.dataset.k, "dir"));
+  }
+  $("noneBtn").classList.toggle("on", it.truth_side === "UNCLEAR" && !it.truth_edge);
+}
+
+/* What the system did, held back until the reader has answered.
+
+   Shown beforehand it turns the task into agreement: the reader sees the system sent the fly
+   down the blue passage and is then asked whether the fly went blue. The colours on the plan
+   carry no such hint, and this card follows the same rule. */
+function drawSystemCard(it) {
+  const box = $("systemCard");
+  const angs = split(it.candidate_angles);
+  const k = candsOf(it).indexOf(it.chosen_edge);
+
+  if (!answered(it)) {
+    box.classList.add("locked");
+    box.innerHTML = `<h3>что решила система</h3>
+      <div class="lock">Скрыто, пока ты не ответишь, — иначе система подсказывает ответ.</div>`;
+    return;
+  }
+
+  const p = colorOf(it, it.chosen_edge);
+  const ang = k >= 0 && angs[k] ? `, ${angs[k]}°` : "";
+  const fly = it.male_direction
+    ? `поворот <b class="c-${it.male_direction.toLowerCase()}">${
+        SIDE_BIG[it.male_direction] || it.male_direction}</b>`
+    : '<span class="c-none">ничего не показала</span>';
+  box.classList.remove("locked");
+  box.innerHTML = `<h3>что решила система</h3>
+    <div class="row"><span class="lbl">повела муху</span>
+      <span class="val big" style="color:${p.c}">по ${p.dat} пути</span></div>
+    <div class="row"><span class="lbl">это путь</span>
+      <span class="val">${pretty(it.chosen_edge)}${ang}</span></div>
+    <div class="row"><span class="lbl">сигнал мухи</span>
+      <span class="val">${fly}</span></div>
+    <div class="row"><span class="lbl">почему так</span>
+      <span class="val">${whyText(it)}</span></div>
+    <div class="row"><span class="lbl">поворот в кадре</span>
+      <span class="val">${it.turn_visible || "не измерено"}</span></div>
+    <div class="note">«Сигнал мухи» — это данные MaleCNS о том, куда муха поворачивала. Если
+      сигнал слабый или нужного пути нет на схеме, система выбирает по форме коридоров.</div>`;
+}
+
+function drawOptions(it, cands, sides, angs) {
+  const done = answered(it);
+  $("opts").innerHTML = cands.map((eid, k) => {
+    const p = colorOf(it, eid);
+    const taken = done && eid === it.chosen_edge;
+    return `<div class="r">
+      <span class="n" style="background:${p.c}"></span>
+      <span style="color:${p.c};font-weight:600">${p.ru}</span>
+      <span>${SIDE_RU[sides[k]] || sides[k] || "?"}${angs[k] ? `, ${angs[k]}°` : ""}
+      → путь ${pretty(eid)}${taken ? "   ← сюда повела система" : ""}</span></div>`;
+  }).join("") || '<div class="r">вариантов не записано</div>';
+}
+
+/* Correctness is worked out from the answer. Nothing else is asked of the reader.
+
+   A path answer names one passage exactly, so it can be compared with the system's choice
+   directly. A direction answer names a side instead, and a side may fit more than one passage:
+   at two of these junctions both ways out are straight on, and answering "straight" there would
+   be scored against whichever one the system happened to take. That ambiguity is why the path
+   answer exists; the direction answer is kept only for the case where the fly left along a
+   passage the graph does not contain. */
+function judge(it) {
+  const cands = candsOf(it);
+  const sides = split(it.candidate_sides);
+
+  if (it.truth_edge) {
+    if (it.truth_edge === it.chosen_edge) return {k: "CORRECT"};
+    return {k: "WRONG", correct: [it.truth_edge]};
+  }
+
+  const ans = it.truth_side;
+  if (!ans) return {k: ""};
+  if (ans === "UNCLEAR") return {k: "UNCLEAR"};
+
+  const matching = cands.filter((e, k) => sides[k] === ans);
+  if (!matching.length) return {k: "MISSING"};      // a side the plan has no passage for
+  return matching.includes(it.chosen_edge)
+    ? {k: "CORRECT"} : {k: "WRONG", correct: matching};
+}
+
+function drawVerdict(it) {
+  const box = $("verdict");
+  const j = judge(it);
+  box.className = "verdict";
+  if (!j.k) { box.innerHTML = ""; return; }
+  box.classList.add("show");
+
+  const myCol = colorOf(it, it.truth_edge);
+  const sysCol = colorOf(it, it.chosen_edge);
+
+  if (j.k === "CORRECT") {
+    box.classList.add("ok");
+    box.innerHTML = `<div class="hd">✓ Система угадала</div>
+      <div class="why">Муха ушла по <b style="color:${myCol.c}">${myCol.dat}</b> пути, и
+      система повела её туда же — ${pretty(it.chosen_edge)}.</div>`;
+  } else if (j.k === "WRONG" && it.truth_edge) {
+    box.classList.add("bad");
+    box.innerHTML = `<div class="hd">✕ Система ошиблась</div>
+      <div class="why">Муха ушла по <b style="color:${myCol.c}">${myCol.dat}</b> пути
+      (${pretty(it.truth_edge)}), а система повела её по
+      <b style="color:${sysCol.c}">${sysCol.dat}</b> (${pretty(it.chosen_edge)}).</div>`;
+  } else if (j.k === "WRONG") {
+    box.classList.add("bad");
+    const good = j.correct.map(e => `<code>${pretty(e)}</code>`).join(" ");
+    box.innerHTML = `<div class="hd">✕ Система ошиблась</div>
+      <div class="why">Муха ушла <b>${SIDE_BIG[it.truth_side] || it.truth_side}</b>, а система
+      повела её по <b style="color:${sysCol.c}">${sysCol.ru}</b> пути
+      (${pretty(it.chosen_edge)}).</div>
+      <div class="fix">Нужен был путь: ${good}</div>`;
+  } else if (j.k === "MISSING") {
+    box.classList.add("bad");
+    box.innerHTML = `<div class="hd">⚠ Такого пути на схеме нет</div>
+      <div class="why">Муха ушла <b>${SIDE_BIG[it.truth_side] || it.truth_side}</b>, но пути
+      туда на схеме нет вовсе. Это дыра в схеме, а не выбор системы.</div>`;
+  } else {
+    box.classList.add("unc");
+    box.innerHTML = '<div class="hd">Здесь не разобрать — пропускаем</div>';
+  }
+}
+
+function drawStrip(it) {
+  const box = $("strip");
+  box.innerHTML = "";
+  const parts = 7;
+  const img = new Image();
+  img.onload = () => {
+    const tw = Math.floor(img.width / parts);
+    for (let k = 0; k < parts; k++) {
+      const c = document.createElement("canvas");
+      c.width = tw; c.height = img.height;
+      const cx = c.getContext("2d");
+      // the corridor clips are dark, and a dark thumbnail shows nothing at this size
+      cx.filter = "brightness(1.3) contrast(1.12)";
+      cx.drawImage(img, k * tw, 0, tw, img.height, 0, 0, tw, img.height);
+      cx.filter = "none";
+      c.title = "перейти к этому моменту";
+      c.addEventListener("click", () => {
+        const v = $("vid");
+        v.currentTime = Math.max(0, Math.min(v.duration || 8, stripTime(k)));
+        v.play().catch(() => {});
+      });
+      box.appendChild(c);
+    }
+    highlight(nearestTile());
+  };
+  img.src = "/p083/" + it.strip;
+}
+
+/* The strip is cut from the clip by `frame_strip`, which takes seven stills from two seconds
+   before the decision to two after. The clip itself starts three seconds before the decision,
+   so tile k sits at clip time 1 + k*(2/3), and the decision is tile 3 at 3.0 s. Getting this
+   wrong is invisible until a strip frame is clicked and the clip lands somewhere else. */
+const DECISION_IN_CLIP = 3.0;
+const TILE_STEP = 4.0 / 6;
+const stripTime = k => DECISION_IN_CLIP - 2.0 + k * TILE_STEP;
+const nearestTile = () => Math.round(
+  (($("vid").currentTime || DECISION_IN_CLIP) - 1.0) / TILE_STEP);
+
+function highlight(k) {
+  for (const [i, c] of Array.from($("strip").children).entries()) {
+    c.classList.toggle("now", i === Math.max(0, Math.min(6, k)));
+  }
+}
+
+function drawDots() {
+  $("dots").innerHTML = ITEMS.map((x, k) => {
+    const j = judge(x);
+    const cls = j.k === "CORRECT" ? "ok" : (j.k === "WRONG" || j.k === "MISSING") ? "bad"
+              : j.k === "UNCLEAR" ? "unc" : k === IDX ? "cur" : "";
+    return `<span class="dot ${cls}" data-k="${k}" title="развилка ${k + 1}"></span>`;
+  }).join("");
+  for (const d of $("dots").querySelectorAll(".dot")) {
+    d.addEventListener("click", () => show(+d.dataset.k));
+  }
+}
+
+function drawSummary() {
+  let ok = 0, bad = 0, missing = 0, skipped = 0, done = 0;
+  for (const x of ITEMS) {
+    const j = judge(x);
+    if (j.k === "CORRECT") { ok++; done++; }
+    else if (j.k === "WRONG") { bad++; done++; }
+    else if (j.k === "MISSING") { missing++; done++; }
+    else if (j.k === "UNCLEAR") { skipped++; done++; }
+  }
+  const fly = ITEMS.filter(x => x.male_direction);
+  const flyDone = fly.filter(x => ["CORRECT", "WRONG", "MISSING"].includes(judge(x).k));
+  const flyOk = fly.filter(x => judge(x).k === "CORRECT").length;
+
+  $("summary").innerHTML =
+    `<span>разобрано <b>${done}</b> из ${ITEMS.length}</span>`
+    + `<span>угадала <b style="color:var(--ok)">${ok}</b></span>`
+    + `<span>ошиблась <b style="color:var(--bad)">${bad}</b></span>`
+    + (missing ? `<span>пути нет на схеме <b style="color:var(--warn)">${missing}</b></span>` : "")
+    + (skipped ? `<span>пропущено <b>${skipped}</b></span>` : "")
+    + (done - skipped
+        ? `<span>точность <b>${(ok / (done - skipped) * 100).toFixed(0)}%</b> из ${done - skipped}</span>`
+        : "")
+    + `<span>из них с сигналом мухи: <b>${flyDone.length ? flyOk + " из " + flyDone.length : "—"}</b></span>`;
+}
+
+/* -------------------------------------------------------------- actions */
+async function setAnswer(value, kind) {
+  const it = item();
+  if (!it) return;
+
+  // A path answer and a direction answer are two ways of naming the same thing, so picking one
+  // clears the other: leaving both set would make the verdict depend on which was read first.
+  if (kind === "path") {
+    it.truth_edge = it.truth_edge === value ? "" : value;
+    it.truth_side = it.truth_edge ? (sidesByEdge(it)[it.truth_edge] || "") : "";
+  } else {
+    const was = !it.truth_edge && it.truth_side === value;
+    it.truth_side = was ? "" : value;
+    it.truth_edge = "";
+  }
+
+  const j = judge(it);
+  const verdict = j.k === "UNCLEAR" ? "UNCLEAR" : j.k || "";
+  const correct = (j.correct || []).join("|");
+
+  drawPaths(it);
+  drawDirs(it);
+  drawVerdict(it);
+  drawOptions(it, candsOf(it), split(it.candidate_sides), split(it.candidate_angles));
+  drawMap(it);            // the system's choice appears on the plan once there is an answer
+  drawDots();
+  drawSummary();
+  drawSystemCard(it);
+  markSteps();
+
+  try {
+    await fetch("/api/p083/verdict", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({n: it.n, verdict, truth_edge: it.truth_edge,
+                            truth_side: it.truth_side,
+                            correct_edge_if_wrong: correct}),
+    });
+  } catch (e) { /* stays on screen; re-sent on the next click */ }
+}
+
+$("noneBtn").addEventListener("click", () => setAnswer("UNCLEAR", "dir"));
+
+$("next").addEventListener("click", () => show(IDX + 1));
+$("prev").addEventListener("click", () => show(IDX - 1));
+$("onlyVisible").addEventListener("click", () => {
+  ONLY_VISIBLE = !ONLY_VISIBLE;
+  $("onlyVisible").classList.toggle("on", ONLY_VISIBLE);
+  ITEMS = ONLY_VISIBLE
+    ? ALL.filter(x => parseFloat(x.rotation_coherence) >= 0.2)
+    : ALL.slice();
+  if (!ITEMS.length) {
+    ITEMS = ALL.slice(); ONLY_VISIBLE = false;
+    $("onlyVisible").classList.remove("on");
+  }
+  show(0);
+});
+
+window.addEventListener("keydown", ev => {
+  if (ev.target.tagName === "INPUT") return;
+  const it = item();
+  const n = +ev.key;
+  if (it && n >= 1 && n <= candsOf(it).length) {
+    setAnswer(candsOf(it)[n - 1], "path");
+  } else if (ev.key === "0") {
+    setAnswer("UNCLEAR", "dir");
+  } else if (ev.key === "ArrowRight") { ev.preventDefault(); show(IDX + 1); }
+  else if (ev.key === "ArrowLeft") { ev.preventDefault(); show(IDX - 1); }
+  else if (ev.key === " ") {
+    ev.preventDefault();
+    const v = $("vid");
+    v.paused ? v.play().catch(() => {}) : v.pause();
+  }
+});
+
+window.addEventListener("resize", () => {
+  layout();
+  if (item()) drawMap(item());
+});
+
+/* The strip follows the playhead so the reader can see where in the clip they are. */
+const vid = $("vid");
+vid.addEventListener("timeupdate", () => highlight(nearestTile()));
+vid.addEventListener("loadedmetadata", () => {
+  highlight(nearestTile());
+  noteShortClip();
+});
+
+/* The last decision in the recording cannot be judged from the clip: the tape runs out a second
+   after it. An eight second window centred on the decision needs four seconds of film after it,
+   and where the recording ends sooner the reader sees almost nothing — which reads as their own
+   failure rather than as missing film. This says which it is. */
+const CLIP_AFTER_S = 3.0;          // the decision sits this far into the clip
+
+function noteShortClip() {
+  const box = $("clipNote");
+  const it = item();
+  if (!it || !isFinite(vid.duration) || !vid.duration) { box.className = "clipnote"; return; }
+  const after = vid.duration - CLIP_AFTER_S;
+  if (after >= 3.5) { box.className = "clipnote"; return; }
+  box.className = "clipnote show";
+  box.innerHTML = `<span>⚠</span><span><b>Здесь судить нельзя.</b> Запись обрывается через
+    ${after.toFixed(1)} с после решения, а дальше муха не видна. Это последнее решение в
+    записи — ответ «не разобрать» тут правильный. Нажми
+    <b>не разобрать</b> и иди дальше.</span>`;
+}
+
+/* Watching the clip through to the end would leave the resting frame a few seconds after the
+   decision, which is the least informative frame in it. Parking on the moment just before the
+   decision means the picture on screen is the one that matters, whether the reader has just
+   arrived or has already watched it. */
+vid.addEventListener("ended", () => {
+  vid.currentTime = DECISION_IN_CLIP - 1.0;
+  highlight(nearestTile());
+});
+
+boot();
+</script>
+</body>
+</html>

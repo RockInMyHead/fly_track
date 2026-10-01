@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fly_vo — turn annotator</title>
+<style>
+  :root{
+    --bg:#0e1116; --panel:#161b22; --panel2:#1c2230; --line:#2a3141;
+    --txt:#e6edf3; --dim:#8b98a9; --accent:#4c8dff;
+    --left:#3fb950; --right:#c678dd; --fwd:#58a6ff; --unclear:#7d8590;
+    --good:#3fb950; --warn:#d29922; --bad:#f85149;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--bg); color:var(--txt);
+    font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  header{
+    display:flex; align-items:center; gap:14px; padding:10px 14px;
+    border-bottom:1px solid var(--line); background:var(--panel); flex:0 0 auto;
+  }
+  header h1{margin:0;font-size:13px;font-weight:600;letter-spacing:.04em}
+  header .meta{color:var(--dim);font-size:11px}
+  header .spacer{flex:1}
+  button{
+    background:var(--panel2); color:var(--txt); border:1px solid var(--line);
+    border-radius:5px; padding:5px 10px; font:inherit; font-size:12px; cursor:pointer;
+  }
+  button:hover{border-color:#3d4759; background:#232b3a}
+  button:active{transform:translateY(1px)}
+  button.primary{background:#1f3a6d;border-color:#2f5bab}
+  button.primary:hover{background:#25457f}
+  button.ghost{background:transparent}
+  button:disabled{opacity:.4;cursor:not-allowed}
+
+  main{flex:1; display:grid; grid-template-columns:minmax(0,1fr) 400px; min-height:0}
+  .stage{display:flex;flex-direction:column;min-width:0;min-height:0}
+
+  .video-wrap{position:relative;background:#000;flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center}
+  video{max-width:100%;max-height:100%;display:block}
+  .hud{
+    position:absolute;left:10px;top:10px;background:rgba(8,11,16,.78);
+    border:1px solid var(--line);border-radius:5px;padding:5px 9px;font-size:11px;line-height:1.5;
+  }
+  .hud b{color:var(--accent);font-weight:600}
+
+  .controls{display:flex;align-items:center;gap:8px;padding:8px 12px;border-top:1px solid var(--line);background:var(--panel);flex:0 0 auto;flex-wrap:wrap}
+  .controls .grp{display:flex;gap:4px;align-items:center}
+  .controls .lbl{color:var(--dim);font-size:11px}
+  input[type=range]{accent-color:var(--accent)}
+  select{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:5px;padding:4px 6px;font:inherit;font-size:12px}
+
+  .timeline{flex:0 0 auto;padding:8px 12px 12px;background:var(--panel);border-top:1px solid var(--line)}
+  .timeline canvas{width:100%;height:78px;display:block;cursor:crosshair;border-radius:5px;background:#0b0e13}
+
+  aside{border-left:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;min-height:0}
+  .tabs{display:flex;border-bottom:1px solid var(--line);flex:0 0 auto}
+  .tabs button{flex:1;border:0;border-radius:0;background:transparent;border-bottom:2px solid transparent;padding:9px 6px;color:var(--dim)}
+  .tabs button.on{color:var(--txt);border-bottom-color:var(--accent);background:#12171f}
+  .tabbody{flex:1;overflow:auto;padding:12px;min-height:0}
+  .tabbody.hidden,.hidden{display:none}
+
+  .markrow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+  .dirbtn{flex:1;min-width:78px;border-width:1px;font-weight:600}
+  .dirbtn.LEFT{border-color:#2b6a33;color:var(--left)}
+  .dirbtn.LEFT:hover{background:#16261a}
+  .dirbtn.RIGHT{border-color:#6a3b7a;color:var(--right)}
+  .dirbtn.RIGHT:hover{background:#221a28}
+  .dirbtn.FWD{border-color:#2b4f78;color:var(--fwd)}
+  .dirbtn.FWD:hover{background:#152130}
+  .dirbtn.UNCLEAR{border-color:#3a414d;color:var(--unclear)}
+
+  .pending{border:1px dashed var(--line);border-radius:6px;padding:8px;margin-bottom:10px;font-size:11px;color:var(--dim)}
+  .pending b{color:var(--txt)}
+
+  .measurebox{margin-bottom:10px}
+  .measurebox .verdict{
+    border-radius:6px;padding:8px 9px;margin-top:7px;font-size:12px;line-height:1.5;
+    border:1px solid var(--line);background:var(--panel2);
+  }
+  .measurebox .verdict b{font-size:13px}
+  .measurebox .verdict .sub{color:var(--dim);font-size:11px;margin-top:3px}
+  details.manual{margin-bottom:10px;font-size:11px;color:var(--dim)}
+  details.manual summary{cursor:pointer;padding:3px 0}
+  details.manual summary:hover{color:var(--txt)}
+  .warnbox{
+    border:1px solid var(--warn);border-left-width:3px;border-radius:5px;
+    padding:8px 9px;margin-bottom:10px;font-size:11px;line-height:1.55;color:var(--dim);
+    background:rgba(210,153,34,.06);
+  }
+  .warnbox b{color:var(--warn)}
+
+  .turn{border:1px solid var(--line);border-radius:6px;padding:8px 9px;margin-bottom:7px;background:var(--panel2);cursor:pointer}
+  .turn:hover{border-color:#3d4759}
+  .turn.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+  .turn .top{display:flex;align-items:center;gap:7px;margin-bottom:4px}
+  .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+  .turn .t{font-weight:600}
+  .turn .times{color:var(--dim);font-size:11px}
+  .turn .notes{color:var(--dim);font-size:11px;margin-top:4px;white-space:pre-wrap}
+  .turn .row{display:flex;gap:4px;margin-top:6px}
+  .turn .row button{padding:2px 7px;font-size:11px}
+
+  .hint{color:var(--dim);font-size:11px;line-height:1.7}
+  .hint kbd{background:var(--panel2);border:1px solid var(--line);border-radius:3px;padding:0 4px;font-size:10px}
+  .hint h4{color:var(--txt);margin:12px 0 5px;font-size:11px;letter-spacing:.05em;text-transform:uppercase}
+
+  .pathwrap{display:flex;flex-direction:column;gap:8px}
+  .pathwrap canvas{width:100%;aspect-ratio:1/1;background:#0b0e13;border:1px solid var(--line);border-radius:6px;cursor:crosshair;display:block}
+  .legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--dim)}
+  .legend span{display:flex;align-items:center;gap:4px}
+
+  .ref{border-left:2px solid var(--line);padding-left:8px;margin-bottom:7px;font-size:11px}
+  .ref .tag{font-weight:600}
+  .ref .st{color:var(--dim)}
+  .ok{color:var(--good)} .no{color:var(--bad)} .mid{color:var(--warn)}
+
+  .toast{
+    position:fixed;left:50%;bottom:22px;transform:translateX(-50%);
+    background:#1f3a6d;border:1px solid #2f5bab;color:#fff;padding:8px 16px;border-radius:6px;
+    font-size:12px;opacity:0;pointer-events:none;transition:opacity .18s;z-index:50;
+  }
+  .toast.on{opacity:1}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>turn annotator</h1>
+  <span class="meta" id="filestate">loading…</span>
+  <span class="spacer"></span>
+  <span class="meta" id="clock">t 0.000 s · frame 0</span>
+  <button id="btnSave" class="primary">save</button>
+  <button id="btnExport">export csv</button>
+  <button id="btnDownload" class="ghost">download json</button>
+  <button id="btnImport" class="ghost">import</button>
+  <input type="file" id="fileInput" accept=".json" class="hidden">
+</header>
+
+<main>
+  <section class="stage">
+    <div class="video-wrap">
+      <video id="vid" src="/media/VID00001.mp4" preload="metadata"></video>
+      <div class="hud">
+        <div>t <b id="hudT">0.000</b> s &nbsp; frame <b id="hudF">0</b></div>
+        <div id="hudMark" style="color:var(--dim)">no span marked</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="grp">
+        <button id="btnPlay">play</button>
+        <button id="btnBack5">−5 s</button>
+        <button id="btnBack1">−1 s</button>
+        <button id="btnFrameB">−frame</button>
+        <button id="btnFrameF">+frame</button>
+        <button id="btnFwd1">+1 s</button>
+        <button id="btnFwd5">+5 s</button>
+      </div>
+      <div class="grp">
+        <span class="lbl">speed</span>
+        <select id="speed">
+          <option value="0.15">0.15×</option>
+          <option value="0.25">0.25×</option>
+          <option value="0.5" selected>0.5×</option>
+          <option value="1">1×</option>
+          <option value="2">2×</option>
+        </select>
+      </div>
+      <div class="grp">
+        <button id="btnLoopSel" class="ghost">loop selected turn</button>
+      </div>
+      <div class="grp" style="margin-left:auto">
+        <span class="lbl">jump</span>
+        <button id="btnPrevTurn" class="ghost">◀ turn</button>
+        <button id="btnNextTurn" class="ghost">turn ▶</button>
+      </div>
+    </div>
+
+    <div class="timeline">
+      <canvas id="tl"></canvas>
+    </div>
+  </section>
+
+  <aside>
+    <div class="tabs">
+      <button data-tab="turns" class="on">turns</button>
+      <button data-tab="path">trajectory</button>
+      <button data-tab="ref">existing</button>
+      <button data-tab="help">help</button>
+    </div>
+
+    <div class="tabbody" id="tab-turns">
+      <div class="pending" id="pending">
+        mark the start and end of a turn, then pick its direction.
+      </div>
+      <div class="markrow">
+        <button id="btnIn">mark in  (i)</button>
+        <button id="btnOut">mark out  (o)</button>
+        <button id="btnClearSpan" class="ghost">clear span</button>
+      </div>
+
+      <div class="measurebox" id="measurebox">
+        <button id="btnMeasure" class="primary" style="width:100%">
+          measure the marked span — the tool decides the direction
+        </button>
+        <div class="hint" id="measureOut" style="margin-top:6px">
+          Uses the frozen estimator on exactly the marked window and reports which way the
+          camera turned, with a confidence from the field coherence. No drawing needed:
+          mark in, mark out, press this, then confirm.
+        </div>
+      </div>
+
+      <div class="markrow" id="confirmRow" style="display:none">
+        <button id="btnAccept" class="primary" style="flex:2">accept measurement</button>
+        <button id="btnReject" class="ghost">override…</button>
+      </div>
+
+      <details class="manual">
+        <summary>or set the direction by hand</summary>
+        <div class="markrow" style="margin-top:8px">
+          <button class="dirbtn LEFT"    data-dir="LEFT">camera LEFT</button>
+          <button class="dirbtn RIGHT"   data-dir="RIGHT">camera RIGHT</button>
+        </div>
+        <div class="markrow">
+          <button class="dirbtn FWD"     data-dir="FWD">forward only</button>
+          <button class="dirbtn UNCLEAR" data-dir="UNCLEAR">unclear</button>
+        </div>
+      </details>
+
+      <div class="markrow">
+        <span class="lbl" style="align-self:center">confidence</span>
+        <select id="conf">
+          <option value="high">high</option>
+          <option value="medium" selected>medium</option>
+          <option value="low">low</option>
+        </select>
+      </div>
+      <div id="turnList"></div>
+    </div>
+
+    <div class="tabbody hidden" id="tab-path">
+      <div class="pathwrap">
+        <div class="hint">
+          Draw the path the camera walked, top-down. <b>Forward is up</b> by default;
+          change it below if your sketch reads better another way.
+          Scrub the video to a moment, then click the canvas where you think the camera
+          was at that moment — the click stamps the current video time on the point.
+          Play at 0.5× and click as you go, and the shape and the timeline stay together.
+          Drag any point to move it, click to select.
+        </div>
+
+        <div class="warnbox">
+          <b>You do not need to draw the whole route.</b> Drawing every second of a
+          25-minute clip would be about 1500 clicks, which nobody should do. This tab is
+          for tracing a <i>short dense stretch</i>, or for a rough route shape.
+          For normal marking use the <b>turns</b> tab: mark the start and end of a turn,
+          press <b>measure</b>, and the tool decides the direction — two clicks per turn.
+        </div>
+
+        <div class="markrow">
+          <span class="lbl" style="align-self:center">forward is</span>
+          <select id="orient">
+            <option value="-90" selected>up</option>
+            <option value="0">right</option>
+            <option value="90">down</option>
+            <option value="180">left</option>
+          </select>
+          <span class="lbl" style="align-self:center">turn rate</span>
+          <select id="turnThresh">
+            <option value="5">5°/s</option>
+            <option value="10" selected>10°/s</option>
+            <option value="20">20°/s</option>
+            <option value="30">30°/s</option>
+          </select>
+        </div>
+
+        <div class="markrow">
+          <button id="btnDrop" class="primary">drop point at playhead</button>
+          <button id="btnPathUndo">undo</button>
+          <button id="btnGrab" class="ghost">grab points</button>
+          <button id="btnPathDel" class="ghost">delete selected</button>
+          <button id="btnPathClear" class="ghost">clear</button>
+        </div>
+
+        <div class="markrow">
+          <span class="lbl" style="align-self:center">view</span>
+          <button id="btnZoomIn" class="ghost">zoom +</button>
+          <button id="btnZoomOut" class="ghost">zoom −</button>
+          <button id="btnFit" class="ghost">fit</button>
+          <button id="btnPanMode" class="ghost">pan mode</button>
+          <span class="lbl" style="align-self:center">·</span>
+          <span class="lbl" id="zoomLabel" style="align-self:center;min-width:44px">1.00×</span>
+        </div>
+        <div class="hint" style="margin-top:-2px">
+          pan: <b>pan mode</b> + drag, or right-drag / middle-drag anywhere ·
+          zoom: mouse wheel, or <b>zoom +</b> / <b>zoom −</b> ·
+          clicking always adds a point · <b>alt</b>-click or <b>grab points</b> selects and drags
+        </div>
+
+        <canvas id="path"></canvas>
+        <div class="hint" id="sampling"></div>
+        <div class="hint" id="pathInfo">no points yet — click the canvas as the clip plays</div>
+
+        <div id="derived"></div>
+      </div>
+    </div>
+
+    <div class="tabbody hidden" id="tab-ref">
+      <div class="hint" style="margin-bottom:10px">
+        Already decided for this clip. Read-only, kept here so you can see what is settled
+        and avoid re-marking the same turn.
+      </div>
+      <div id="refList"></div>
+    </div>
+
+    <div class="tabbody hidden" id="tab-help">
+      <div class="hint">
+        <h4>the normal workflow: two clicks per turn</h4>
+        <b>turns tab</b> — press <kbd>i</kbd> where a turn starts and <kbd>o</kbd> where it
+        ends, then press <b>measure</b>. The tool runs the frozen estimator on exactly that
+        window and tells you which way the camera turned, with a confidence. Press
+        <b>accept</b> if it matches what you saw, or override it by hand if it does not.
+        That is the whole job, and it does not scale with the length of the clip.
+        <br><br>
+        You do not have to decide the direction yourself. The estimator has been checked
+        against hand labels on readable windows and agreed on 7 of 8, so it is a good
+        first opinion; your job is to catch the cases where it is wrong, and those get
+        recorded as an override so the disagreement stays visible.
+        <h4>why the trajectory tab is not the main tool</h4>
+        Drawing the path by hand is richer in principle: the shape gives direction, turn
+        rate and total angle at once. But it needs roughly one click per second of video,
+        which is about 1500 clicks for this clip, and it cannot represent standing still —
+        the points pile up in one spot. It is kept for short dense stretches where you want
+        the rate, not for marking the whole route.
+        <h4>direction</h4>
+        Everywhere in this tool a label means the direction the <b>camera</b> turned.
+        For a yaw the image moves the opposite way: if content slides toward the left edge
+        of the frame, the camera turned right. The <b>measure</b> button already accounts
+        for this and reports the camera direction directly.
+        <h4>which turns are worth marking</h4>
+        Clean ones: one sustained sideways slide in a single direction, no strong up or
+        down pitch, no walking bob dominating. Two clean turns of each direction are worth
+        more than ten muddy ones. If a stretch is muddy, mark it <b>unclear</b> rather than
+        guessing — that is a useful answer. Watch out especially for windows that are
+        mostly pitch: a camera tipping down shows vertical streaks, not a sideways slide,
+        and will not give a usable yaw.
+        <h4>keys</h4>
+        <kbd>space</kbd> play/pause · <kbd>←</kbd><kbd>→</kbd> one frame ·
+        <kbd>shift</kbd>+<kbd>←</kbd><kbd>→</kbd> one second ·
+        <kbd>i</kbd> mark in · <kbd>o</kbd> mark out ·
+        <kbd>m</kbd> measure the marked span ·
+        <kbd>1</kbd> left <kbd>2</kbd> right <kbd>3</kbd> forward <kbd>4</kbd> unclear ·
+        <kbd>p</kbd> drop a trajectory point ·
+        <kbd>h</kbd> pan mode <kbd>0</kbd> fit the path ·
+        <kbd>s</kbd> save · <kbd>del</kbd> delete selected
+        <h4>saving</h4>
+        <b>save</b> writes straight to the project on disk, so nothing has to be mailed.
+        Marked turns, measured values and any drawn trajectory all go into the same file.
+      </div>
+    </div>
+  </aside>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const LEFT="LEFT", RIGHT="RIGHT", FWD="FWD", UNCLEAR="UNCLEAR";
+const COLOR={LEFT:"#3fb950",RIGHT:"#c678dd",FWD:"#58a6ff",UNCLEAR:"#7d8590"};
+const CAMNAME={LEFT:"camera LEFT",RIGHT:"camera RIGHT",FWD:"forward only",UNCLEAR:"unclear"};
+
+const vid=document.getElementById("vid");
+const tl=document.getElementById("tl");
+const pathCv=document.getElementById("path");
+const tlx=tl.getContext("2d");
+const px=pathCv.getContext("2d");
+
+const state={
+  turns:[], trajectory:[], notes:"",
+  span:{t0:null,t1:null},
+  selTurn:null, selPoint:null, brush:FWD,
+  dragging:null, loopTurn:null,
+  existing:{},
+  fps:30, duration:0,
+};
+
+/* ---------------------------------------------------------------- utilities */
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const fmt=t=>`${t.toFixed(3)} s`;
+function toast(msg){const el=document.getElementById("toast");el.textContent=msg;el.classList.add("on");clearTimeout(el._h);el._h=setTimeout(()=>el.classList.remove("on"),1600);}
+function now(){return vid.currentTime||0;}
+function frame(){return Math.round(now()*state.fps);}
+function uid(){return "t"+Math.random().toString(36).slice(2,8);}
+
+/* -------------------------------------------------------------------- video */
+document.getElementById("btnPlay").onclick=()=>vid.paused?vid.play():vid.pause();
+vid.onplay=()=>document.getElementById("btnPlay").textContent="pause";
+vid.onpause=()=>document.getElementById("btnPlay").textContent="play";
+vid.onloadedmetadata=()=>{
+  state.duration=vid.duration||0;
+  const v = vid.videoWidth?`${vid.videoWidth}×${vid.videoHeight}`:"";
+  document.getElementById("filestate").textContent=`${state.duration.toFixed(1)} s · ${v}`;
+  drawTimeline();
+};
+function seek(t){vid.currentTime=clamp(t,0,state.duration);}
+document.getElementById("btnBack5").onclick=()=>seek(now()-5);
+document.getElementById("btnBack1").onclick=()=>seek(now()-1);
+document.getElementById("btnFwd1").onclick=()=>seek(now()+1);
+document.getElementById("btnFwd5").onclick=()=>seek(now()+5);
+document.getElementById("btnFrameB").onclick=()=>{vid.pause();seek(now()-1/state.fps);};
+document.getElementById("btnFrameF").onclick=()=>{vid.pause();seek(now()+1/state.fps);};
+document.getElementById("speed").onchange=e=>{vid.playbackRate=parseFloat(e.target.value);};
+vid.playbackRate=0.5;
+
+vid.addEventListener("timeupdate",()=>{
+  document.getElementById("clock").textContent=`t ${now().toFixed(3)} s · frame ${frame()}`;
+  document.getElementById("hudT").textContent=now().toFixed(3);
+  document.getElementById("hudF").textContent=frame();
+  if(state.loopTurn){
+    const t=state.loopTurn;
+    if(now()>t.t1){vid.currentTime=t.t0;}
+  }
+  drawTimeline();
+});
+
+/* ----------------------------------------------------------------- timeline */
+function tsToX(t,W){return state.duration?(t/state.duration)*W:0;}
+function xToTs(x,W){return state.duration?(x/W)*state.duration:0;}
+
+function drawTimeline(){
+  const W=tl.width=tl.clientWidth*devicePixelRatio;
+  const H=tl.height=tl.clientHeight*devicePixelRatio;
+  tlx.setTransform(1,0,0,1,0,0);
+  tlx.clearRect(0,0,W,H);
+  tlx.fillStyle="#0b0e13";tlx.fillRect(0,0,W,H);
+
+  const pad=8*devicePixelRatio, barH=16*devicePixelRatio, barY=H-barH-6*devicePixelRatio;
+
+  // existing reference labels (dim, behind)
+  const evs=(state.existing.events||[]).filter(e=>["LEFT_YAW","RIGHT_YAW","FWD"].includes(e.label));
+  for(const e of evs){
+    const x0=tsToX(e.start,W), x1=tsToX(e.end,W);
+    if(x1-x0<1)continue;
+    tlx.fillStyle="rgba(255,255,255,.05)";
+    tlx.fillRect(x0,barY,x1-x0,barH);
+    tlx.strokeStyle="rgba(255,255,255,.09)";tlx.strokeRect(x0,barY,x1-x0,barH);
+  }
+
+  // turns
+  state.turns.forEach((t,i)=>{
+    const x0=tsToX(t.t0,W), x1=Math.max(tsToX(t.t1,W),x0+2*devicePixelRatio);
+    tlx.fillStyle=COLOR[t.direction]+"cc";
+    tlx.fillRect(x0,barY,x1-x0,barH);
+    if(state.selTurn===t.id){
+      tlx.strokeStyle="#fff";tlx.lineWidth=2*devicePixelRatio;
+      tlx.strokeRect(x0,barY,x1-x0,barH);tlx.lineWidth=1;
+    }
+    const label=String(i+1);
+    tlx.fillStyle="#08111f";tlx.font=`600 ${11*devicePixelRatio}px ui-monospace,monospace`;
+    if(x1-x0>14*devicePixelRatio)tlx.fillText(label,x0+4*devicePixelRatio,barY+barH-4*devicePixelRatio);
+  });
+
+  // pending span
+  if(state.span.t0!==null){
+    const t1=state.span.t1!==null?state.span.t1:now();
+    const x0=tsToX(Math.min(state.span.t0,t1),W), x1=tsToX(Math.max(state.span.t0,t1),W);
+    tlx.fillStyle="rgba(76,141,255,.28)";
+    tlx.fillRect(x0,barY,Math.max(x1-x0,1),barH);
+    tlx.strokeStyle="#4c8dff";tlx.setLineDash([4*devicePixelRatio,4*devicePixelRatio]);
+    tlx.strokeRect(x0,barY,Math.max(x1-x0,1),barH);tlx.setLineDash([]);
+  }
+
+  // trajectory points as small ticks just above the turn bar
+  const tickY=barY-7*devicePixelRatio;
+  state.trajectory.forEach(p=>{
+    const xx=tsToX(p.t,W);
+    tlx.fillStyle=COLOR[p.dir]||"#7d8590";
+    tlx.fillRect(xx-1*devicePixelRatio,tickY,2*devicePixelRatio,5*devicePixelRatio);
+  });
+
+  // playhead
+  const x=tsToX(now(),W);
+  tlx.strokeStyle="#fff";tlx.lineWidth=1*devicePixelRatio;
+  tlx.beginPath();tlx.moveTo(x,0);tlx.lineTo(x,H);tlx.stroke();
+
+  // ticks
+  if(state.duration>0){
+    const step=state.duration>900?120:state.duration>300?60:30;
+    tlx.fillStyle="#8b98a9";tlx.font=`${10*devicePixelRatio}px ui-monospace,monospace`;
+    for(let t=0;t<state.duration;t+=step){
+      const xx=tsToX(t,W);
+      tlx.fillRect(xx,0,1*devicePixelRatio,6*devicePixelRatio);
+      tlx.fillText(`${Math.floor(t/60)}:${String(Math.floor(t%60)).padStart(2,"0")}`,
+                   xx+3*devicePixelRatio,10*devicePixelRatio);
+    }
+  }
+  // near-view ruler so small offsets are readable
+  const span=6; // seconds visible around the playhead
+  const a=Math.max(0,now()-span/2), b=Math.min(state.duration,now()+span/2);
+  tlx.fillStyle="rgba(255,255,255,.35)";
+  tlx.font=`${9*devicePixelRatio}px ui-monospace,monospace`;
+  for(let t=Math.ceil(a*2)/2;t<=b;t+=0.5){
+    const xx=tsToX(t,W);
+    tlx.fillRect(xx,barY-3*devicePixelRatio,1*devicePixelRatio,3*devicePixelRatio);
+  }
+  tlx.fillStyle="#e6edf3";
+  tlx.fillText(`${now().toFixed(2)} s`,x+5*devicePixelRatio,28*devicePixelRatio);
+}
+let tlDown=false;
+function tlSeek(ev){
+  const r=tl.getBoundingClientRect();
+  const x=(ev.clientX-r.left)/r.width;
+  seek(xToTs(x,tl.width)*1); // tl.width is device px; ratio is what matters below
+}
+tl.addEventListener("pointerdown",ev=>{
+  const r=tl.getBoundingClientRect();
+  const frac=(ev.clientX-r.left)/r.width;
+  seek(frac*state.duration);
+  tlDown=true;
+  tl.setPointerCapture(ev.pointerId);
+});
+tl.addEventListener("pointermove",ev=>{
+  if(!tlDown)return;
+  const r=tl.getBoundingClientRect();
+  const frac=(ev.clientX-r.left)/r.width;
+  seek(frac*state.duration);
+});
+tl.addEventListener("pointerup",()=>tlDown=false);
+window.addEventListener("resize",()=>{drawTimeline();drawPath();});
+
+/* -------------------------------------------------------------------- turns */
+function markIn(){
+  state.span.t0=now();
+  if(state.span.t1!==null&&state.span.t1<state.span.t0)state.span.t1=null;
+  updatePending();drawTimeline();
+}
+function markOut(){
+  if(state.span.t0===null){state.span.t0=Math.max(0,now()-3);}
+  state.span.t1=now();
+  updatePending();drawTimeline();
+}
+function updatePending(){
+  const s=state.span;
+  const el=document.getElementById("pending");
+  const hud=document.getElementById("hudMark");
+  if(s.t0===null){el.innerHTML="mark the start and end of a turn, then pick its direction.";
+    hud.textContent="no span marked";hud.style.color="var(--dim)";return;}
+  const t1=s.t1!==null?s.t1:now();
+  const a=Math.min(s.t0,t1),b=Math.max(s.t0,t1);
+  const txt=`span <b>${a.toFixed(3)}</b> → <b>${b.toFixed(3)}</b> s  ·  <b>${(b-a).toFixed(2)}</b> s`;
+  el.innerHTML=txt;
+  hud.textContent=`span ${a.toFixed(2)}–${b.toFixed(2)} s (${(b-a).toFixed(2)} s)`;
+  hud.style.color="var(--accent)";
+}
+document.getElementById("btnIn").onclick=markIn;
+document.getElementById("btnOut").onclick=markOut;
+document.getElementById("btnClearSpan").onclick=()=>{
+  state.span={t0:null,t1:null};state.measurement=null;
+  document.getElementById("measureOut").textContent="span cleared";
+  document.getElementById("confirmRow").style.display="none";
+  updatePending();drawTimeline();
+};
+
+/* Ask the frozen estimator what the camera did over the marked span. This is the
+   primary workflow: two clicks per turn instead of drawing the whole route. */
+async function measureSpan(){
+  const s=state.span;
+  if(s.t0===null||s.t1===null){
+    toast("mark in and out first");return;
+  }
+  const a=Math.min(s.t0,s.t1), b=Math.max(s.t0,s.t1);
+  const out=document.getElementById("measureOut");
+  out.innerHTML="measuring…";
+  document.getElementById("confirmRow").style.display="none";
+  try{
+    const r=await fetch("/api/measure",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({t0:a,t1:b})});
+    const m=await r.json();
+    if(!m.ok){out.innerHTML=`<span style="color:var(--bad)">failed: ${m.error}</span>`;return;}
+    state.measurement={...m,t0:a,t1:b};
+    const col=m.suggested_camera==="LEFT"?"var(--left)":
+              m.suggested_camera==="RIGHT"?"var(--right)":"var(--unclear)";
+    // coherence is a ratio of two different medians, so it can exceed 1; showing it as a
+    // percentage would read as "111% confident". Shown as a plain ratio instead.
+    const coh=m.coherence.toFixed(2);
+    out.innerHTML=
+      `<div class="verdict" style="border-color:${col}">
+         <b style="color:${col}">measured: camera ${m.suggested_camera}</b>
+         <div class="sub">${m.reading}</div>
+         <div class="sub">confidence ${m.suggested_confidence} · coherence ratio ${coh}
+           (above 1 means the median displacement is larger than the typical local
+           motion, which is a strong reading) · local motion
+           ${m.local_activity.toFixed(2)} px/frame · tracking reliable on
+           ${(m.reliable_fraction*100).toFixed(0)}% of points</div>
+       </div>`;
+    document.getElementById("conf").value=m.suggested_confidence;
+    document.getElementById("confirmRow").style.display="flex";
+  }catch(e){
+    out.innerHTML=`<span style="color:var(--bad)">request failed: ${e.message}</span>`;
+  }
+}
+document.getElementById("btnMeasure").onclick=measureSpan;
+
+document.getElementById("btnAccept").onclick=()=>{
+  const m=state.measurement;
+  if(!m)return;
+  state.turns.push({
+    id:uid(), t0:+m.t0.toFixed(3), t1:+m.t1.toFixed(3),
+    direction:m.suggested_camera,
+    confidence:document.getElementById("conf").value,
+    notes:"", measured_coherence:+m.coherence.toFixed(3),
+    measured_content_dx:+m.content_dx.toFixed(4), source:"measurement",
+  });
+  state.span={t0:null,t1:null};state.measurement=null;
+  document.getElementById("measureOut").innerHTML=
+    "saved. mark the next turn: <b>i</b> at its start, <b>o</b> at its end, then measure again.";
+  document.getElementById("confirmRow").style.display="none";
+  updatePending();renderTurns();drawTimeline();
+  toast(`accepted camera ${m.suggested_camera}`);
+};
+document.getElementById("btnReject").onclick=()=>{
+  document.querySelector("details.manual").open=true;
+  toast("use the manual buttons below");
+};
+
+document.querySelectorAll("[data-dir]").forEach(b=>{
+  b.onclick=()=>{
+    const dir=b.dataset.dir;
+    let t0=state.span.t0, t1=state.span.t1;
+    if(t0===null){t0=Math.max(0,now()-1.5);t1=now()+1.5;}
+    if(t1===null)t1=now();
+    if(t1<t0)[t0,t1]=[t1,t0];
+    if(t1-t0<0.2)t1=t0+0.2;
+    // if a measurement was taken for exactly this span, keep it alongside the manual
+    // override so the disagreement stays visible in the saved file
+    const m=state.measurement && Math.abs(state.measurement.t0-t0)<0.05
+            && Math.abs(state.measurement.t1-t1)<0.05 ? state.measurement : null;
+    state.turns.push({
+      id:uid(), t0:+t0.toFixed(3), t1:+t1.toFixed(3),
+      direction:dir, confidence:document.getElementById("conf").value, notes:"",
+      measured_camera:m?m.suggested_camera:null,
+      measured_coherence:m?+m.coherence.toFixed(3):null,
+      source:m?(dir===m.suggested_camera?"manual_agrees":"manual_overrides"):"manual",
+    });
+    state.span={t0:null,t1:null};state.measurement=null;
+    document.getElementById("confirmRow").style.display="none";
+    updatePending();renderTurns();drawTimeline();
+    toast(`marked ${CAMNAME[dir]} ${t0.toFixed(2)}–${t1.toFixed(2)} s`);
+  };
+});
+
+function renderTurns(){
+  const box=document.getElementById("turnList");
+  box.innerHTML="";
+  const sorted=[...state.turns].sort((a,b)=>a.t0-b.t0);
+  if(!sorted.length){
+    box.innerHTML='<div class="hint">no turns marked yet</div>';return;
+  }
+  sorted.forEach((t,i)=>{
+    const d=document.createElement("div");
+    d.className="turn"+(state.selTurn===t.id?" sel":"");
+    d.innerHTML=`
+      <div class="top">
+        <span class="dot" style="background:${COLOR[t.direction]}"></span>
+        <span class="t">${i+1}. ${CAMNAME[t.direction]}</span>
+        <span class="times" style="margin-left:auto">${t.t0.toFixed(2)}–${t.t1.toFixed(2)} s · ${(t.t1-t.t0).toFixed(2)} s</span>
+      </div>
+      <div class="times">confidence ${t.confidence}</div>
+      ${t.notes?`<div class="notes">${t.notes.replace(/</g,"&lt;")}</div>`:""}
+      <div class="row">
+        <button data-act="go">go</button>
+        <button data-act="loop">loop</button>
+        <button data-act="left">left</button>
+        <button data-act="right">right</button>
+        <button data-act="fwd">fwd</button>
+        <button data-act="unclear">unclear</button>
+        <button data-act="conf">conf</button>
+        <button data-act="note">note</button>
+        <button data-act="del">del</button>
+      </div>`;
+    d.onclick=ev=>{
+      if(ev.target.tagName==="BUTTON")return;
+      state.selTurn=t.id;renderTurns();drawTimeline();
+      seek(t.t0);
+    };
+    d.querySelectorAll("button").forEach(btn=>{
+      btn.onclick=ev=>{
+        ev.stopPropagation();
+        const a=btn.dataset.act;
+        if(a==="go"){seek(t.t0);}
+        else if(a==="loop"){state.loopTurn=state.loopTurn===t?null:t;vid.play();toast(state.loopTurn?"looping":"loop off");}
+        else if(a==="left")t.direction=LEFT;
+        else if(a==="right")t.direction=RIGHT;
+        else if(a==="fwd")t.direction=FWD;
+        else if(a==="unclear")t.direction=UNCLEAR;
+        else if(a==="conf"){const o=["high","medium","low"];t.confidence=o[(o.indexOf(t.confidence)+1)%3];}
+        else if(a==="note"){const v=prompt("note for this turn:",t.notes||"");if(v!==null)t.notes=v;}
+        else if(a==="del"){state.turns=state.turns.filter(x=>x.id!==t.id);if(state.selTurn===t.id)state.selTurn=null;}
+        state.selTurn=t.id;renderTurns();drawTimeline();
+      };
+    });
+    box.appendChild(d);
+  });
+}
+
+document.getElementById("btnPrevTurn").onclick=()=>{
+  const s=[...state.turns].sort((a,b)=>a.t0-b.t0).filter(t=>t.t0<now()-0.05);
+  if(s.length)seek(s[s.length-1].t0);
+};
+document.getElementById("btnNextTurn").onclick=()=>{
+  const s=[...state.turns].sort((a,b)=>a.t0-b.t0).filter(t=>t.t0>now()+0.05);
+  if(s.length)seek(s[0].t0);
+};
+document.getElementById("btnLoopSel").onclick=()=>{
+  const t=state.turns.find(x=>x.id===state.selTurn);
+  if(!t){toast("select a turn first");return;}
+  state.loopTurn=state.loopTurn===t?null:t;
+  vid.play();toast(state.loopTurn?"looping selected":"loop off");
+};
+
+/* --------------------------------------------------------------- trajectory */
+/* --------------------------------------------------------------- trajectory
+   The path is the primary input. Each point carries the video time at which it
+   was placed, so the shape of the sketch and the timeline stay linked. The turn
+   direction is DERIVED from the path geometry, not assigned by hand:
+
+       bearing of segment i = angle of (p[i+1] - p[i]) measured from the "forward"
+       direction. Positive bearing = veering clockwise = camera turning right.
+       Yaw rate is the derivative of that bearing over time.
+
+   forward is up by default: canvas y grows downward, so forward is angle -90 deg.
+------------------------------------------------------------------------------ */
+let pathDown=false;
+state.orient = -90;          // degrees, canvas-space angle that means "forward"
+state.turnThresh = 10;       // deg/s of turn rate before a segment counts as a turn
+state.hover = null;
+/* View transform for the path canvas, so a long route stays readable at a workable
+   scale. Coordinates are plain screen fractions for drawing, and world units for the
+   stored points, converted by:
+       screen = world * scale + t
+   scale > 1 means zoomed in. tx/ty are in screen fractions. */
+state.view = {scale:1, tx:0, ty:0};
+state.panMode = false;
+state.grabMode = false;      // alt or the grab button: click selects/drags instead of adding
+state.panning = null;
+
+function viewW2S(p){
+  return {x:p.x*state.view.scale + state.view.tx, y:p.y*state.view.scale + state.view.ty};
+}
+function viewS2W(s){
+  return {x:(s.x - state.view.tx)/state.view.scale, y:(s.y - state.view.ty)/state.view.scale};
+}
+function canvasPt(ev){
+  const r=pathCv.getBoundingClientRect();
+  return viewS2W({x:(ev.clientX-r.left)/r.width, y:(ev.clientY-r.top)/r.height});
+}
+function canvasScreenPt(ev){
+  const r=pathCv.getBoundingClientRect();
+  return {x:(ev.clientX-r.left)/r.width, y:(ev.clientY-r.top)/r.height};
+}
+function fitView(){
+  const pts=state.trajectory;
+  if(!pts.length){state.view={scale:1,tx:0,ty:0};drawPath();return;}
+  let x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
+  for(const p of pts){
+    if(p.x<x0)x0=p.x; if(p.x>x1)x1=p.x;
+    if(p.y<y0)y0=p.y; if(p.y>y1)y1=p.y;
+  }
+  const pad=0.06;
+  const w=Math.max(x1-x0,1e-3), h=Math.max(y1-y0,1e-3);
+  const s=clamp(Math.min((1-2*pad)/w,(1-2*pad)/h),0.02,400);
+  state.view.scale=s;
+  state.view.tx=0.5-s*(x0+x1)/2;
+  state.view.ty=0.5-s*(y0+y1)/2;
+  drawPath();
+}
+function togglePanMode(){
+  state.panMode=!state.panMode;
+  const b=document.getElementById("btnPanMode");
+  b.classList.toggle("primary",state.panMode);
+  b.textContent=state.panMode?"pan mode ON":"pan mode";
+  pathCv.style.cursor=state.panMode?"grab":"crosshair";
+}
+function zoomAt(screen, factor){
+  const before=viewS2W(screen);
+  state.view.scale=clamp(state.view.scale*factor,0.02,400);
+  const after=viewS2W(screen);
+  // keep the world point under the cursor fixed
+  state.view.tx += (after.x-before.x)*state.view.scale;
+  state.view.ty += (after.y-before.y)*state.view.scale;
+  drawPath();
+}
+const fwdRad = () => state.orient*Math.PI/180;
+const deg = r => r*180/Math.PI;
+function norm180(d){ while(d>180)d-=360; while(d<=-180)d+=360; return d; }
+
+/* bearing of the segment a->b, degrees from forward, positive = veering right */
+function bearingOf(a,b){
+  const dx=b.x-a.x, dy=b.y-a.y;
+  if(Math.hypot(dx,dy)<1e-6) return null;
+  const alpha=Math.atan2(dy,dx);
+  return norm180(deg(alpha - fwdRad()));
+}
+
+/* Segments carry a heading AND a turn rate.
+   The heading alone cannot identify a turn: after a 90 deg left turn the path keeps
+   pointing left, and a straight continuation would still read as "heading -90". What
+   identifies a turn is the *change* of heading per second, which is the yaw rate. */
+function segments(){
+  const pts=state.trajectory;
+  const out=[];
+  for(let i=0;i<pts.length-1;i++){
+    const h=bearingOf(pts[i],pts[i+1]);
+    if(h===null)continue;
+    out.push({i, t0:pts[i].t, t1:pts[i+1].t, heading:h, rate:null});
+  }
+  for(let k=1;k<out.length;k++){
+    const midPrev=(out[k-1].t0+out[k-1].t1)/2;
+    const midCur=(out[k].t0+out[k].t1)/2;
+    const dt=midCur-midPrev;
+    if(Math.abs(dt)<1e-6)continue;
+    out[k].rate=norm180(out[k].heading-out[k-1].heading)/dt;   // deg/s, + = right
+  }
+  return out;
+}
+
+/* contiguous runs of same-sign turn rate above the threshold = candidate turns */
+function deriveTurns(){
+  const th=state.turnThresh;                      // now a rate threshold, deg/s
+  const segs=segments().filter(s=>s.rate!==null && Math.abs(s.rate)>=th);
+  const runs=[];
+  let cur=null;
+  for(const s of segs){
+    const dir=s.rate>0?"RIGHT":"LEFT";
+    if(cur&&cur.direction===dir&&s.t0<=cur.t1+0.6){
+      cur.t1=s.t1; cur.segs.push(s);
+    }else{
+      if(cur)runs.push(cur);
+      cur={direction:dir,t0:s.t0,t1:s.t1,segs:[s]};
+    }
+  }
+  if(cur)runs.push(cur);
+  return runs.filter(r=>r.t1-r.t0>=0.15).map(r=>{
+    const rs=r.segs.map(s=>Math.abs(s.rate));
+    return {
+      direction:r.direction, t0:+r.t0.toFixed(3), t1:+r.t1.toFixed(3),
+      n:r.segs.length,
+      mean_rate:+(rs.reduce((a,b)=>a+b,0)/rs.length).toFixed(1),
+      peak_rate:+Math.max(...rs).toFixed(1),
+      net_deg:+(r.segs.reduce((a,s)=>a+s.rate*(s.t1-s.t0),0)).toFixed(1),
+    };
+  });
+}
+
+pathCv.addEventListener("pointerdown",ev=>{
+  const r=pathCv.getBoundingClientRect();
+  const sf={x:(ev.clientX-r.left)/r.width, y:(ev.clientY-r.top)/r.height};
+  const p=viewS2W(sf);
+  pathCv.setPointerCapture(ev.pointerId);
+
+  // pan: middle button, right button, or pan mode
+  if(ev.button===1||ev.button===2||state.panMode){
+    state.panning={sx:sf.x, sy:sf.y, tx:state.view.tx, ty:state.view.ty};
+    pathCv.style.cursor="grabbing";
+    return;
+  }
+
+  // A stationarity problem was reported: when the camera does not move, every new click
+  // lands on an existing point and the hit test swallowed it, so no further points could
+  // be placed. Two changes fix that:
+  //   * clicking always adds a point; points are allowed to sit at the same place and
+  //     are told apart by their timestamp, which is what actually carries the meaning
+  //   * to select or drag an existing point, hold Alt, or grab it and move
+  const tol=9*devicePixelRatio/Math.min(pathCv.width,pathCv.height)/state.view.scale;
+  const hit=state.trajectory.findIndex(q=>Math.hypot((q.x-p.x),(q.y-p.y))<Math.max(tol,0.008));
+  if(hit>=0 && (ev.altKey||state.grabMode)){
+    state.selPoint=hit;state.dragging=hit;drawPath();
+    return;
+  }
+  // NOTE: deliberately no vid.pause() here. The whole point is to click along while
+  // the clip plays, so the time stamped on each point is the moment you saw.
+  const tNow=+now().toFixed(3);
+  const dupT=state.trajectory.findIndex(q=>Math.abs(q.t-tNow)<0.02);
+  const rec={x:+p.x.toFixed(5),y:+p.y.toFixed(5),t:tNow,dir:null};
+  if(dupT>=0)state.trajectory[dupT]=rec;      // same instant: replace, do not duplicate
+  else state.trajectory.push(rec);
+  state.selPoint=state.trajectory.length-1;
+  drawPath();
+});
+pathCv.addEventListener("pointermove",ev=>{
+  const r=pathCv.getBoundingClientRect();
+  const sf={x:(ev.clientX-r.left)/r.width, y:(ev.clientY-r.top)/r.height};
+  if(state.panning){
+    state.view.tx=state.panning.tx+(sf.x-state.panning.sx);
+    state.view.ty=state.panning.ty+(sf.y-state.panning.sy);
+    drawPath();return;
+  }
+  const p=viewS2W(sf);
+  state.hover={x:p.x,y:p.y};
+  if(state.dragging===null){drawPath();return;}
+  state.trajectory[state.dragging].x=+p.x.toFixed(5);
+  state.trajectory[state.dragging].y=+p.y.toFixed(5);
+  drawPath();
+});
+pathCv.addEventListener("pointerleave",()=>{state.hover=null;drawPath();});
+pathCv.addEventListener("pointerup",()=>{
+  state.dragging=null;state.panning=null;
+  pathCv.style.cursor=state.panMode?"grab":"crosshair";
+});
+pathCv.addEventListener("contextmenu",ev=>ev.preventDefault());
+pathCv.addEventListener("wheel",ev=>{
+  ev.preventDefault();
+  const sf=canvasScreenPt(ev);
+  if(ev.shiftKey){                       // shift+wheel pans instead of zooming
+    state.view.tx-=ev.deltaY*0.0016;
+    drawPath();return;
+  }
+  zoomAt(sf, ev.deltaY<0?1.12:1/1.12);
+},{passive:false});
+
+function dropPoint(){
+  const last=state.trajectory[state.trajectory.length-1];
+  const p=state.hover||(last?{x:last.x,y:last.y}:{x:0.5,y:0.8});
+  state.trajectory.push({x:+p.x.toFixed(5),y:+p.y.toFixed(5),t:+now().toFixed(3),dir:null});
+  state.selPoint=state.trajectory.length-1;
+  drawPath();
+}
+
+function drawPath(){
+  const W=pathCv.width=pathCv.clientWidth*devicePixelRatio;
+  const H=pathCv.height=pathCv.clientHeight*devicePixelRatio;
+  px.setTransform(1,0,0,1,0,0);
+  px.fillStyle="#0b0e13";px.fillRect(0,0,W,H);
+
+  const v=state.view;
+  const sx=x=>x*W, sy=y=>y*H;              // screen fraction -> device px
+  const S=p=>{const q=viewW2S(p);return {x:q.x*W,y:q.y*H};};
+
+  // grid in WORLD units, spaced so it stays readable at any zoom
+  const target=34*devicePixelRatio;
+  let step=0.1;
+  while(step*v.scale*W < target) step*=2;
+  while(step*v.scale*W > target*3) step/=2;
+  const tl=viewS2W({x:0,y:0}), br=viewS2W({x:1,y:1});
+  px.strokeStyle="rgba(255,255,255,.05)";px.lineWidth=1;
+  px.fillStyle="rgba(139,152,169,.55)";px.font=`${9*devicePixelRatio}px ui-monospace,monospace`;
+  for(let gx=Math.floor(tl.x/step)*step; gx<=br.x; gx+=step){
+    const X=sx((gx)*v.scale+v.tx);
+    px.beginPath();px.moveTo(X,0);px.lineTo(X,H);px.stroke();
+    px.fillText(gx.toFixed(2),X+3*devicePixelRatio,H-4*devicePixelRatio);
+  }
+  for(let gy=Math.floor(tl.y/step)*step; gy<=br.y; gy+=step){
+    const Y=sy(gy*v.scale+v.ty);
+    px.beginPath();px.moveTo(0,Y);px.lineTo(W,Y);px.stroke();
+    px.fillText(gy.toFixed(2),3*devicePixelRatio,Y-3*devicePixelRatio);
+  }
+  // world origin crosshair
+  const o=S({x:0,y:0});
+  px.strokeStyle="rgba(255,255,255,.18)";
+  px.beginPath();px.moveTo(o.x-7*devicePixelRatio,o.y);px.lineTo(o.x+7*devicePixelRatio,o.y);
+  px.moveTo(o.x,o.y-7*devicePixelRatio);px.lineTo(o.x,o.y+7*devicePixelRatio);px.stroke();
+
+  // compass: which way "forward" points on this canvas
+  const cx=W/2, cy=26*devicePixelRatio, Lc=26*devicePixelRatio;
+  const fx=Math.cos(fwdRad())*Lc, fy=Math.sin(fwdRad())*Lc;
+  px.strokeStyle="#4c8dff";px.lineWidth=2*devicePixelRatio;
+  px.beginPath();px.moveTo(cx,cy);px.lineTo(cx+fx,cy+fy);px.stroke();
+  px.beginPath();px.arc(cx+fx,cy+fy,3*devicePixelRatio,0,Math.PI*2);px.fillStyle="#4c8dff";px.fill();
+  px.fillStyle="#8b98a9";px.font=`${10*devicePixelRatio}px ui-monospace,monospace`;
+  px.fillText("forward",cx+fx+7*devicePixelRatio,cy+fy+3*devicePixelRatio);
+
+  const pts=state.trajectory;
+  const th=state.turnThresh;
+  const segs=segments();
+
+  // path coloured by turn rate: purple = turning right, green = turning left,
+  // blue = not turning (a straight continuation after a turn stays blue)
+  for(let k=1;k<pts.length;k++){
+    const a=S(pts[k-1]),b=S(pts[k]);
+    const s=segs.find(q=>q.i===k-1);
+    let col="#58a6ff";
+    if(s&&s.rate!==null){
+      if(s.rate>=th)col="#c678dd";
+      else if(s.rate<=-th)col="#3fb950";
+    }
+    px.strokeStyle=col;
+    px.lineWidth=3*devicePixelRatio;
+    px.beginPath();px.moveTo(a.x,a.y);px.lineTo(b.x,b.y);px.stroke();
+  }
+
+  // heading ticks every few points, so the course reads as a direction field
+  pts.forEach((p,i)=>{
+    if(i===0||i===pts.length-1)return;
+    if(i%3!==0)return;
+    const A=S(pts[i-1]),B=S(pts[i+1]),P=S(p);
+    const ang=Math.atan2(B.y-A.y,B.x-A.x);
+    const Lh=14*devicePixelRatio;
+    px.strokeStyle="rgba(230,237,243,.35)";px.lineWidth=1.2*devicePixelRatio;
+    px.beginPath();px.moveTo(P.x,P.y);
+    px.lineTo(P.x+Math.cos(ang)*Lh,P.y+Math.sin(ang)*Lh);px.stroke();
+  });
+
+  pts.forEach((p,i)=>{
+    const P=S(p);
+    if(P.x<-20||P.x>W+20||P.y<-20||P.y>H+20)return;   // skip off-screen labels only
+    const r=(i===state.selPoint?8:5)*devicePixelRatio;
+    px.fillStyle="#e6edf3";
+    px.beginPath();px.arc(P.x,P.y,r,0,Math.PI*2);px.fill();
+    px.strokeStyle="rgba(0,0,0,.6)";px.lineWidth=1.5*devicePixelRatio;px.stroke();
+    px.fillStyle="rgba(230,237,243,.62)";
+    px.font=`${9*devicePixelRatio}px ui-monospace,monospace`;
+    px.fillText(`${i+1}·${p.t.toFixed(1)}s`,P.x+8*devicePixelRatio,P.y-7*devicePixelRatio);
+  });
+
+  if(pts.length){
+    let best=0,bd=1e9;
+    pts.forEach((p,i)=>{const d=Math.abs(p.t-now());if(d<bd){bd=d;best=i;}});
+    const P=S(pts[best]);
+    px.strokeStyle="rgba(255,255,255,.55)";px.lineWidth=1.4*devicePixelRatio;
+    px.beginPath();px.arc(P.x,P.y,11*devicePixelRatio,0,Math.PI*2);px.stroke();
+  }
+
+  const info=document.getElementById("pathInfo");
+  if(!pts.length){info.textContent="no points yet — click the canvas as the clip plays";}
+  else{
+    const mono=pts.every((p,i)=>i===0||p.t>=pts[i-1].t);
+    const span=(pts[pts.length-1].t-pts[0].t);
+    info.textContent=`${pts.length} points · t=${pts[0].t.toFixed(2)} → ${pts[pts.length-1].t.toFixed(2)} s `
+      +`(${span.toFixed(1)} s of video) · zoom ${state.view.scale.toFixed(2)}×`
+      +(mono?"":" · WARNING: points are out of time order — sort them");
+    const q=samplingQuality();
+    const qel=document.getElementById("sampling");
+    qel.style.color=q.level==="bad"?"var(--bad)":(q.level==="warn"?"var(--warn)":"var(--good)");
+    qel.textContent=q.text;
+  }
+  document.getElementById("zoomLabel").textContent=`${state.view.scale.toFixed(2)}×`;
+  renderDerived();
+}
+
+/* How well does the click rate resolve a turn? A turn lasts 2-3 s, and its rate is
+   the change of heading per second, so a few points must land *inside* it. The
+   median interval is the honest measure of that. */
+function samplingQuality(){
+  const pts=state.trajectory;
+  if(pts.length<2)return {level:"warn",text:"need at least 2 points"};
+  const gaps=[];
+  for(let i=1;i<pts.length;i++)gaps.push(pts[i].t-pts[i-1].t);
+  gaps.sort((a,b)=>a-b);
+  const med=gaps[Math.floor(gaps.length/2)];
+  const big=gaps.filter(g=>g>5).length;
+  const bigTime=gaps.filter(g=>g>5).reduce((a,b)=>a+b,0);
+  const total=pts[pts.length-1].t-pts[0].t||1;
+  let level="good";
+  if(med>1.5)level="warn";
+  if(med>3||big>=3)level="bad";
+  const perTurn=(2.5/med);
+  return {
+    level, med, big, frac:bigTime/total, perTurn,
+    text:`click rate: one point per ${med.toFixed(2)} s `
+      +`(${perTurn.toFixed(1)} points inside a 2.5 s turn; 3-4 needed) · `
+      +`${big} gap${big===1?"":"s"} over 5 s, covering ${(bigTime/total*100).toFixed(0)}% of the route`
+      +(level==="bad"?" — TOO SPARSE to read turns, click more often":""),
+  };
+}
+
+function renderDerived(){
+  const box=document.getElementById("derived");
+  const runs=deriveTurns();
+  if(!state.trajectory.length){
+    box.innerHTML='<div class="hint">Draw a path and the turns will be read off its geometry here.</div>';
+    return;
+  }
+  const nl=runs.filter(r=>r.direction==="LEFT").length;
+  const nr=runs.filter(r=>r.direction==="RIGHT").length;
+  let html=`<div class="hint" style="margin-top:10px">turns derived from the path geometry `
+    +`(turn rate >= ${state.turnThresh}°/s): <b>${nl}</b> left, <b>${nr}</b> right</div>`;
+  if(!runs.length && state.trajectory.length>1){
+    box.innerHTML=html+'<div class="hint">the path holds a steady course — no turn above the threshold</div>';
+    return;
+  }
+  html+='<div class="ref"><div class="st">click a row to jump there</div></div>';
+  runs.sort((a,b)=>a.t0-b.t0).forEach((r,i)=>{
+    const col=r.direction==="LEFT"?"var(--left)":"var(--right)";
+    // A turn needs at least 3 points inside it to have its rate measured: the rate
+    // is a difference of headings, so 2 points give one number with no check on it.
+    const weak=r.n<3;
+    html+=`<div class="ref" data-jump="${r.t0}" style="cursor:pointer${weak?";opacity:.62":""}">
+      <div class="tag" style="color:${col}">${i+1}. camera ${r.direction}`
+      +(weak?` <span style="color:var(--bad)">— unreliable, only ${r.n} segment${r.n===1?"":"s"}</span>`:"")
+      +`</div>
+      <div class="st">${r.t0.toFixed(2)}–${r.t1.toFixed(2)} s · ${(r.t1-r.t0).toFixed(2)} s ·
+      rate ${r.mean_rate}°/s (peak ${r.peak_rate}) · net ${r.net_deg}°</div></div>`;
+  });
+  box.innerHTML=html;
+  box.querySelectorAll("[data-jump]").forEach(el=>{
+    el.onclick=()=>{seek(parseFloat(el.dataset.jump));};
+  });
+}
+
+document.getElementById("btnDrop").onclick=dropPoint;
+document.getElementById("btnZoomIn").onclick=()=>zoomAt({x:0.5,y:0.5},1.25);
+document.getElementById("btnZoomOut").onclick=()=>zoomAt({x:0.5,y:0.5},1/1.25);
+document.getElementById("btnFit").onclick=fitView;
+document.getElementById("btnPanMode").onclick=togglePanMode;
+document.getElementById("btnGrab").onclick=()=>{
+  state.grabMode=!state.grabMode;
+  const b=document.getElementById("btnGrab");
+  b.classList.toggle("primary",state.grabMode);
+  b.textContent=state.grabMode?"grab ON":"grab points";
+  pathCv.style.cursor=state.grabMode?"grab":"crosshair";
+};
+document.getElementById("orient").onchange=e=>{state.orient=parseFloat(e.target.value);drawPath();};
+document.getElementById("turnThresh").onchange=e=>{state.turnThresh=parseFloat(e.target.value);drawPath();};
+document.getElementById("btnPathUndo").onclick=()=>{
+  state.trajectory.pop();state.selPoint=null;drawPath();
+};
+document.getElementById("btnPathDel").onclick=()=>{
+  if(state.selPoint===null)return;
+  state.trajectory.splice(state.selPoint,1);state.selPoint=null;drawPath();
+};
+document.getElementById("btnPathClear").onclick=()=>{
+  if(!confirm("clear the whole trajectory?"))return;
+  state.trajectory=[];state.selPoint=null;drawPath();
+};
+
+/* --------------------------------------------------------------------- tabs */
+document.querySelectorAll(".tabs button").forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll(".tabs button").forEach(o=>o.classList.toggle("on",o===b));
+    ["turns","path","ref","help"].forEach(t=>{
+      document.getElementById("tab-"+t).classList.toggle("hidden",t!==b.dataset.tab);
+    });
+    if(b.dataset.tab==="path")drawPath();
+  };
+});
+
+/* ---------------------------------------------------------------- reference */
+function renderRef(){
+  const box=document.getElementById("refList");
+  const lbl=state.existing;
+  if(!lbl||!lbl.events){box.innerHTML='<div class="hint">nothing loaded</div>';return;}
+  box.innerHTML="";
+  lbl.events.forEach(e=>{
+    if(!["LEFT_YAW","RIGHT_YAW","FWD"].includes(e.label))return;
+    const dir = e.label==="LEFT_YAW"?"camera LEFT":e.label==="RIGHT_YAW"?"camera RIGHT":"forward";
+    const st = e.status||"";
+    const cls = st==="CONFIRMED"?"ok":st==="REJECT"?"no":st==="UNVERIFIED"?"mid":"";
+    const d=document.createElement("div");
+    d.className="ref";
+    d.innerHTML=`<div class="tag" style="color:${COLOR[dir.includes("LEFT")?"LEFT":dir.includes("RIGHT")?"RIGHT":"FWD"]}">
+        ${e.id} — ${dir}</div>
+      <div class="st"><span class="${cls}">${st||"old label"}</span> · ${(e.window||[]).join("–")} s</div>
+      <div class="st" style="margin-top:3px">${(e.evidence||"").replace(/</g,"&lt;")}</div>`;
+    box.appendChild(d);
+  });
+}
+
+/* ------------------------------------------------------------------- saving */
+async function save(){
+  const payload={
+    clip:"VID00001", fps:state.fps,
+    orient_deg:state.orient, turn_threshold_deg:state.turnThresh,
+    view:state.view,
+    turns:state.turns.map(t=>({...t})),
+    trajectory:state.trajectory.map(p=>({...p})),
+    derived_turns:deriveTurns(),
+    notes:state.notes
+  };
+  try{
+    const r=await fetch("/api/save",{method:"POST",headers:{"Content-Type":"application/json"},
+                                     body:JSON.stringify(payload)});
+    const j=await r.json();
+    toast(`saved ${j.turns} turns, ${j.trajectory} points`);
+    document.getElementById("filestate").textContent=`saved ${j.turns} turns`;
+  }catch(e){toast("save failed: "+e.message);}
+}
+document.getElementById("btnSave").onclick=save;
+document.getElementById("btnExport").onclick=async()=>{
+  const r=await fetch("/api/export",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({turns:state.turns})});
+  const j=await r.json();toast(`csv written (${j.turns} turns)`);
+};
+document.getElementById("btnDownload").onclick=()=>{
+  const blob=new Blob([JSON.stringify({turns:state.turns,trajectory:state.trajectory},null,2)],
+                      {type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);a.download="turns.json";a.click();
+};
+document.getElementById("btnImport").onclick=()=>document.getElementById("fileInput").click();
+document.getElementById("fileInput").onchange=async ev=>{
+  const f=ev.target.files[0];if(!f)return;
+  const j=JSON.parse(await f.text());
+  state.turns=j.turns||[];state.trajectory=j.trajectory||[];
+  renderTurns();drawPath();drawTimeline();toast("imported");
+};
+
+/* --------------------------------------------------------------------- keys */
+window.addEventListener("keydown",ev=>{
+  if(ev.target.tagName==="INPUT"||ev.target.tagName==="SELECT")return;
+  const k=ev.key;
+  if(k===" "){ev.preventDefault();vid.paused?vid.play():vid.pause();}
+  else if(k==="0"){fitView();}
+  else if(k==="h"||k==="H"){togglePanMode();}
+  else if(k==="ArrowLeft"){ev.preventDefault();vid.pause();seek(now()-(ev.shiftKey?1:1/state.fps));}
+  else if(k==="ArrowRight"){ev.preventDefault();vid.pause();seek(now()+(ev.shiftKey?1:1/state.fps));}
+  else if(k==="i"||k==="I"){markIn();}
+  else if(k==="o"||k==="O"){markOut();}
+  else if(k==="m"||k==="M"){measureSpan();}
+  else if(k==="p"||k==="P"){dropPoint();}
+  else if(k==="1"){document.querySelector('[data-dir="LEFT"]').click();}
+  else if(k==="2"){document.querySelector('[data-dir="RIGHT"]').click();}
+  else if(k==="3"){document.querySelector('[data-dir="FWD"]').click();}
+  else if(k==="4"){document.querySelector('[data-dir="UNCLEAR"]').click();}
+  else if(k==="s"||k==="S"){save();}
+  else if(k==="Delete"||k==="Backspace"){
+    if(state.selTurn){state.turns=state.turns.filter(t=>t.id!==state.selTurn);
+      state.selTurn=null;renderTurns();drawTimeline();}
+  }
+});
+window.addEventListener("keyup",ev=>{});
+
+/* --------------------------------------------------------------------- init */
+(async function init(){
+  try{
+    const r=await fetch("/api/state");const j=await r.json();
+    state.existing=j.existing_labels||{};
+    if(j.saved){
+      state.turns=j.saved.turns||[];
+      state.trajectory=j.saved.trajectory||[];
+      state.notes=j.saved.notes||"";
+      if(j.saved.view)state.view={...state.view,...j.saved.view};
+      if(j.saved.orient_deg!==undefined)state.orient=j.saved.orient_deg;
+      if(j.saved.turn_threshold_deg!==undefined){
+        state.turnThresh=j.saved.turn_threshold_deg;
+        document.getElementById("turnThresh").value=String(state.turnThresh);
+      }
+      document.getElementById("orient").value=String(state.orient);
+    }
+    document.getElementById("filestate").textContent=
+      j.saved&&j.saved.turns&&j.saved.turns.length
+        ? `restored ${j.saved.turns.length} turns` : "ready";
+  }catch(e){
+    document.getElementById("filestate").textContent="state load failed";
+  }
+  renderTurns();renderRef();updatePending();drawPath();drawTimeline();
+  document.getElementById("measureOut").innerHTML=
+    "Uses the frozen estimator on exactly the marked window and reports which way the "
+    +"camera turned, with a confidence from the field coherence. No drawing needed: "
+    +"mark in, mark out, press this, then confirm.";
+})();
+</script>
+</body>
+</html>

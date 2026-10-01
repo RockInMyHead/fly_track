@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+output/
+uploads/
+data/
+*.mp4
+.env
+.env.*
+!.env.example
+.DS_Store
+.matplotlib/
+*.zip

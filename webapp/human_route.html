@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Где ходил человек — рисование на плане</title>
+<style>
+  :root{--bg:#0b0d12;--panel:#141821;--line:#252b3a;--fg:#eef2f8;--dim:#8a94a8}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden}
+  body{background:var(--bg);color:var(--fg);
+    font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  #app{display:flex;flex-direction:column;height:100%}
+  header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:10px 14px;
+    background:var(--panel);border-bottom:1px solid var(--line);flex:none}
+  header h1{font-size:15px;font-weight:600}
+  select,button{font:inherit;color:var(--fg);background:#1a1f2b;border:1px solid var(--line);
+    border-radius:8px;padding:6px 11px;cursor:pointer}
+  button.primary{background:#14532d;border-color:#166534;color:#dcfce7;font-weight:600}
+  button:hover{filter:brightness(1.08)}
+  label.chk{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--dim)}
+  #main{display:flex;flex:1;min-height:0}
+  #videoCol{flex:0 0 38%;max-width:520px;min-width:280px;display:flex;flex-direction:column;
+    background:#000;border-right:1px solid var(--line)}
+  #videoCol h2{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);
+    padding:8px 12px;border-bottom:1px solid var(--line);flex:none}
+  #videoWrap{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;padding:8px}
+  video{max-width:100%;max-height:100%;background:#000;border-radius:6px}
+  #noVideo{padding:16px;color:var(--dim);font-size:12px;line-height:1.5}
+  #stage{flex:1;position:relative;background:#1a1a1a;cursor:crosshair;touch-action:none;min-width:0}
+  canvas{display:block;width:100%;height:100%}
+  #hint{position:absolute;left:12px;bottom:12px;max-width:480px;padding:10px 12px;
+    background:rgba(10,12,18,.92);border:1px solid var(--line);border-radius:10px;
+    font-size:12px;color:var(--dim);line-height:1.5;pointer-events:none}
+  #hint b{color:var(--fg)}
+  #zoom{position:absolute;right:12px;bottom:12px;padding:8px 10px;background:rgba(10,12,18,.92);
+    border:1px solid var(--line);border-radius:8px;font-size:12px;color:var(--dim)}
+  #planStatus{position:absolute;left:12px;top:12px;padding:6px 10px;background:rgba(10,12,18,.9);
+    border:1px solid var(--line);border-radius:8px;font-size:11px;color:var(--dim)}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>Где ходил человек</h1>
+    <select id="clip"></select>
+    <button id="fit">Вся карта</button>
+    <button id="undo">Отменить точку</button>
+    <button id="clear">Очистить свой рисунок</button>
+    <button id="save" class="primary">Сохранить</button>
+    <label class="chk"><input type="checkbox" id="showGraph" checked> граф</label>
+    <label class="chk"><input type="checkbox" id="showTrack" checked> трекер (ошибочный)</label>
+    <span id="status" style="color:var(--dim);font-size:12px;margin-left:auto"></span>
+  </header>
+  <div id="main">
+    <aside id="videoCol">
+      <h2>Видео</h2>
+      <div id="videoWrap">
+        <video id="vid" controls playsinline></video>
+        <div id="noVideo" style="display:none">Нет mp4 в webapp/media для этого ролика.
+          Положите <code>VID000XX_fixed.mp4</code> или откройте AVI через final/video API.</div>
+      </div>
+    </aside>
+    <div id="stage">
+      <canvas id="c"></canvas>
+      <div id="planStatus">план: загрузка…</div>
+      <div id="hint"><b>Справа — полный план цеха.</b> Рисуйте зелёной линией, где шёл человек.
+        Колёсико — зум; Space + мышь — сдвиг. Фиолетовое — FINAL V1.</div>
+      <div id="zoom">масштаб 100%</div>
+    </div>
+  </div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const stage = $('stage'), canvas = $('c'), ctx = canvas.getContext('2d');
+const plan = new Image();
+let iw = 5298, ih = 3743, graph = null, nodeById = {}, edgeList = [];
+let tracker = [], sketch = [];
+let scale = 1, offX = 0, offY = 0, drawing = false, panning = false, space = false;
+let lastPan = null, clip = 'VID00010', planReady = false;
+
+function toPlan(sx,sy){ return {x:(sx-offX)/scale, y:(sy-offY)/scale}; }
+
+function indexGraph(g){
+  nodeById = {}; edgeList = [];
+  if(!g) return;
+  const nodes = g.nodes;
+  if(Array.isArray(nodes)) nodes.forEach(n => { if(n && n.id) nodeById[n.id] = n; });
+  else if(nodes) Object.assign(nodeById, nodes);
+  if(Array.isArray(g.edges)) edgeList = g.edges;
+  else if(g.edges) edgeList = Object.values(g.edges);
+}
+
+function ensurePlan(){
+  return new Promise((resolve, reject) => {
+    plan.onload = () => {
+      iw = plan.naturalWidth || +graph?.img_w || 5298;
+      ih = plan.naturalHeight || +graph?.img_h || 3743;
+      planReady = true;
+      $('planStatus').textContent = `план: ${iw}×${ih} px`;
+      resolve();
+    };
+    plan.onerror = () => {
+      planReady = false;
+      $('planStatus').textContent = 'план: ошибка загрузки /api/p08/plan';
+      reject(new Error('plan load failed'));
+    };
+    plan.src = '/api/p08/plan?' + Date.now();
+  });
+}
+
+function fitAll(){
+  const w = stage.clientWidth, h = stage.clientHeight;
+  scale = Math.min(w/iw, h/ih) * 0.98;
+  offX = (w - iw*scale)/2;
+  offY = (h - ih*scale)/2;
+  draw();
+}
+
+async function loadClips(){
+  const r = await fetch('/api/final/list');
+  const j = await r.json();
+  const sel = $('clip');
+  sel.innerHTML = '';
+  const ids = (j.clips||[]).filter(c=>c.ok).map(c=>c.id);
+  if(!ids.includes('VID00010')) ids.unshift('VID00010');
+  ids.forEach(id=>{
+    const o = document.createElement('option'); o.value = id; o.textContent = id; sel.appendChild(o);
+  });
+  clip = sel.value || ids[0];
+  try { await ensurePlan(); } catch(e) { console.error(e); }
+  await loadClip(clip);
+}
+
+async function loadClip(id){
+  clip = id;
+  const r = await fetch('/api/human/state?clip='+encodeURIComponent(id));
+  const st = await r.json();
+  if(!st.ok){ $('status').textContent = st.error||'ошибка'; return; }
+  graph = st.graph;
+  indexGraph(graph);
+  if(!planReady) try { await ensurePlan(); } catch(e) { /* shown in planStatus */ }
+  tracker = st.tracker || [];
+  sketch = (st.sketch && st.sketch.points) ? st.sketch.points.slice() : [];
+  const v = $('vid'), nv = $('noVideo');
+  if(st.video_url){
+    v.style.display = 'block'; nv.style.display = 'none';
+    v.src = st.video_url; v.load();
+  } else {
+    v.style.display = 'none'; nv.style.display = 'block';
+  }
+  fitAll();
+  $('status').textContent = st.sketch?.saved_at ? ('сохранено '+st.sketch.saved_at) : 'не сохранено';
+}
+
+function drawGraph(){
+  if(!$('showGraph').checked || !edgeList.length) return;
+  ctx.strokeStyle = 'rgba(80,90,110,0.55)'; ctx.lineWidth = Math.max(1, 1.2/scale);
+  for(const e of edgeList){
+    const a = nodeById[e.from], b = nodeById[e.to];
+    if(!a||!b) continue;
+    ctx.beginPath();
+    ctx.moveTo(a.x*iw, a.y*ih); ctx.lineTo(b.x*iw, b.y*ih); ctx.stroke();
+  }
+}
+
+function drawTracker(){
+  if(!$('showTrack').checked || !tracker.length) return;
+  ctx.strokeStyle = 'rgba(99,102,241,0.65)'; ctx.lineWidth = Math.max(2, 4/scale);
+  ctx.beginPath();
+  tracker.forEach((p,i)=>{ if(i===0) ctx.moveTo(p[0],p[1]); else ctx.lineTo(p[0],p[1]); });
+  ctx.stroke();
+}
+
+function drawSketch(){
+  if(sketch.length < 2) return;
+  ctx.strokeStyle = '#22c55e'; ctx.lineWidth = Math.max(3, 6/scale);
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.beginPath();
+  sketch.forEach((p,i)=>{ if(i===0) ctx.moveTo(p[0],p[1]); else ctx.lineTo(p[0],p[1]); });
+  ctx.stroke();
+  ctx.fillStyle = '#22c55e';
+  [0, sketch.length-1].forEach(i=>{
+    const p = sketch[i];
+    ctx.beginPath(); ctx.arc(p[0],p[1], Math.max(4, 8/scale), 0, Math.PI*2); ctx.fill();
+  });
+}
+
+function draw(){
+  const w = stage.clientWidth, h = stage.clientHeight;
+  if(w < 10 || h < 10) return;
+  canvas.width = w; canvas.height = h;
+  ctx.fillStyle = '#2a2a2a'; ctx.fillRect(0,0,w,h);
+  ctx.save();
+  ctx.translate(offX, offY); ctx.scale(scale, scale);
+  if(planReady && plan.naturalWidth){
+    ctx.globalAlpha = 1;
+    ctx.drawImage(plan, 0, 0, iw, ih);
+  } else {
+    ctx.fillStyle = '#444'; ctx.fillRect(0,0,iw,ih);
+    ctx.fillStyle = '#888'; ctx.font = `${48/scale}px sans-serif`;
+    ctx.fillText('план не загрузился', 40, 80);
+  }
+  ctx.globalAlpha = 1;
+  drawGraph(); drawTracker(); drawSketch();
+  ctx.restore();
+  $('zoom').textContent = 'масштаб ' + Math.round(scale*100) + '% · точек ' + sketch.length;
+}
+
+async function saveSketch(){
+  const body = {video: clip, coordinate_system:'plan_pixels', img_w:iw, img_h:ih,
+    points: sketch, note:'нарисовано человеком на полном плане'};
+  const r = await fetch('/api/human/save', {method:'POST',
+    headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+  const j = await r.json();
+  $('status').textContent = j.ok ? ('сохранено '+j.saved_at) : (j.error||'ошибка');
+}
+
+canvas.addEventListener('mousedown', e=>{
+  if(e.button===1 || (space && e.button===0)){
+    panning=true; lastPan={x:e.clientX,y:e.clientY}; return;
+  }
+  if(e.button!==0) return;
+  drawing = true;
+  const p = toPlan(e.offsetX, e.offsetY);
+  if(sketch.length && Math.hypot(sketch[sketch.length-1][0]-p.x, sketch[sketch.length-1][1]-p.y) < 3/scale) return;
+  sketch.push([p.x, p.y]); draw();
+});
+canvas.addEventListener('mousemove', e=>{
+  if(panning && lastPan){
+    offX += e.clientX - lastPan.x; offY += e.clientY - lastPan.y;
+    lastPan = {x:e.clientX,y:e.clientY}; draw(); return;
+  }
+  if(!drawing) return;
+  const p = toPlan(e.offsetX, e.offsetY);
+  const last = sketch[sketch.length-1];
+  if(Math.hypot(last[0]-p.x, last[1]-p.y) < 4/scale) return;
+  sketch.push([p.x, p.y]); draw();
+});
+window.addEventListener('mouseup', ()=>{ drawing=false; panning=false; lastPan=null; });
+canvas.addEventListener('wheel', e=>{
+  e.preventDefault();
+  const f = e.deltaY > 0 ? 0.9 : 1.1;
+  const mx = e.offsetX, my = e.offsetY;
+  offX = mx - f*(mx-offX); offY = my - f*(my-offY); scale *= f; draw();
+}, {passive:false});
+window.addEventListener('keydown', e=>{ if(e.code==='Space'){ space=true; e.preventDefault(); }});
+window.addEventListener('keyup', e=>{ if(e.code==='Space') space=false; });
+
+$('clip').onchange = e=> loadClip(e.target.value);
+$('fit').onclick = fitAll;
+$('undo').onclick = ()=>{ sketch.pop(); draw(); };
+$('clear').onclick = ()=>{ if(confirm('Удалить весь рисунок?')){ sketch=[]; draw(); }};
+$('save').onclick = saveSketch;
+['showGraph','showTrack'].forEach(id=> $(id).onchange = draw);
+window.addEventListener('resize', ()=>{ fitAll(); });
+loadClips();
+</script>
+</body>
+</html>

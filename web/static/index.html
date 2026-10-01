@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>MaleCNS VO Live</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'SF Pro Text', system-ui, sans-serif;
+    background: #0a0c10; color: #e2e8f0; min-height: 100vh;
+  }
+  header {
+    padding: 16px 24px; border-bottom: 1px solid #1e293b;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  }
+  header h1 { font-size: 18px; font-weight: 600; }
+  header .meta { font-size: 12px; color: #64748b; }
+  .layout {
+    display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 12px;
+    padding: 12px; height: calc(100vh - 64px);
+  }
+  @media (max-width: 1100px) {
+    .layout { grid-template-columns: 1fr; grid-template-rows: auto; height: auto; }
+    .panel { min-height: 300px; }
+    .panel.brain-panel { min-height: 340px; }
+  }
+  .panel {
+    background: #111827; border: 1px solid #1e293b; border-radius: 10px;
+    display: flex; flex-direction: column; overflow: hidden; min-height: 320px;
+  }
+  .panel h2 {
+    font-size: 11px; text-transform: uppercase; letter-spacing: .08em;
+    color: #64748b; padding: 10px 14px; border-bottom: 1px solid #1e293b;
+  }
+  .panel-body { flex: 1; min-height: 0; position: relative; padding: 10px; }
+  video, canvas { width: 100%; height: 100%; display: block; border-radius: 6px; background: #000; object-fit: contain; }
+  #vidCanvas { display: none; }
+  .controls {
+    grid-column: 1 / -1; background: #111827; border: 1px solid #1e293b;
+    border-radius: 10px; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+  }
+  label { font-size: 12px; color: #94a3b8; display: flex; flex-direction: column; gap: 4px; }
+  input[type=range] { width: 160px; accent-color: #3b82f6; }
+  input[type=file] { font-size: 12px; color: #94a3b8; }
+  input[type=number] {
+    width: 72px; background: #0f172a; border: 1px solid #334155; color: #e2e8f0;
+    border-radius: 6px; padding: 6px 8px; font-size: 12px;
+  }
+  button {
+    background: #1d4ed8; color: white; border: none; border-radius: 8px;
+    padding: 8px 16px; font-size: 13px; cursor: pointer; font-weight: 500;
+  }
+  button:disabled { opacity: .4; cursor: not-allowed; }
+  button.secondary { background: #334155; }
+  button.danger { background: #991b1b; }
+  button.pick {
+    background: #059669; font-size: 14px; padding: 10px 20px;
+  }
+  button.pick:hover { background: #047857; }
+  button.dopamine {
+    background: linear-gradient(135deg, #f59e0b, #ec4899);
+    font-weight: 700; font-size: 14px; padding: 10px 18px;
+  }
+  button.dopamine:hover { filter: brightness(1.08); }
+  button.mode-on { outline: 2px solid #3b82f6; }
+  button.mode-group { min-width: 88px; }
+  #traj.draw-mode { cursor: crosshair; }
+  #traj.setup-mode { cursor: grab; }
+  #traj.setup-mode:active { cursor: grabbing; }
+  .view-hint { font-size: 10px; color: #475569; margin-left: 4px; }
+  .file-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  #file { display: none; }
+  .upload-link { font-size: 12px; color: #64748b; cursor: pointer; text-decoration: underline; }
+  .status { font-size: 12px; color: #64748b; margin-left: auto; }
+  .status.ok { color: #22c55e; }
+  .status.warn { color: #f59e0b; }
+  .hint { font-size: 11px; color: #475569; padding: 0 14px 10px; }
+  #trajWrap { position: relative; width: 100%; height: 100%; }
+  #traj { cursor: crosshair; }
+  .train-strip {
+    grid-column: 1 / -1;
+    background: #111827; border: 1px solid #1e293b; border-radius: 10px;
+    padding: 10px 16px; display: none; gap: 10px; align-items: center;
+  }
+  .train-strip.on { display: flex; flex-wrap: wrap; }
+  .train-bar {
+    flex: 1; min-width: 180px; height: 8px; background: #1e293b; border-radius: 99px; overflow: hidden;
+  }
+  .train-bar > i {
+    display: block; height: 100%; width: 0%;
+    background: linear-gradient(90deg, #f59e0b, #ec4899);
+    transition: width .25s ease;
+  }
+  .train-meta { font-size: 12px; color: #cbd5e1; font-variant-numeric: tabular-nums; }
+  .test-report {
+    position: absolute; top: 10px; right: 10px; z-index: 2;
+    background: rgba(15, 23, 42, .92); border: 1px solid #334155;
+    border-radius: 8px; padding: 10px 12px; min-width: 168px; pointer-events: none;
+  }
+  .test-report[hidden] { display: none; }
+  .test-score { font-size: 22px; font-weight: 700; letter-spacing: -.03em; }
+  .test-score.good { color: #22c55e; }
+  .test-score.mid { color: #f59e0b; }
+  .test-score.bad { color: #f87171; }
+  .test-score span { font-size: 11px; font-weight: 500; color: #64748b; margin-left: 4px; }
+  .test-rows { margin-top: 6px; font-size: 11px; color: #94a3b8; line-height: 1.55; }
+  .legend { font-size: 10px; color: #64748b; padding-top: 4px; }
+  .legend b { font-weight: 600; }
+  .legend .g { color: #22c55e; } .legend .b { color: #3b82f6; }
+  .legend .o { color: #f59e0b; } .legend .c { color: #22d3ee; }
+  .feedback-strip {
+    margin: 0 12px 12px;
+    background: linear-gradient(135deg, #1e1b4b, #111827);
+    border: 1px solid #4338ca; border-radius: 10px;
+    padding: 12px 16px; display: none; flex-wrap: wrap; gap: 10px; align-items: center;
+  }
+  .feedback-strip.on { display: flex; }
+  .feedback-strip .fb-title { font-size: 13px; font-weight: 600; color: #e2e8f0; margin-right: 8px; }
+  .feedback-strip .fb-stats { font-size: 11px; color: #64748b; margin-left: auto; }
+  .feedback-fix { width: 100%; display: none; flex-direction: column; gap: 8px; margin-top: 4px; }
+  .feedback-fix.on { display: flex; }
+  .issue-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .issue-chip {
+    background: #1e293b; border: 1px solid #334155; color: #94a3b8;
+    border-radius: 999px; padding: 5px 12px; font-size: 11px; cursor: pointer;
+  }
+  .issue-chip.on { background: #422006; border-color: #f59e0b; color: #fcd34d; }
+  .fb-note {
+    width: 100%; max-width: 420px; background: #0f172a; border: 1px solid #334155;
+    color: #e2e8f0; border-radius: 8px; padding: 6px 10px; font-size: 12px;
+  }
+  button.fb-ok { background: #15803d; }
+  button.fb-bad { background: #b45309; }
+  button.fb-send { background: #7c3aed; font-weight: 600; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>🪰 MaleCNS VO Live</h1>
+    <div class="meta">▶ Fly! → муха рисует → ✅/❌ → обучение → снова Fly!</div>
+  </div>
+  <div class="meta" id="deviceInfo">device: …</div>
+</header>
+
+<div class="layout">
+  <div class="panel">
+    <h2>Видео</h2>
+    <div class="panel-body">
+      <video id="vid" controls playsinline muted></video>
+      <canvas id="vidCanvas"></canvas>
+    </div>
+  </div>
+  <div class="panel">
+    <h2>Траектория — муха рисует · ты оцениваешь</h2>
+    <div class="panel-body"><div id="trajWrap">
+      <canvas id="traj"></canvas>
+      <div id="testReport" class="test-report" hidden>
+        <div class="test-score" id="testScore">—<span>сходимость</span></div>
+        <div class="test-rows" id="testRows"></div>
+        <div class="legend"><b class="g">■</b> эталон · <b class="b">■</b> train · <b class="c">■</b> test · <b class="o">╌</b> до</div>
+      </div>
+    </div></div>
+    <div class="hint" id="trajHint">▶ Fly! — муха рисует синим · потом отметь ✅/❌ · если ❌ — нарисуй как должно быть (оранжевым)</div>
+  </div>
+  <div class="panel">
+    <h2>Как видит муха — сетчатка (721 гекс · BoxEye)</h2>
+    <div class="panel-body"><canvas id="retina"></canvas></div>
+  </div>
+  <div class="panel brain-panel">
+    <h2>Мозг — T4/T5 · EPG · optic flow · ego-motion</h2>
+    <div class="panel-body"><canvas id="brain"></canvas></div>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="file-row">
+    <button type="button" id="pickBtn" class="pick">📂 Выбрать видео</button>
+    <input type="file" id="file" accept="video/*,.avi,.mov,.mp4,.mkv"/>
+    <span class="upload-link" id="uploadLink">или загрузить маленький файл (&lt;500 MB)</span>
+  </div>
+  <label>Старт (с)<input type="range" id="startSlider" min="0" max="100" value="0" step="0.1" disabled/>
+    <span id="startLabel">0.0</span></label>
+  <label>Длина (с)<input type="range" id="segSlider" min="5" max="120" value="60" step="1"/>
+    <span id="segLabel">60</span></label>
+  <label>Heading °<input type="number" id="headingInput" value="90" min="0" max="359" step="1"/></label>
+  <label>X0<input type="number" id="x0" value="0" step="0.1"/></label>
+  <label>Y0<input type="number" id="y0" value="0" step="0.1"/></label>
+  <button id="drawModeBtn" class="secondary mode-on" title="Рисовать эталонную траекторию">✏️ Рисовать</button>
+  <button id="setupModeBtn" class="secondary" title="Задать старт и heading">📍 Старт</button>
+  <button id="undoDrawBtn" class="secondary" disabled title="Отменить последнюю точку">⌫</button>
+  <button id="fitViewBtn" class="secondary" title="Подогнать масштаб">🔍 Fit</button>
+  <button id="clearTeacherBtn" class="secondary" disabled>✕ Эталон</button>
+  <span class="view-hint" id="viewHint">зум: колёсико</span>
+  <label>Эпохи<input type="number" id="epochsInput" value="5" min="1" max="30" step="1"/></label>
+  <button id="liveModeBtn" class="secondary mode-group mode-on" title="Показывать по мере обработки">⚡ Live</button>
+  <button id="batchModeBtn" class="secondary mode-group" title="Сначала обработка, потом воспроизведение">📦 Batch</button>
+  <button id="flyBtn" disabled>▶ Fly!</button>
+  <button id="dopamineBtn" class="dopamine" disabled>🧪 ДОФАМИН</button>
+  <button id="stopBtn" class="danger" disabled>■ Stop</button>
+  <button id="resetBtn" class="secondary">↺ Сброс</button>
+  <span class="status" id="status">Загрузите видео</span>
+</div>
+<div class="train-strip" id="trainStrip">
+  <div class="train-bar"><i id="trainBarFill"></i></div>
+  <div class="train-meta" id="trainMeta">ожидание…</div>
+</div>
+<div class="feedback-strip" id="feedbackStrip">
+  <span class="fb-title" id="fbTitle">🪰 Муха нарисовала путь. Верно?</span>
+  <button type="button" id="fbCorrect" class="fb-ok">✅ Правильно</button>
+  <button type="button" id="fbWrong" class="fb-bad">❌ Неправильно</button>
+  <span class="fb-stats" id="fbStats"></span>
+  <div class="feedback-fix" id="feedbackFix">
+    <div class="issue-chips" id="issueChips">
+      <button type="button" class="issue-chip" data-issue="no_turn">Нет поворота</button>
+      <button type="button" class="issue-chip" data-issue="weak_turn">Слабый поворот</button>
+      <button type="button" class="issue-chip" data-issue="wrong_direction">Не туда</button>
+      <button type="button" class="issue-chip" data-issue="too_slow">Медленно</button>
+      <button type="button" class="issue-chip" data-issue="too_fast">Быстро</button>
+      <button type="button" class="issue-chip" data-issue="drift_left">Уходит влево</button>
+      <button type="button" class="issue-chip" data-issue="drift_right">Уходит вправо</button>
+    </div>
+    <input type="text" class="fb-note" id="fbNote" placeholder="Комментарий (опционально)"/>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <span style="font-size:11px;color:#94a3b8;">Клик на карте = как должно быть · Shift = новая линия</span>
+      <button type="button" id="fbSubmitFix" class="fb-send">Отправить исправление → обучить</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/brain_viz.js"></script>
+<script>
+const vid = document.getElementById('vid');
+const vidCanvas = document.getElementById('vidCanvas');
+const vidCtx = vidCanvas.getContext('2d');
+const fileInput = document.getElementById('file');
+const pickBtn = document.getElementById('pickBtn');
+const uploadLink = document.getElementById('uploadLink');
+const startSlider = document.getElementById('startSlider');
+const startLabel = document.getElementById('startLabel');
+const segSlider = document.getElementById('segSlider');
+const segLabel = document.getElementById('segLabel');
+const headingInput = document.getElementById('headingInput');
+const x0Input = document.getElementById('x0');
+const y0Input = document.getElementById('y0');
+const flyBtn = document.getElementById('flyBtn');
+const dopamineBtn = document.getElementById('dopamineBtn');
+const epochsInput = document.getElementById('epochsInput');
+const trainStrip = document.getElementById('trainStrip');
+const trainBarFill = document.getElementById('trainBarFill');
+const trainMeta = document.getElementById('trainMeta');
+const testReport = document.getElementById('testReport');
+const testScore = document.getElementById('testScore');
+const testRows = document.getElementById('testRows');
+const drawModeBtn = document.getElementById('drawModeBtn');
+const setupModeBtn = document.getElementById('setupModeBtn');
+const clearTeacherBtn = document.getElementById('clearTeacherBtn');
+const undoDrawBtn = document.getElementById('undoDrawBtn');
+const fitViewBtn = document.getElementById('fitViewBtn');
+const liveModeBtn = document.getElementById('liveModeBtn');
+const batchModeBtn = document.getElementById('batchModeBtn');
+const stopBtn = document.getElementById('stopBtn');
+const resetBtn = document.getElementById('resetBtn');
+const statusEl = document.getElementById('status');
+const deviceInfo = document.getElementById('deviceInfo');
+
+const canvas = document.getElementById('traj');
+const ctx = canvas.getContext('2d');
+const retinaCanvas = document.getElementById('retina');
+const retinaCtx = retinaCanvas.getContext('2d');
+const brainCanvas = document.getElementById('brain');
+const brainCtx = brainCanvas.getContext('2d');
+
+let hexLayout = null;
+let lastBrainFrame = null;
+let lastLumHex = null;
+let videoId = null;
+let videoDuration = 0;
+let frameMode = false;
+let frameLoadSeq = 0;
+let syncVideoT = 0;
+let ws = null;
+let points = [];
+let flyPathBefore = [];
+let flyPathTest = [];
+let lastTestPairs = [];
+let trainWs = null;
+let training = false;
+let running = false;
+let startSeconds = 0;
+let drag = null;
+let trajMode = 'draw'; // 'draw' | 'setup'
+let teacherPath = [];
+let hoverDrawPt = null;
+let adaptiveSessions = 0;
+let flyMode = 'live'; // 'live' | 'batch'
+let segmentEnd = 0;
+let batchPlaybackTimer = null;
+let recordedPoints = [];
+let replaying = false;
+let trajViewBounds = null;
+let viewSpan = 18;
+let awaitingFeedback = false;
+let feedbackFixActive = false;
+let selectedIssues = new Set();
+let feedbackCorrect = 0;
+let feedbackWrong = 0;
+let lastFlyPathSnapshot = [];
+
+const feedbackStrip = document.getElementById('feedbackStrip');
+const feedbackFix = document.getElementById('feedbackFix');
+const fbCorrect = document.getElementById('fbCorrect');
+const fbWrong = document.getElementById('fbWrong');
+const fbSubmitFix = document.getElementById('fbSubmitFix');
+const fbStats = document.getElementById('fbStats');
+const fbNote = document.getElementById('fbNote');
+const fbTitle = document.getElementById('fbTitle');
+const issueChips = document.getElementById('issueChips');
+
+// --- canvas setup ---
+function resizeCanvas() {
+  const wrap = document.getElementById('trajWrap');
+  canvas.width = wrap.clientWidth * devicePixelRatio;
+  canvas.height = wrap.clientHeight * devicePixelRatio;
+  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  drawTraj();
+}
+function resizeBrainCanvases() {
+  for (const [c, panel] of [[retinaCanvas, retinaCanvas.parentElement], [brainCanvas, brainCanvas.parentElement]]) {
+    c.width = panel.clientWidth * devicePixelRatio;
+    c.height = panel.clientHeight * devicePixelRatio;
+    c.getContext('2d').setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  }
+  if (lastBrainFrame) drawBrainPanel(lastBrainFrame);
+  if (lastLumHex && hexLayout) drawRetinaPanel(lastLumHex);
+}
+
+function clearRetinaPanel() {
+  lastLumHex = null;
+  const w = retinaCanvas.width / devicePixelRatio;
+  const h = retinaCanvas.height / devicePixelRatio;
+  retinaCtx.fillStyle = '#0a0c10';
+  retinaCtx.fillRect(0, 0, w, h);
+}
+
+function clearBrainPanel() {
+  lastBrainFrame = null;
+  const w = brainCanvas.width / devicePixelRatio;
+  const h = brainCanvas.height / devicePixelRatio;
+  brainCtx.fillStyle = '#0a0c10';
+  brainCtx.fillRect(0, 0, w, h);
+}
+
+function drawRetinaPanel(lumHex) {
+  if (lumHex === null) { clearRetinaPanel(); return; }
+  if (lumHex) lastLumHex = lumHex;
+  if (!hexLayout) return;
+  const w = retinaCanvas.width / devicePixelRatio;
+  const h = retinaCanvas.height / devicePixelRatio;
+  drawHexFieldLegacy(retinaCtx, w, h, hexLayout?.hex_x, hexLayout?.hex_y, lastLumHex, 'Сетчатка · photoreceptors');
+}
+
+function drawBrainPanel(frame) {
+  if (frame === null) { clearBrainPanel(); return; }
+  if (frame) lastBrainFrame = frame;
+  const w = brainCanvas.width / devicePixelRatio;
+  const h = brainCanvas.height / devicePixelRatio;
+  if (!hexLayout) return;
+  drawBrainActivity(brainCtx, w, h, lastBrainFrame, hexLayout.hex_x, hexLayout.hex_y);
+}
+
+window.addEventListener('resize', () => { resizeCanvas(); resizeBrainCanvases(); });
+resizeCanvas();
+resizeBrainCanvases();
+
+fetch('/api/hex-layout').then(r => r.json()).then(d => { hexLayout = d; });
+
+function worldToScreen(x, y, bounds) {
+  const w = canvas.width / devicePixelRatio;
+  const h = canvas.height / devicePixelRatio;
+  const pad = 36;
+  const { xmin, xmax, ymin, ymax } = bounds;
+  const sx = v => pad + (v - xmin) / (xmax - xmin + 1e-6) * (w - 2 * pad);
+  const sy = v => h - pad - (v - ymin) / (ymax - ymin + 1e-6) * (h - 2 * pad);
+  return { sx, sy, w, h, pad };
+}
+
+function resetViewBounds() {
+  const x0 = parseFloat(x0Input.value), y0 = parseFloat(y0Input.value);
+  trajViewBounds = {
+    xmin: x0 - viewSpan, xmax: x0 + viewSpan,
+    ymin: y0 - viewSpan, ymax: y0 + viewSpan,
+  };
+}
+
+function ensureViewBounds() {
+  if (!trajViewBounds) resetViewBounds();
+  return trajViewBounds;
+}
+
+function centerViewOn(x0, y0) {
+  trajViewBounds = {
+    xmin: x0 - viewSpan, xmax: x0 + viewSpan,
+    ymin: y0 - viewSpan, ymax: y0 + viewSpan,
+  };
+}
+
+function autoFitBounds() {
+  const xs = points.map(p => p.x)
+    .concat(flyPathBefore.map(p => p.x))
+    .concat(flyPathTest.map(p => p.x))
+    .concat(teacherPath.map(p => p.x))
+    .concat([parseFloat(x0Input.value)]);
+  const ys = points.map(p => p.y)
+    .concat(flyPathBefore.map(p => p.y))
+    .concat(flyPathTest.map(p => p.y))
+    .concat(teacherPath.map(p => p.y))
+    .concat([parseFloat(y0Input.value)]);
+  if (!xs.length) { resetViewBounds(); return; }
+  const m = 3;
+  trajViewBounds = {
+    xmin: Math.min(...xs) - m, xmax: Math.max(...xs) + m,
+    ymin: Math.min(...ys) - m, ymax: Math.max(...ys) + m,
+  };
+  viewSpan = Math.max(
+    (trajViewBounds.xmax - trajViewBounds.xmin) / 2,
+    (trajViewBounds.ymax - trajViewBounds.ymin) / 2,
+  );
+}
+
+function getBounds() {
+  if (trajMode === 'draw' || trajMode === 'setup') return ensureViewBounds();
+  if (trajViewBounds && (points.length || teacherPath.length)) return trajViewBounds;
+  const xs = points.map(p => p.x)
+    .concat(flyPathBefore.map(p => p.x))
+    .concat(flyPathTest.map(p => p.x))
+    .concat(teacherPath.map(p => p.x))
+    .concat([parseFloat(x0Input.value)]);
+  const ys = points.map(p => p.y)
+    .concat(flyPathBefore.map(p => p.y))
+    .concat(flyPathTest.map(p => p.y))
+    .concat(teacherPath.map(p => p.y))
+    .concat([parseFloat(y0Input.value)]);
+  if (!points.length && !flyPathBefore.length && !flyPathTest.length && !teacherPath.length) return ensureViewBounds();
+  const m = 2;
+  return {
+    xmin: Math.min(...xs) - m, xmax: Math.max(...xs) + m,
+    ymin: Math.min(...ys) - m, ymax: Math.max(...ys) + m,
+  };
+}
+
+function drawTraj() {
+  const bounds = getBounds();
+  const { sx, sy, w, h } = worldToScreen(0, 0, bounds);
+  ctx.fillStyle = '#0a0c10';
+  ctx.fillRect(0, 0, w, h);
+
+  const x0 = parseFloat(x0Input.value), y0 = parseFloat(y0Input.value);
+  const hd = parseFloat(headingInput.value) * Math.PI / 180;
+  const arrowWorld = 4;
+
+  // grid
+  ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const gx = 36 + i * (w - 72) / 4;
+    const gy = 36 + i * (h - 72) / 4;
+    ctx.beginPath(); ctx.moveTo(gx, 36); ctx.lineTo(gx, h - 36); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(36, gy); ctx.lineTo(w - 36, gy); ctx.stroke();
+  }
+
+  // correction / teacher path (click-to-add points)
+  if (teacherPath.length > 0) {
+    const isCorrection = feedbackFixActive;
+    ctx.strokeStyle = isCorrection ? '#f59e0b' : '#22c55e';
+    ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.setLineDash([]);
+    if (teacherPath.length > 1) {
+      ctx.beginPath();
+      teacherPath.forEach((p, i) => {
+        const px = sx(p.x), py = sy(p.y);
+        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+      });
+      ctx.stroke();
+    }
+    teacherPath.forEach((p, i) => {
+      const px = sx(p.x), py = sy(p.y);
+      ctx.fillStyle = isCorrection ? (i === 0 ? '#fde68a' : '#f59e0b') : (i === 0 ? '#86efac' : '#22c55e');
+      ctx.strokeStyle = isCorrection ? '#78350f' : '#052e16'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(px, py, 7, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#ecfdf5'; ctx.font = 'bold 10px system-ui'; ctx.textAlign = 'center';
+      ctx.fillText(String(i + 1), px, py + 3.5);
+      ctx.textAlign = 'start';
+    });
+  }
+  if (trajMode === 'draw' && hoverDrawPt && teacherPath.length) {
+    const last = teacherPath[teacherPath.length - 1];
+    ctx.strokeStyle = 'rgba(34, 197, 94, 0.45)'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(sx(last.x), sy(last.y));
+    ctx.lineTo(hoverDrawPt.mx, hoverDrawPt.my);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // fly path before dopamine
+  if (flyPathBefore.length > 1) {
+    ctx.strokeStyle = '#f97316'; ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    flyPathBefore.forEach((p, i) => {
+      const px = sx(p.x), py = sy(p.y);
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    });
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // fly path after dopamine (train)
+  if (points.length > 1) {
+    ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 2; ctx.beginPath();
+    points.forEach((p, i) => {
+      const px = sx(p.x), py = sy(p.y);
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    });
+    ctx.stroke();
+  }
+
+  // hold-out test fly
+  if (flyPathTest.length > 1) {
+    ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 2.5; ctx.beginPath();
+    flyPathTest.forEach((p, i) => {
+      const px = sx(p.x), py = sy(p.y);
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    });
+    ctx.stroke();
+  }
+
+  // correspondence ticks: fly ↔ teacher
+  if (lastTestPairs.length) {
+    ctx.strokeStyle = 'rgba(248, 113, 113, 0.55)'; ctx.lineWidth = 1;
+    lastTestPairs.forEach(pr => {
+      ctx.beginPath();
+      ctx.moveTo(sx(pr.fx), sy(pr.fy));
+      ctx.lineTo(sx(pr.tx), sy(pr.ty));
+      ctx.stroke();
+    });
+  }
+
+  // direction arrow from start
+  ctx.strokeStyle = '#a855f7'; ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(sx(x0), sy(y0));
+  ctx.lineTo(sx(x0 + Math.cos(hd) * arrowWorld), sy(y0 + Math.sin(hd) * arrowWorld));
+  ctx.stroke();
+
+  // start dot
+  ctx.fillStyle = '#22c55e';
+  ctx.beginPath(); ctx.arc(sx(x0), sy(y0), 6, 0, Math.PI * 2); ctx.fill();
+
+  // current position + live integrated heading (same signal as EPG)
+  if (points.length) {
+    const last = points[points.length - 1];
+    ctx.fillStyle = '#ef4444';
+    ctx.beginPath(); ctx.arc(sx(last.x), sy(last.y), 7, 0, Math.PI * 2); ctx.fill();
+    if (typeof last.heading === 'number') {
+      const hdLive = last.heading * Math.PI / 180;
+      const ah = 2.5;
+      ctx.strokeStyle = last.turning ? '#fbbf24' : '#e879f9';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(sx(last.x), sy(last.y));
+      ctx.lineTo(sx(last.x + Math.cos(hdLive) * ah), sy(last.y + Math.sin(hdLive) * ah));
+      ctx.stroke();
+    }
+  }
+
+  ctx.fillStyle = '#64748b'; ctx.font = '11px system-ui';
+  const hdTxt = points.length && typeof points[points.length - 1].heading === 'number'
+    ? ` · θ ${points[points.length - 1].heading.toFixed(0)}°` : '';
+  const teachTxt = teacherPath.length ? ` · эталон ${teacherPath.length}pt` : '';
+  const dopTxt = adaptiveSessions ? ` · 🧪×${adaptiveSessions}` : '';
+  ctx.fillText(`fly ${points.length}${hdTxt}${teachTxt}${dopTxt}`, 12, 18);
+}
+
+function setTrajMode(mode) {
+  trajMode = mode;
+  hoverDrawPt = null;
+  drag = null;
+  canvas.classList.toggle('draw-mode', mode === 'draw');
+  canvas.classList.toggle('setup-mode', mode === 'setup');
+  drawModeBtn.classList.toggle('mode-on', mode === 'draw');
+  setupModeBtn.classList.toggle('mode-on', mode === 'setup');
+  if (mode === 'draw' || mode === 'setup') resetViewBounds();
+  drawTraj();
+}
+
+function setFlyMode(mode) {
+  flyMode = mode;
+  liveModeBtn.classList.toggle('mode-on', mode === 'live');
+  batchModeBtn.classList.toggle('mode-on', mode === 'batch');
+}
+
+function updateDrawButtons() {
+  undoDrawBtn.disabled = teacherPath.length === 0;
+  clearTeacherBtn.disabled = teacherPath.length === 0;
+  dopamineBtn.disabled = !videoId || teacherPath.length < 2;
+}
+
+function undoDrawPoint() {
+  if (!teacherPath.length) return;
+  teacherPath.pop();
+  updateDrawButtons();
+  drawTraj();
+}
+
+drawModeBtn.addEventListener('click', () => setTrajMode('draw'));
+setupModeBtn.addEventListener('click', () => setTrajMode('setup'));
+liveModeBtn.addEventListener('click', () => setFlyMode('live'));
+batchModeBtn.addEventListener('click', () => setFlyMode('batch'));
+fitViewBtn.addEventListener('click', () => { autoFitBounds(); drawTraj(); });
+undoDrawBtn.addEventListener('click', undoDrawPoint);
+setTrajMode('draw');
+setFlyMode('live');
+
+clearTeacherBtn.addEventListener('click', () => {
+  teacherPath = [];
+  updateDrawButtons();
+  drawTraj();
+});
+
+// --- canvas interaction ---
+function screenToWorld(mx, my, bounds) {
+  bounds = bounds || getBounds();
+  const w = canvas.width / devicePixelRatio;
+  const h = canvas.height / devicePixelRatio;
+  const pad = 36;
+  const x = bounds.xmin + (mx - pad) / (w - 2 * pad) * (bounds.xmax - bounds.xmin);
+  const y = bounds.ymin + (h - pad - my) / (h - 2 * pad) * (bounds.ymax - bounds.ymin);
+  return { x, y };
+}
+
+function worldToScreenPt(x, y, bounds) {
+  const w = canvas.width / devicePixelRatio;
+  const h = canvas.height / devicePixelRatio;
+  const pad = 36;
+  const sx = v => pad + (v - bounds.xmin) / (bounds.xmax - bounds.xmin + 1e-6) * (w - 2 * pad);
+  const sy = v => h - pad - (v - bounds.ymin) / (bounds.ymax - bounds.ymin + 1e-6) * (h - 2 * pad);
+  return { sx: sx(x), sy: sy(y) };
+}
+
+function canvasPos(e) {
+  const rect = canvas.getBoundingClientRect();
+  return { mx: e.clientX - rect.left, my: e.clientY - rect.top };
+}
+
+function addTeacherPoint(mx, my, shiftKey) {
+  const bounds = ensureViewBounds();
+  const { x, y } = screenToWorld(mx, my, bounds);
+  if (shiftKey) {
+    teacherPath = [{ x, y }];
+  } else {
+    if (teacherPath.length) {
+      const last = teacherPath[teacherPath.length - 1];
+      const lastScr = worldToScreenPt(last.x, last.y, bounds);
+      if (Math.hypot(mx - lastScr.sx, my - lastScr.sy) < 10) return;
+    }
+    teacherPath.push({ x, y });
+  }
+  updateDrawButtons();
+  drawTraj();
+}
+
+canvas.addEventListener('click', e => {
+  if (trajMode !== 'draw') return;
+  const { mx, my } = canvasPos(e);
+  addTeacherPoint(mx, my, e.shiftKey);
+});
+
+canvas.addEventListener('mousemove', e => {
+  const { mx, my } = canvasPos(e);
+  if (trajMode === 'draw') {
+    hoverDrawPt = { mx, my };
+    drawTraj();
+    return;
+  }
+  hoverDrawPt = null;
+});
+
+canvas.addEventListener('mouseleave', () => {
+  hoverDrawPt = null;
+  if (trajMode === 'draw') drawTraj();
+});
+
+canvas.addEventListener('pointerdown', e => {
+  if (e.button !== 0 || trajMode !== 'setup') return;
+  canvas.setPointerCapture(e.pointerId);
+  const { mx, my } = canvasPos(e);
+  const bounds = ensureViewBounds();
+  const { x, y } = screenToWorld(mx, my, bounds);
+  drag = { x0: x, y0: y, sx: mx, sy: my };
+  x0Input.value = x.toFixed(2);
+  y0Input.value = y.toFixed(2);
+  centerViewOn(x, y);
+  drawTraj();
+});
+
+canvas.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const { mx, my } = canvasPos(e);
+  const dx = mx - drag.sx, dy = drag.sy - my;
+  const deg = (Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360;
+  headingInput.value = Math.round(deg);
+  drawTraj();
+});
+
+canvas.addEventListener('pointerup', e => {
+  if (canvas.hasPointerCapture(e.pointerId)) canvas.releasePointerCapture(e.pointerId);
+  drag = null;
+});
+
+canvas.addEventListener('pointercancel', () => {
+  drag = null;
+});
+
+canvas.addEventListener('wheel', e => {
+  if (trajMode !== 'draw' && trajMode !== 'setup') return;
+  e.preventDefault();
+  const factor = e.deltaY > 0 ? 1.12 : 0.89;
+  viewSpan = Math.max(4, Math.min(100, viewSpan * factor));
+  resetViewBounds();
+  drawTraj();
+}, { passive: false });
+
+window.addEventListener('keydown', e => {
+  if ((e.key === 'Backspace' || e.key === 'Delete') && trajMode === 'draw' && !e.target.matches('input')) {
+    e.preventDefault();
+    undoDrawPoint();
+  }
+});
+
+[x0Input, y0Input, headingInput].forEach(el => el.addEventListener('input', () => {
+  if (trajMode === 'setup') centerViewOn(parseFloat(x0Input.value), parseFloat(y0Input.value));
+  drawTraj();
+}));
+
+// --- device info ---
+fetch('/api/device').then(r => r.json()).then(d => {
+  adaptiveSessions = d.dopamine_sessions || 0;
+  feedbackCorrect = d.feedback_correct || 0;
+  feedbackWrong = d.feedback_wrong || 0;
+  updateFbStats();
+  deviceInfo.textContent = `MaleCNS · ${d.device} · ${d.sim_hz} Hz · 🧪 ${adaptiveSessions} · ✅${feedbackCorrect} ❌${feedbackWrong}`;
+});
+
+function resizeVidCanvas() {
+  const body = vidCanvas.parentElement;
+  vidCanvas.width = body.clientWidth * devicePixelRatio;
+  vidCanvas.height = body.clientHeight * devicePixelRatio;
+  vidCtx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+}
+window.addEventListener('resize', resizeVidCanvas);
+resizeVidCanvas();
+
+function setFrameMode(enabled) {
+  frameMode = enabled;
+  vid.style.display = enabled ? 'none' : 'block';
+  vidCanvas.style.display = enabled ? 'block' : 'none';
+}
+
+async function loadFrameAt(t) {
+  if (!videoId || !frameMode) return;
+  const seq = ++frameLoadSeq;
+  try {
+    const res = await fetch(`/api/video/${videoId}/frame.jpg?t=${t.toFixed(2)}&w=960`);
+    if (!res.ok || seq !== frameLoadSeq) return;
+    const blob = await res.blob();
+    if (seq !== frameLoadSeq) return;
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      if (seq !== frameLoadSeq) { URL.revokeObjectURL(url); return; }
+      const w = vidCanvas.width / devicePixelRatio;
+      const h = vidCanvas.height / devicePixelRatio;
+      vidCtx.fillStyle = '#000';
+      vidCtx.fillRect(0, 0, w, h);
+      const scale = Math.min(w / img.width, h / img.height);
+      const dw = img.width * scale;
+      const dh = img.height * scale;
+      vidCtx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
+  } catch (_) { /* ignore stale frame fetch */ }
+}
+
+/** Sync video preview to FlyVis point timestamp (no wall-clock playback). */
+function syncVideoToPoint(msg) {
+  if (typeof msg.t !== 'number') return;
+  syncVideoT = msg.t;
+  if (frameMode) {
+    if (msg.frame) drawFrameB64(msg.frame);
+    else loadFrameAt(msg.t);
+  } else {
+    vid.pause();
+    if (Math.abs(vid.currentTime - msg.t) > 0.02) vid.currentTime = msg.t;
+  }
+}
+
+function segmentEndSeconds() {
+  const start = parseFloat(startSlider.value);
+  const seg = parseFloat(segSlider.value);
+  return Math.min(start + seg, videoDuration || start + seg);
+}
+
+function drawFrameB64(b64) {
+  const img = new Image();
+  img.onload = () => {
+    const w = vidCanvas.width / devicePixelRatio;
+    const h = vidCanvas.height / devicePixelRatio;
+    vidCtx.fillStyle = '#000';
+    vidCtx.fillRect(0, 0, w, h);
+    const scale = Math.min(w / img.width, h / img.height);
+    const dw = img.width * scale;
+    const dh = img.height * scale;
+    vidCtx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+  };
+  img.src = 'data:image/jpeg;base64,' + b64;
+}
+
+function applyVideoMeta(data) {
+  videoId = data.video_id;
+  videoDuration = data.duration;
+  startSlider.max = Math.max(0, videoDuration - 1).toFixed(1);
+  const segMax = Math.max(5, Math.min(120, Math.floor(videoDuration)));
+  segSlider.max = segMax.toString();
+  segSlider.value = Math.min(parseFloat(segSlider.value) || 60, segMax).toString();
+  segLabel.textContent = segSlider.value;
+  startSlider.disabled = false;
+  trajViewBounds = null;
+  resetViewBounds();
+  flyBtn.disabled = false;
+  if (teacherPath.length >= 2) dopamineBtn.disabled = false;
+  const src = data.source === 'local' ? 'локальный' : 'upload';
+  const codecNote = data.codec ? ` · ${data.codec}` : '';
+
+  const baseStatus = `${data.filename} · ${videoDuration.toFixed(0)}s · ${data.width}×${data.height} · ${data.size_mb} MB (${src}${codecNote})`;
+
+  if (data.browser_playable) {
+    setFrameMode(false);
+    vid.src = `/api/video/${videoId}`;
+    vid.load();
+    statusEl.textContent = baseStatus;
+  } else {
+    setFrameMode(true);
+    vid.removeAttribute('src');
+    vid.load();
+    loadFrameAt(parseFloat(startSlider.value));
+    statusEl.textContent = `${baseStatus} · preview: JPEG-кадры (${data.codec || 'AVI'})`;
+  }
+  statusEl.className = 'status ok';
+}
+
+async function parseError(res) {
+  try {
+    const j = await res.json();
+    return j.detail || JSON.stringify(j);
+  } catch {
+    return res.statusText || `HTTP ${res.status}`;
+  }
+}
+
+// --- upload (small files) ---
+fileInput.addEventListener('change', async () => {
+  const file = fileInput.files[0];
+  if (!file) return;
+  if (file.size > 500 * 1024 * 1024) {
+    statusEl.textContent = `Файл ${(file.size/1e6).toFixed(0)} MB — используй «Путь на Mac»`;
+    statusEl.className = 'status warn';
+    fileInput.value = '';
+    return;
+  }
+  statusEl.textContent = `Загрузка ${(file.size/1e6).toFixed(0)} MB…`;
+  statusEl.className = 'status warn';
+  try {
+    const fd = new FormData();
+    fd.append('file', file);
+    const res = await fetch('/api/upload', { method: 'POST', body: fd });
+    if (!res.ok) throw new Error(await parseError(res));
+    applyVideoMeta(await res.json());
+  } catch (err) {
+    statusEl.textContent = 'Ошибка: ' + err.message;
+    statusEl.className = 'status warn';
+  }
+});
+
+// --- pick video via system dialog (large files OK) ---
+pickBtn.addEventListener('click', async () => {
+  statusEl.textContent = 'Откройте окно выбора файла…';
+  statusEl.className = 'status warn';
+  pickBtn.disabled = true;
+  try {
+    const res = await fetch('/api/pick-local', { method: 'POST' });
+    if (!res.ok) throw new Error(await parseError(res));
+    applyVideoMeta(await res.json());
+  } catch (err) {
+    if (!String(err.message).includes('отмен')) {
+      statusEl.textContent = 'Ошибка: ' + err.message;
+      statusEl.className = 'status warn';
+    } else {
+      statusEl.textContent = 'Выбор отменён';
+      statusEl.className = 'status';
+    }
+  } finally {
+    pickBtn.disabled = false;
+  }
+});
+
+uploadLink.addEventListener('click', () => fileInput.click());
+
+startSlider.addEventListener('input', () => {
+  startSeconds = parseFloat(startSlider.value);
+  startLabel.textContent = startSeconds.toFixed(1);
+  if (frameMode) loadFrameAt(startSeconds);
+  else vid.currentTime = startSeconds;
+});
+
+segSlider.addEventListener('input', () => {
+  segLabel.textContent = segSlider.value;
+});
+
+// --- WebSocket streaming ---
+function connectWs() {
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  return new WebSocket(`${proto}://${location.host}/ws/stream`);
+}
+
+function handleFlyPoint(msg, live) {
+  if (live) {
+    points.push(msg);
+    syncVideoToPoint(msg);
+    if (msg.eye_preview) drawRetinaPanel(msg.eye_preview);
+    else if (msg.lum_hex) drawRetinaPanel(msg.lum_hex);
+    if (msg.pathways || msg.descending || msg.t4) drawBrainPanel(msg);
+    drawTraj();
+    statusEl.textContent = `⚡ Live · t=${syncVideoT.toFixed(2)}s · ${points.length} pt`;
+    statusEl.className = 'status ok';
+    return;
+  }
+  recordedPoints.push(msg);
+  const pct = segmentEnd > startSeconds
+    ? Math.min(99, ((msg.t - startSeconds) / (segmentEnd - startSeconds)) * 100)
+    : 0;
+  // Preview brain/retina while processing (every few points to avoid UI freeze).
+  if (recordedPoints.length % 4 === 0 || pct >= 98) {
+    if (msg.eye_preview) drawRetinaPanel(msg.eye_preview);
+    else if (msg.lum_hex) drawRetinaPanel(msg.lum_hex);
+    if (msg.pathways || msg.descending || msg.t4) drawBrainPanel(msg);
+  }
+  statusEl.textContent = `📦 Обработка ${pct.toFixed(0)}% · ${recordedPoints.length} pt · сетчатка+мозг`;
+  statusEl.className = 'status warn';
+}
+
+function stopBatchPlayback() {
+  if (batchPlaybackTimer) {
+    clearTimeout(batchPlaybackTimer);
+    batchPlaybackTimer = null;
+  }
+  replaying = false;
+  flyBtn.disabled = !videoId;
+  stopBtn.disabled = true;
+}
+
+function startBatchPlayback(pts) {
+  stopBatchPlayback();
+  if (!pts.length) return;
+  replaying = true;
+  flyBtn.disabled = true;
+  stopBtn.disabled = false;
+  points = [];
+  let idx = 0;
+  lastBrainFrame = null;
+  lastLumHex = null;
+  if (window.resetBrainSmoothing) window.resetBrainSmoothing();
+
+  function step() {
+    if (!replaying || idx >= pts.length) {
+      stopBatchPlayback();
+      statusEl.textContent = `📦 Готово · ${pts.length} точек · воспроизведение завершено`;
+      statusEl.className = 'status ok';
+      autoFitBounds();
+      drawTraj();
+      showFeedbackPanel();
+      return;
+    }
+    const msg = pts[idx++];
+    points.push(msg);
+    syncVideoToPoint(msg);
+    if (msg.eye_preview) drawRetinaPanel(msg.eye_preview);
+    else if (msg.lum_hex) drawRetinaPanel(msg.lum_hex);
+    if (msg.pathways || msg.descending || msg.t4) drawBrainPanel(msg);
+    drawTraj();
+    statusEl.textContent = `▶ Воспроизведение · t=${syncVideoT.toFixed(2)}s · ${idx}/${pts.length}`;
+    statusEl.className = 'status ok';
+    const next = pts[idx];
+    const delay = next ? Math.max(25, Math.min(120, (next.t - msg.t) * 1000)) : 40;
+    batchPlaybackTimer = setTimeout(step, delay);
+  }
+
+  statusEl.textContent = `▶ Воспроизведение · 0/${pts.length}`;
+  syncVideoT = startSeconds;
+  if (frameMode) loadFrameAt(startSeconds);
+  else { vid.pause(); vid.currentTime = startSeconds; }
+  step();
+}
+
+async function startFly() {
+  if (!videoId || running || replaying || training) return;
+  stopBatchPlayback();
+  points = [];
+  recordedPoints = [];
+  running = true;
+  flyBtn.disabled = true;
+  stopBtn.disabled = false;
+  startSeconds = parseFloat(startSlider.value);
+  segmentEnd = segmentEndSeconds();
+  const isBatch = flyMode === 'batch';
+  statusEl.textContent = isBatch ? '📦 Подключение…' : '⚡ Подключение…';
+  statusEl.className = 'status warn';
+
+  ws = connectWs();
+  syncVideoT = startSeconds;
+  vid.pause();
+  if (frameMode) loadFrameAt(startSeconds);
+  else vid.currentTime = startSeconds;
+  if (isBatch) {
+    drawRetinaPanel(null);
+    drawBrainPanel(null);
+  }
+
+  ws.onopen = () => {
+    ws.send(JSON.stringify({
+      action: 'start',
+      video_id: videoId,
+      start_seconds: startSeconds,
+      end_seconds: segmentEnd,
+      display_mode: isBatch ? 'batch' : 'live',
+      x0: parseFloat(x0Input.value),
+      y0: parseFloat(y0Input.value),
+      heading_deg: parseFloat(headingInput.value),
+    }));
+    statusEl.textContent = isBatch
+      ? `📦 Обработка ${startSeconds.toFixed(1)}–${segmentEnd.toFixed(1)}s…`
+      : `⚡ Live ${startSeconds.toFixed(1)}–${segmentEnd.toFixed(1)}s`;
+    statusEl.className = 'status warn';
+  };
+
+  ws.onmessage = ev => {
+    const msg = JSON.parse(ev.data);
+    if (msg.type === 'point') {
+      handleFlyPoint(msg, !isBatch);
+    } else if (msg.type === 'done') {
+      running = false;
+      flyBtn.disabled = !videoId;
+      stopBtn.disabled = true;
+      if (ws) { ws.close(); ws = null; }
+      if (isBatch) {
+        statusEl.textContent = `📦 Обработано ${recordedPoints.length} pt · запуск воспроизведения…`;
+        startBatchPlayback(recordedPoints);
+      } else {
+        statusEl.textContent = `⚡ Готово · ${points.length} точек`;
+        statusEl.className = 'status ok';
+        autoFitBounds();
+        drawTraj();
+        showFeedbackPanel();
+      }
+    } else if (msg.type === 'error') {
+      statusEl.textContent = 'Ошибка: ' + msg.message;
+      statusEl.className = 'status warn';
+      stopFly();
+    } else if (msg.type === 'started') {
+      if (msg.hex_x) hexLayout = { hex_x: msg.hex_x, hex_y: msg.hex_y, n_hexals: msg.n_hexals };
+      if (typeof msg.end_seconds === 'number') segmentEnd = msg.end_seconds;
+      if (!isBatch) {
+        lastBrainFrame = null;
+        lastLumHex = null;
+        if (window.resetBrainSmoothing) window.resetBrainSmoothing();
+      }
+      statusEl.textContent = isBatch
+        ? `📦 MaleCNS @ ${msg.device} · обработка…`
+        : `⚡ Live @ ${msg.device} · heading ${msg.heading ?? msg.heading_deg ?? '?'}°`;
+    }
+  };
+
+  ws.onerror = () => {
+    statusEl.textContent = 'WebSocket ошибка';
+    statusEl.className = 'status warn';
+    stopFly();
+  };
+}
+
+function stopFly() {
+  running = false;
+  stopBatchPlayback();
+  stopTraining();
+  flyBtn.disabled = !videoId;
+  stopBtn.disabled = true;
+  if (ws) { ws.close(); ws = null; }
+  vid.pause();
+}
+
+flyBtn.addEventListener('click', startFly);
+stopBtn.addEventListener('click', stopFly);
+
+function formatEta(sec) {
+  if (!Number.isFinite(sec) || sec < 0) return '—';
+  if (sec < 60) return `${Math.ceil(sec)} с`;
+  const m = Math.floor(sec / 60), s = Math.round(sec % 60);
+  return `${m} мин ${s} с`;
+}
+
+function setTrainProgress(frac, text) {
+  trainStrip.classList.add('on');
+  trainBarFill.style.width = `${Math.max(0, Math.min(100, frac * 100)).toFixed(1)}%`;
+  trainMeta.textContent = text;
+}
+
+function hideTrainProgress() {
+  trainStrip.classList.remove('on');
+}
+
+function showTestReport(data) {
+  const test = data.test || {};
+  const train = data.train || {};
+  const before = data.before || {};
+  const pct = test.overlap_pct;
+  testReport.hidden = false;
+  const cls = pct >= 70 ? 'good' : pct >= 40 ? 'mid' : 'bad';
+  testScore.className = `test-score ${cls}`;
+  testScore.innerHTML = `${Number(pct).toFixed(0)}%<span>${data.held_out ? 'тест hold-out' : 'на сегменте'}</span>`;
+  const dOverlap = (test.overlap_pct - (before.overlap_pct || 0)).toFixed(0);
+  const sign = dOverlap >= 0 ? '+' : '';
+  testRows.innerHTML =
+    `train ${Number(train.overlap_pct).toFixed(0)}% · RMSE ${Number(train.rmse).toFixed(2)}<br>` +
+    `тест RMSE ${Number(test.rmse).toFixed(2)} · конец ${Number(test.endpoint_m).toFixed(2)}<br>` +
+    `Δheading ${Number(test.heading_err_deg).toFixed(1)}° · длина ×${Number(test.length_ratio).toFixed(2)}<br>` +
+    `vs до обучения: ${sign}${dOverlap} п.п. сходимости`;
+}
+
+function applyTrainResult(data) {
+  adaptiveSessions = (data.params && data.params.sessions) || adaptiveSessions;
+  deviceInfo.textContent = deviceInfo.textContent.replace(/🧪 \d+/, `🧪 ${adaptiveSessions}`);
+  flyPathBefore = (data.fly_path_before || []).map(p => ({
+    x: p.x, y: p.y, t: p.t, heading: p.heading,
+  }));
+  points = (data.fly_path || []).map(p => ({
+    x: p.x, y: p.y, t: p.t, heading: p.heading ?? parseFloat(headingInput.value),
+  }));
+  flyPathTest = data.held_out
+    ? (data.fly_path_test || []).map(p => ({ x: p.x, y: p.y, t: p.t, heading: p.heading }))
+    : [];
+  lastTestPairs = (data.test && data.test.pairs) || [];
+  if (points.length && typeof points[points.length - 1].t === 'number') {
+    syncVideoToPoint(points[points.length - 1]);
+  }
+  showTestReport(data);
+  autoFitBounds();
+  drawTraj();
+}
+
+function stopTraining() {
+  training = false;
+  if (trainWs) { trainWs.close(); trainWs = null; }
+  hideTrainProgress();
+  dopamineBtn.disabled = !videoId || teacherPath.length < 2;
+  flyBtn.disabled = !videoId;
+}
+
+async function pulseDopamine() {
+  if (!videoId || teacherPath.length < 2) {
+    statusEl.textContent = 'Нарисуйте эталон (✏️) — минимум 2 точки';
+    statusEl.className = 'status warn';
+    return;
+  }
+  if (running || replaying || training) return;
+  const x0 = parseFloat(x0Input.value), y0 = parseFloat(y0Input.value);
+  const path = teacherPath.map(p => ({ x: p.x, y: p.y }));
+  if (Math.hypot(path[0].x - x0, path[0].y - y0) > 0.4) path.unshift({ x: x0, y: y0 });
+  const epochs = Math.max(1, Math.min(30, parseInt(epochsInput.value, 10) || 5));
+
+  training = true;
+  dopamineBtn.disabled = true;
+  flyBtn.disabled = true;
+  stopBtn.disabled = false;
+  testReport.hidden = true;
+  lastTestPairs = [];
+  flyPathTest = [];
+  setTrainProgress(0, `кэш MaleCNS · ${epochs} эпох`);
+  statusEl.textContent = `🧪 Обучение ${epochs} эпох…`;
+  statusEl.className = 'status warn';
+
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  trainWs = new WebSocket(`${proto}://${location.host}/ws/train`);
+
+  trainWs.onopen = () => {
+    trainWs.send(JSON.stringify({
+      video_id: videoId,
+      start_seconds: parseFloat(startSlider.value),
+      end_seconds: segmentEndSeconds(),
+      x0, y0,
+      heading_deg: parseFloat(headingInput.value),
+      teacher: path,
+      epochs,
+    }));
+  };
+
+  trainWs.onmessage = ev => {
+    const msg = JSON.parse(ev.data);
+    if (msg.type === 'status') {
+      setTrainProgress(0.02, msg.message || 'кэш…');
+    } else if (msg.type === 'cache') {
+      const frac = 0.35 * (msg.frac || 0);
+      setTrainProgress(frac, `кэш MaleCNS ${((msg.frac || 0) * 100).toFixed(0)}% · t=${(msg.t || 0).toFixed(1)}s`);
+      statusEl.textContent = `🧪 Кэш видео ${((msg.frac || 0) * 100).toFixed(0)}%`;
+    } else if (msg.type === 'epoch') {
+      const frac = 0.35 + 0.65 * (msg.epoch / msg.epochs);
+      const speedTxt = msg.speed >= 1
+        ? `${msg.speed.toFixed(2)} эп/с`
+        : `${(1 / Math.max(msg.speed, 1e-6)).toFixed(1)} с/эп`;
+      setTrainProgress(frac,
+        `эпоха ${msg.epoch}/${msg.epochs} · loss ${msg.loss.toFixed(3)} · ${speedTxt} · осталось ${formatEta(msg.eta)}`);
+      statusEl.textContent = `🧪 ${msg.epoch}/${msg.epochs} · loss ${msg.loss.toFixed(3)} · ETA ${formatEta(msg.eta)}`;
+      statusEl.className = 'status warn';
+    } else if (msg.type === 'done') {
+      applyTrainResult(msg);
+      const test = msg.test || {};
+      statusEl.textContent =
+        `🧪 ${msg.epochs} эпох · тест ${Number(test.overlap_pct).toFixed(0)}% сходимости` +
+        ` · RMSE ${Number(test.rmse).toFixed(2)}` +
+        (msg.held_out ? ' · hold-out 30%' : '');
+      statusEl.className = (test.overlap_pct || 0) >= 40 ? 'status ok' : 'status warn';
+      hideTrainProgress();
+      training = false;
+      trainWs = null;
+      dopamineBtn.disabled = !videoId || teacherPath.length < 2;
+      flyBtn.disabled = !videoId;
+      stopBtn.disabled = running || replaying;
+    } else if (msg.type === 'error') {
+      statusEl.textContent = 'Дофамин: ' + msg.message;
+      statusEl.className = 'status warn';
+      stopTraining();
+      stopBtn.disabled = running || replaying;
+    }
+  };
+
+  trainWs.onerror = () => {
+    statusEl.textContent = 'Дофамин: WebSocket ошибка';
+    statusEl.className = 'status warn';
+    stopTraining();
+    stopBtn.disabled = running || replaying;
+  };
+}
+
+dopamineBtn.addEventListener('click', pulseDopamine);
+
+function updateFbStats() {
+  fbStats.textContent = `обучение: ✅ ${feedbackCorrect} · ❌ ${feedbackWrong}`;
+}
+
+function hideFeedbackPanel() {
+  awaitingFeedback = false;
+  feedbackFixActive = false;
+  selectedIssues.clear();
+  feedbackStrip.classList.remove('on');
+  feedbackFix.classList.remove('on');
+  issueChips.querySelectorAll('.issue-chip').forEach(c => c.classList.remove('on'));
+  fbNote.value = '';
+}
+
+function showFeedbackPanel() {
+  if (points.length < 2) return;
+  lastFlyPathSnapshot = points.map(p => ({ x: p.x, y: p.y, t: p.t, heading: p.heading }));
+  awaitingFeedback = true;
+  feedbackFixActive = false;
+  teacherPath = [];
+  selectedIssues.clear();
+  feedbackStrip.classList.add('on');
+  feedbackFix.classList.remove('on');
+  fbTitle.textContent = '🪰 Муха нарисовала путь. Верно?';
+  updateFbStats();
+  document.getElementById('trajHint').textContent =
+    'Отметь ✅ если путь верный · ❌ если нет — нарисуй как должно быть';
+}
+
+function flyPathPayload() {
+  return lastFlyPathSnapshot.map(p => ({ x: p.x, y: p.y }));
+}
+
+async function submitFeedback(verdict, correction, issues) {
+  if (!videoId || lastFlyPathSnapshot.length < 2) return;
+  fbCorrect.disabled = true;
+  fbWrong.disabled = true;
+  fbSubmitFix.disabled = true;
+  statusEl.textContent = verdict === 'correct' ? 'Запоминаю…' : 'Обучаю по твоей оценке…';
+  statusEl.className = 'status warn';
+  try {
+    const res = await fetch('/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        video_id: videoId,
+        verdict,
+        fly_path: flyPathPayload(),
+        correction: correction || null,
+        issues: issues || [],
+        note: fbNote.value.trim(),
+        start_seconds: startSeconds,
+        end_seconds: segmentEndSeconds(),
+        x0: parseFloat(x0Input.value),
+        y0: parseFloat(y0Input.value),
+        heading_deg: parseFloat(headingInput.value),
+      }),
+    });
+    if (!res.ok) throw new Error(await parseError(res));
+    const data = await res.json();
+    adaptiveSessions = (data.params && data.params.sessions) || adaptiveSessions;
+    feedbackCorrect = (data.stats && data.stats.correct) || feedbackCorrect;
+    feedbackWrong = (data.stats && data.stats.wrong) || feedbackWrong;
+    deviceInfo.textContent = `MaleCNS · 🧪 ${adaptiveSessions} · ✅${feedbackCorrect} ❌${feedbackWrong}`;
+    if (data.fly_path_learned && data.fly_path_learned.length) {
+      flyPathBefore = lastFlyPathSnapshot;
+      points = data.fly_path_learned.map(p => ({
+        x: p.x, y: p.y, t: p.t, heading: p.heading,
+      }));
+      autoFitBounds();
+      drawTraj();
+    }
+    hideFeedbackPanel();
+    teacherPath = [];
+    updateDrawButtons();
+    statusEl.textContent = data.message || 'Обучение завершено';
+    statusEl.className = 'status ok';
+  } catch (err) {
+    statusEl.textContent = 'Ошибка: ' + err.message;
+    statusEl.className = 'status warn';
+  } finally {
+    fbCorrect.disabled = false;
+    fbWrong.disabled = false;
+    fbSubmitFix.disabled = false;
+  }
+}
+
+fbCorrect.addEventListener('click', () => submitFeedback('correct'));
+
+fbWrong.addEventListener('click', () => {
+  feedbackFixActive = true;
+  feedbackFix.classList.add('on');
+  teacherPath = [];
+  setTrajMode('draw');
+  fbTitle.textContent = '❌ Что не так? Выбери метки и/или нарисуй правильный путь';
+  document.getElementById('trajHint').textContent =
+    'Метки = быстрая подсказка · клик на карте = точный путь · Shift = новая линия';
+  updateDrawButtons();
+  drawTraj();
+});
+
+issueChips.addEventListener('click', e => {
+  const chip = e.target.closest('.issue-chip');
+  if (!chip) return;
+  const id = chip.dataset.issue;
+  if (selectedIssues.has(id)) {
+    selectedIssues.delete(id);
+    chip.classList.remove('on');
+  } else {
+    selectedIssues.add(id);
+    chip.classList.add('on');
+  }
+});
+
+fbSubmitFix.addEventListener('click', () => {
+  const issues = [...selectedIssues];
+  const correction = teacherPath.length >= 2 ? teacherPath.map(p => ({ x: p.x, y: p.y })) : null;
+  if (!issues.length && !correction) {
+    statusEl.textContent = 'Выбери метки или нарисуй путь (мин. 2 точки)';
+    statusEl.className = 'status warn';
+    return;
+  }
+  submitFeedback('wrong', correction, issues);
+});
+
+resetBtn.addEventListener('click', () => {
+  stopFly();
+  points = [];
+  flyPathBefore = [];
+  flyPathTest = [];
+  lastTestPairs = [];
+  recordedPoints = [];
+  teacherPath = [];
+  testReport.hidden = true;
+  trajViewBounds = null;
+  viewSpan = 18;
+  lastBrainFrame = null;
+  lastLumHex = null;
+  x0Input.value = '0'; y0Input.value = '0'; headingInput.value = '90';
+  updateDrawButtons();
+  resetViewBounds();
+  drawTraj();
+  clearRetinaPanel();
+  clearBrainPanel();
+  hideFeedbackPanel();
+});
+</script>
+</body>
+</html>

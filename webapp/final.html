@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>FINAL TRACKER V2</title>
+<style>
+  :root{
+    --bg:#0b0d12; --panel:#141821; --line:#252b3a; --fg:#eef2f8; --dim:#8a94a8;
+    --accent:#5b8def; --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--fg);
+    font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  #app{display:flex;flex-direction:column;height:100%}
+  header{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--panel);
+    border-bottom:1px solid var(--line);flex:none}
+  header h1{font-size:15px;font-weight:600}
+  select,button{font:inherit;color:var(--fg);background:#1a1f2b;border:1px solid var(--line);
+    border-radius:8px;padding:6px 10px;cursor:pointer}
+  button.on{background:#1e3a6e;border-color:var(--accent);color:#fff}
+  main{display:grid;grid-template-columns:minmax(280px,0.85fr) 1.1fr 1.1fr;flex:1;min-height:0}
+  .pane{border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+  .pane:last-child{border-right:none}
+  .pane h2{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--dim);
+    padding:8px 12px;border-bottom:1px solid var(--line)}
+  #planWrap{flex:1;position:relative;background:#06080c;min-height:0}
+  #legend{position:absolute;top:8px;right:8px;max-height:70%;overflow:auto;
+    background:rgba(10,12,18,.86);border:1px solid var(--line);border-radius:8px;
+    padding:6px 8px;font-size:11px;color:var(--dim)}
+  #legend div{display:flex;align-items:center;gap:6px;margin:2px 0;white-space:nowrap}
+  #legend i{width:16px;height:3px;border-radius:2px;display:inline-block}
+  canvas{display:block;width:100%;height:100%}
+  #videoWrap{flex:1;display:flex;align-items:center;justify-content:center;background:#000;min-height:0}
+  video{max-width:100%;max-height:100%}
+  #controls{padding:10px 12px;border-top:1px solid var(--line);background:var(--panel)}
+  #showAll,#showEvery{margin:0 8px 8px 0}
+  input[type=range]{width:100%}
+  #info{font-size:12px;color:var(--dim);margin-top:8px;line-height:1.5}
+  #info b{color:var(--fg)}
+  #drawWrap{flex:1;position:relative;background:#06080c;min-height:0;cursor:crosshair;touch-action:none}
+  #drawHint{position:absolute;left:8px;bottom:8px;max-width:340px;padding:8px 10px;
+    background:rgba(10,12,18,.88);border:1px solid var(--line);border-radius:8px;
+    font-size:12px;color:var(--dim);pointer-events:none;line-height:1.45}
+  #drawHint b{color:var(--fg)}
+  #drawControls{padding:10px 12px;border-top:1px solid var(--line);background:var(--panel);
+    display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  #drawControls button{margin:0}
+  #drawStatus{font-size:12px;color:var(--dim);margin-left:auto}
+  #decisions{flex:1;overflow:auto;padding:8px 12px;font-size:12px}
+  .dec{border:1px solid var(--line);border-radius:8px;padding:8px 10px;margin-bottom:8px;
+    background:#121722}
+  .dec.amb{border-color:#7a5518}
+  .tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:10px;
+    background:#2c3344;margin-right:6px}
+  .tag.res{background:#163a24;color:#86efac}
+  .tag.amb{background:#3d2a0a;color:#fcd34d}
+  .empty{padding:20px;color:var(--dim)}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>FINAL TRACKER V2</h1>
+    <select id="clipSel"></select>
+    <span id="meta" style="color:var(--dim);font-size:12px"></span>
+    <a href="/start" style="margin-left:auto;color:var(--accent);font-size:13px">Старт VID00001</a>
+  </header>
+  <main>
+    <section class="pane">
+      <h2>Видео</h2>
+      <div id="videoWrap"><video id="vid" controls playsinline></video></div>
+      <div id="decisions"></div>
+    </section>
+    <section class="pane">
+      <h2 id="planTitle">План — только рёбра графа</h2>
+      <div id="planWrap"><canvas id="plan"></canvas><div id="legend" hidden></div></div>
+      <div id="controls">
+        <button type="button" id="showAll">Увидеть всю траекторию</button>
+        <button type="button" id="showEvery">Траектории всех видео</button>
+        <input type="range" id="time" min="0" max="100" value="0" step="0.1">
+        <div id="info">Выберите запись с прогоном трекера.</div>
+      </div>
+    </section>
+    <section class="pane">
+      <h2>Моя траектория на графе</h2>
+      <div id="drawWrap">
+        <canvas id="draw"></canvas>
+        <div id="drawHint"><b>Только по графу.</b> Линия идёт по рёбрам, мимо стен не режет.
+          Колёсико — масштаб, пробел и мышь — сдвиг.</div>
+      </div>
+      <div id="drawControls">
+        <button type="button" id="drawFit">Вся карта</button>
+        <button type="button" id="drawUndo">Отменить</button>
+        <button type="button" id="drawClear">Очистить</button>
+        <button type="button" id="drawSave">Сохранить</button>
+        <span id="drawStatus">нет рисунка</span>
+      </div>
+    </section>
+  </main>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+let state = null, planImg = null, graph = null, traj = [], decs = [], alts = [];
+let showAll = false, showEvery = false, allTracks = null, onlyClip = false;
+let sketch = [], sketchSeg = [], sketchMarks = [], drawScale = 1, drawOffX = 0, drawOffY = 0;
+let drawing = false, drawPanning = false, spaceDown = false, lastPan = null;
+let gestureLen = 0, hoverLoc = null, segs = [], adj = new Map(), geomKey = '';
+const TRACK_COLORS = ['#e85d4c','#3dbe7a','#5b8def','#f5b942','#c084fc','#2dd4bf','#fb7185','#a3e635','#38bdf8','#f97316','#e879f9','#facc15','#94a3b8','#67e8f9','#f43f5e','#86efac'];
+
+async function loadList(){
+  const r = await fetch('/api/final/list');
+  const j = await r.json();
+  const sel = $('clipSel');
+  sel.innerHTML = '';
+  for(const c of j.clips){
+    const o = document.createElement('option');
+    o.value = c.id; o.textContent = c.id + (c.ok ? '' : ' (нет прогона)');
+    sel.appendChild(o);
+  }
+  const q = new URLSearchParams(location.search);
+  const want = q.get('clip');
+  if(want && (q.get('full') === '1' || q.get('all') === '1')){
+    onlyClip = true;
+    showAll = true;
+    showEvery = false;
+    $('showAll').textContent = 'Только до текущего времени';
+    $('showAll').classList.add('on');
+    $('showEvery').hidden = true;
+  }
+  const ids = j.clips.map(c => c.id);
+  const pick = want && ids.includes(want) ? want : (ids[0] || '');
+  if(pick){ sel.value = pick; await loadClip(pick); }
+}
+
+async function loadClip(id){
+  const r = await fetch('/api/final/state?clip=' + encodeURIComponent(id));
+  state = await r.json();
+  graph = indexGraph(state.graph || {});
+  traj = state.trajectory || [];
+  decs = state.decisions || [];
+  alts = state.alternatives || [];
+  $('planTitle').textContent = onlyClip ? ('Только ' + id) : 'План — только рёбра графа';
+  $('meta').textContent = state.report
+    ? `${onlyClip ? 'только ' + id + ' · ' : ''}${state.version || ''} ${state.report.stats.route_meters} м, ${state.report.stats.edges_traversed} рёбер`
+    : (onlyClip ? ('только ' + id) : '');
+  $('time').max = state.duration || 100;
+  $('time').value = 0;
+  $('vid').src = state.video_url || '';
+  $('vid').load();
+  renderDecisions();
+  await loadPlan();
+  renderLegend();
+  await loadSketch(id);
+  drawPlan(0);
+  fitDraw();
+}
+
+async function loadSketch(id){
+  const r = await fetch('/api/human/state?clip=' + encodeURIComponent(id));
+  const j = await r.json();
+  sketch = (j.sketch && j.sketch.points) ? j.sketch.points.map(p => [+p[0], +p[1]]) : [];
+  sketchSeg = sketch.map(() => null);
+  sketchMarks = sketch.map((_, i) => i + 1);
+  hoverLoc = null;
+  $('drawStatus').textContent = j.sketch && j.sketch.saved_at
+    ? ('сохранено ' + j.sketch.saved_at) : 'нет рисунка';
+}
+
+function renderDecisions(){
+  const box = $('decisions');
+  if(!decs.length){ box.innerHTML = '<div class="empty">Нет decisions.csv для этого куска.</div>'; return; }
+  box.innerHTML = decs.slice(-40).reverse().map(d => {
+    const st = d.decision_status || '';
+    const cls = st === 'AMBIGUOUS' ? 'dec amb' : 'dec';
+    const tag = st === 'RESOLVED' ? 'tag res' : (st === 'AMBIGUOUS' ? 'tag amb' : 'tag');
+    return `<div class="${cls}"><span class="${tag}">${st}</span>`
+      + `<b>t=${d.time}</b> узел ${d.node}, вошли по ${d.incoming_edge}<br>`
+      + `кандидаты: ${d.candidate_edges || ''}<br>`
+      + `yaw: ${d.camera_yaw || '—'} (${d.yaw_strength || 0}), `
+      + `net: ${d.net_displacement || '—'} (${d.net_confidence || 0})<br>`
+      + `выбор: <b>${d.chosen_edge || '—'}</b></div>`;
+  }).join('');
+}
+
+async function loadPlan(){
+  if(planImg) return;
+  planImg = new Image();
+  planImg.src = '/api/p08/plan';
+  await new Promise((res,rej)=>{ planImg.onload=res; planImg.onerror=rej; });
+}
+
+function sampleAt(t){
+  if(!traj.length) return null;
+  let i = traj.findIndex(r => +r.time >= t);
+  if(i < 0) i = traj.length - 1;
+  if(i > 0 && +traj[i].time - t > t - +traj[i-1].time) i--;
+  return traj[i];
+}
+
+function indexGraph(g){
+  const nodes = {};
+  const rawN = Array.isArray(g.nodes) ? g.nodes : Object.values(g.nodes || {});
+  for(const n of rawN) if(n && n.id) nodes[n.id] = n;
+  const edges = Array.isArray(g.edges) ? g.edges : Object.values(g.edges || {});
+  return {nodes, edges, img_w: g.img_w || 5298, img_h: g.img_h || 3743};
+}
+
+function routeFrame(w, h){
+  const iw = +graph.img_w || 5298, ih = +graph.img_h || 3743;
+  if(!onlyClip || showEvery || !traj.length || w < 10 || h < 10) return null;
+  let minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity;
+  for(const r of traj){
+    const x = +r.x, y = +r.y;
+    if(x < minx) minx = x; if(y < miny) miny = y;
+    if(x > maxx) maxx = x; if(y > maxy) maxy = y;
+  }
+  const pad = Math.max(80, 0.15 * Math.max(maxx - minx, maxy - miny, 1));
+  let x0 = minx - pad, y0 = miny - pad;
+  let vw = Math.max(1, maxx - minx + pad * 2), vh = Math.max(1, maxy - miny + pad * 2);
+  const aspect = w / h;
+  if(vw / vh < aspect){
+    const nw = vh * aspect;
+    x0 -= (nw - vw) / 2;
+    vw = nw;
+  } else {
+    const nh = vw / aspect;
+    y0 -= (nh - vh) / 2;
+    vh = nh;
+  }
+  return {x0, y0, vw, vh, iw, ih};
+}
+
+function drawPlan(t){
+  const c = $('plan'), wrap = $('planWrap');
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#06080c'; ctx.fillRect(0,0,w,h);
+  if(!graph) return;
+  const fr = routeFrame(w, h);
+  const iw = +graph.img_w || 5298, ih = +graph.img_h || 3743;
+  const tx = x => fr ? ((+x - fr.x0) / fr.vw) * w : (+x / iw) * w;
+  const ty = y => fr ? ((+y - fr.y0) / fr.vh) * h : (+y / ih) * h;
+  const nx = n => tx(n[0] * iw), ny = n => ty(n[1] * ih);
+  if(planImg && planImg.complete && planImg.naturalWidth){
+    ctx.globalAlpha = 0.55;
+    if(fr){
+      const sx = fr.x0 * planImg.naturalWidth / iw;
+      const sy = fr.y0 * planImg.naturalHeight / ih;
+      const sw = fr.vw * planImg.naturalWidth / iw;
+      const sh = fr.vh * planImg.naturalHeight / ih;
+      ctx.drawImage(planImg, sx, sy, sw, sh, 0, 0, w, h);
+    } else ctx.drawImage(planImg, 0, 0, w, h);
+    ctx.globalAlpha = 1;
+  }
+  ctx.strokeStyle = '#666'; ctx.lineWidth = 1;
+  for(const e of graph.edges){
+    const a = nodePos(e.from), b = nodePos(e.to);
+    if(!a||!b) continue;
+    ctx.beginPath(); ctx.moveTo(nx(a), ny(a)); ctx.lineTo(nx(b), ny(b)); ctx.stroke();
+  }
+  if(showEvery && allTracks){
+    const current = state && state.clip;
+    allTracks.forEach((tr, i) => {
+      const color = TRACK_COLORS[i % TRACK_COLORS.length];
+      strokeTrack(ctx, tr.points, tx, ty, color, tr.id === current ? 2.6 : 1.4);
+      if(!tr.points.length) return;
+      const p0 = tr.points[0];
+      const px = tx(p0[0]), py = ty(p0[1]);
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(px, py, tr.id === current ? 4 : 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.font = '11px sans-serif';
+      ctx.fillText(tr.id.slice(3), px + 5, py - 4 - (i % 6) * 12);
+    });
+  }
+  if(!showEvery){
+  const liveIds = new Set(alts.filter(a => Math.abs(+a.time - t) <= 1.2).map(a => a.hyp_id));
+  const byId = new Map();
+  for(const a of alts){
+    if(+a.time > t + 0.05) continue;
+    if(!liveIds.has(a.hyp_id)) continue;
+    if(!byId.has(a.hyp_id)) byId.set(a.hyp_id, []);
+    byId.get(a.hyp_id).push(a);
+  }
+  ctx.lineWidth = 1.2; ctx.strokeStyle = 'rgba(180,190,220,0.9)';
+  for(const [, pts] of byId){
+    const last = pts[pts.length - 1];
+    if(last.is_best === '1' || last.is_best === 1) continue;
+    ctx.beginPath();
+    pts.forEach((p,i)=>{ const px=tx(p.x), py=ty(p.y); if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py); });
+    ctx.stroke();
+  }
+  const shown = showAll ? traj : traj.filter(r => +r.time <= t + 0.05);
+  if(shown.length){
+    ctx.strokeStyle = '#1f77ff'; ctx.lineWidth = 2.6;
+    let prev = null;
+    ctx.beginPath();
+    shown.forEach((r)=>{
+      const px = tx(r.x), py = ty(r.y);
+      const hid = r.best_hypothesis;
+      if(prev !== null && hid !== prev){ ctx.stroke(); ctx.beginPath(); ctx.moveTo(px, py); }
+      else if(prev === null) ctx.moveTo(px, py);
+      else ctx.lineTo(px, py);
+      prev = hid;
+    });
+    ctx.stroke();
+  }
+  }
+  const cur = sampleAt(t);
+  if(cur){
+    ctx.fillStyle = cur.is_stop==='1' || cur.is_stop===1 ? '#f59e0b' : '#22c55e';
+    ctx.beginPath(); ctx.arc(tx(cur.x), ty(cur.y), 8, 0, Math.PI*2); ctx.fill();
+    const conf = cur.confidence != null ? cur.confidence : (1 - (+cur.uncertainty || 0)).toFixed(2);
+    $('info').innerHTML = `<b>t=${cur.time} с</b> — ребро <b>${cur.edge}</b>, `
+      + `прогресс ${cur.progress_m || cur.progress} м, `
+      + `${cur.status || ''} , уверенность ${conf}, живых ${cur.n_alive || 1}<br>`
+      + `yaw ${cur.camera_yaw||'—'} (${cur.camera_yaw_strength}), `
+      + `net ${cur.net_displacement} (${cur.net_displacement_confidence})`;
+  }
+  if(!showEvery){
+  for(const d of decs){
+    if(Math.abs(+d.time - t) > 2) continue;
+    const p = nodePos(d.node);
+    if(!p) continue;
+    ctx.strokeStyle = d.decision_status==='AMBIGUOUS' ? '#ffb000' : '#ef4444';
+    ctx.lineWidth = 2;
+    const dx = nx(p), dy = ny(p);
+    ctx.strokeRect(dx - 6, dy - 6, 12, 12);
+  }
+  }
+}
+
+function strokeTrack(ctx, pts, tx, ty, color, width){
+  if(!pts || !pts.length) return;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.beginPath();
+  let prev = null;
+  for(const p of pts){
+    const px = tx(p[0]), py = ty(p[1]);
+    const jump = prev && Math.hypot(p[0] - prev[0], p[1] - prev[1]) > 30;
+    if(!prev || jump){
+      if(prev) ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(px, py);
+    } else ctx.lineTo(px, py);
+    prev = p;
+  }
+  ctx.stroke();
+}
+
+function renderLegend(){
+  const box = $('legend');
+  if(!showEvery || !allTracks){ box.hidden = true; return; }
+  const current = state && state.clip;
+  box.hidden = false;
+  box.innerHTML = allTracks.map((tr, i) => {
+    const color = TRACK_COLORS[i % TRACK_COLORS.length];
+    const mark = tr.id === current ? ' ←' : '';
+    return `<div><i style="background:${color}"></i>${tr.id}${mark}</div>`;
+  }).join('');
+}
+
+function buildGraphGeom(){
+  if(!graph) return;
+  const {iw, ih} = planSize();
+  const key = iw + 'x' + ih + ':' + graph.edges.length;
+  if(key === geomKey && segs.length) return;
+  geomKey = key;
+  segs = [];
+  adj = new Map();
+  for(const e of graph.edges){
+    const a = graph.nodes[e.from], b = graph.nodes[e.to];
+    if(!a || !b) continue;
+    const ax = a.x * iw, ay = a.y * ih, bx = b.x * iw, by = b.y * ih;
+    const len = Math.hypot(bx - ax, by - ay);
+    if(len < 1e-3) continue;
+    const seg = {id: e.id, a: e.from, b: e.to, ax, ay, bx, by, len};
+    segs.push(seg);
+    const link = (frm, to) => {
+      if(!adj.has(frm)) adj.set(frm, []);
+      adj.get(frm).push({to, seg});
+    };
+    link(e.from, e.to);
+    if(e.bidirectional !== false) link(e.to, e.from);
+  }
+}
+
+function projectSeg(seg, x, y){
+  const dx = seg.bx - seg.ax, dy = seg.by - seg.ay;
+  let t = ((x - seg.ax) * dx + (y - seg.ay) * dy) / (seg.len * seg.len);
+  t = Math.max(0, Math.min(1, t));
+  let px = seg.ax + dx * t, py = seg.ay + dy * t;
+  const dist = Math.hypot(x - px, y - py);
+  let node = null;
+  if(Math.hypot(px - seg.ax, py - seg.ay) <= 10){
+    t = 0; px = seg.ax; py = seg.ay; node = seg.a;
+  } else if(Math.hypot(px - seg.bx, py - seg.by) <= 10){
+    t = 1; px = seg.bx; py = seg.by; node = seg.b;
+  }
+  return {seg, t, x: px, y: py, node, dist};
+}
+
+function nearestOnGraph(x, y, prefer){
+  buildGraphGeom();
+  let best = null, stuck = null;
+  for(const seg of segs){
+    const loc = projectSeg(seg, x, y);
+    if(!best || loc.dist < best.dist) best = loc;
+    if(prefer && seg === prefer) stuck = loc;
+  }
+  if(stuck && stuck.dist <= best.dist + 28) return stuck;
+  return best;
+}
+
+function routePoints(from, to){
+  if(!from || !to) return [];
+  if(from.node && to.node && from.node === to.node) return [];
+  if(from.seg === to.seg){
+    if(Math.hypot(from.x - to.x, from.y - to.y) < 1) return [];
+    return [{x: to.x, y: to.y, seg: to.seg}];
+  }
+  const starts = from.node
+    ? [{node: from.node, cost: 0}]
+    : [{node: from.seg.a, cost: from.t * from.seg.len},
+       {node: from.seg.b, cost: (1 - from.t) * from.seg.len}];
+  const ends = to.node
+    ? [{node: to.node, extra: 0}]
+    : [{node: to.seg.a, extra: to.t * to.seg.len},
+       {node: to.seg.b, extra: (1 - to.t) * to.seg.len}];
+  const cost = new Map(), prev = new Map(), used = new Set();
+  const heap = [];
+  for(const s of starts){
+    if(cost.has(s.node) && cost.get(s.node) <= s.cost) continue;
+    cost.set(s.node, s.cost);
+    prev.set(s.node, null);
+    heap.push(s.node);
+  }
+  while(heap.length){
+    let bi = 0;
+    for(let i = 1; i < heap.length; i++) if(cost.get(heap[i]) < cost.get(heap[bi])) bi = i;
+    const u = heap.splice(bi, 1)[0];
+    if(used.has(u)) continue;
+    used.add(u);
+    for(const link of (adj.get(u) || [])){
+      const nc = cost.get(u) + link.seg.len;
+      if(cost.has(link.to) && cost.get(link.to) <= nc) continue;
+      cost.set(link.to, nc);
+      prev.set(link.to, {node: u, seg: link.seg});
+      heap.push(link.to);
+    }
+  }
+  let best = null;
+  for(const e of ends){
+    if(!cost.has(e.node)) continue;
+    const total = cost.get(e.node) + e.extra;
+    if(!best || total < best.total) best = {node: e.node, total};
+  }
+  if(!best) return [];
+  const nodes = [], via = [];
+  let cur = best.node;
+  const seen = new Set();
+  while(cur && !seen.has(cur)){
+    seen.add(cur);
+    nodes.push(cur);
+    const p = prev.get(cur);
+    via.push(p ? p.seg : from.seg);
+    cur = p ? p.node : null;
+  }
+  nodes.reverse();
+  via.reverse();
+  const xy = id => {
+    for(const seg of segs){
+      if(seg.a === id) return [seg.ax, seg.ay];
+      if(seg.b === id) return [seg.bx, seg.by];
+    }
+    const n = graph.nodes[id];
+    const {iw, ih} = planSize();
+    return [n.x * iw, n.y * ih];
+  };
+  const pts = [];
+  const startHere = from.node && nodes[0] === from.node;
+  if(!startHere){
+    const [x, y] = xy(nodes[0]);
+    pts.push({x, y, seg: from.seg});
+  }
+  for(let i = 1; i < nodes.length; i++){
+    const [x, y] = xy(nodes[i]);
+    pts.push({x, y, seg: via[i] || to.seg});
+  }
+  const atEnd = to.node && nodes[nodes.length - 1] === to.node;
+  if(!atEnd) pts.push({x: to.x, y: to.y, seg: to.seg});
+  return pts;
+}
+
+function addSketchPoint(x, y, seg){
+  const n = sketch.length;
+  const prev = sketch[n - 1];
+  if(prev && Math.hypot(prev[0] - x, prev[1] - y) < 0.8){
+    if(seg) sketchSeg[n - 1] = seg;
+    return;
+  }
+  if(n >= 2 && (n - 1) >= gestureLen && seg && sketchSeg[n - 1] === seg && sketchSeg[n - 2] === seg){
+    sketch[n - 1] = [x, y];
+    return;
+  }
+  sketch.push([x, y]);
+  sketchSeg.push(seg || null);
+}
+
+function extendSketch(loc){
+  if(!loc) return;
+  if(!sketch.length){
+    sketch = [[loc.x, loc.y]];
+    sketchSeg = [loc.seg];
+    return;
+  }
+  const from = nearestOnGraph(sketch[sketch.length - 1][0], sketch[sketch.length - 1][1], sketchSeg[sketchSeg.length - 1]);
+  for(const p of routePoints(from, loc)) addSketchPoint(p.x, p.y, p.seg);
+}
+
+function planSize(){
+  const iw = (planImg && planImg.naturalWidth) || (graph && +graph.img_w) || 5298;
+  const ih = (planImg && planImg.naturalHeight) || (graph && +graph.img_h) || 3743;
+  return {iw, ih};
+}
+
+function fitDraw(){
+  const wrap = $('drawWrap');
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  if(w < 10 || h < 10 || !graph) return;
+  const {iw, ih} = planSize();
+  drawScale = Math.min(w / iw, h / ih) * 0.98;
+  drawOffX = (w - iw * drawScale) / 2;
+  drawOffY = (h - ih * drawScale) / 2;
+  drawSketchCanvas();
+}
+
+function drawSketchCanvas(){
+  const c = $('draw'), wrap = $('drawWrap');
+  const w = wrap.clientWidth, h = wrap.clientHeight;
+  if(w < 10 || h < 10) return;
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#06080c';
+  ctx.fillRect(0, 0, w, h);
+  if(!graph) return;
+  const {iw, ih} = planSize();
+  ctx.save();
+  ctx.translate(drawOffX, drawOffY);
+  ctx.scale(drawScale, drawScale);
+  if(planImg && planImg.complete && planImg.naturalWidth){
+    ctx.globalAlpha = 0.9;
+    ctx.drawImage(planImg, 0, 0, iw, ih);
+    ctx.globalAlpha = 1;
+  }
+  ctx.strokeStyle = 'rgba(180,190,210,0.85)';
+  ctx.lineWidth = Math.max(1, 1.4 / drawScale);
+  for(const e of graph.edges){
+    const a = graph.nodes[e.from], b = graph.nodes[e.to];
+    if(!a || !b) continue;
+    ctx.beginPath();
+    ctx.moveTo(a.x * iw, a.y * ih);
+    ctx.lineTo(b.x * iw, b.y * ih);
+    ctx.stroke();
+  }
+  ctx.fillStyle = '#dbe4f5';
+  const nr = Math.max(2.2, 4.5 / drawScale);
+  for(const n of Object.values(graph.nodes)){
+    ctx.beginPath();
+    ctx.arc(n.x * iw, n.y * ih, nr, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  if(sketch.length){
+    ctx.strokeStyle = '#22c55e';
+    ctx.lineWidth = Math.max(2.5, 5 / drawScale);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.beginPath();
+    sketch.forEach((p, i) => { if(i === 0) ctx.moveTo(p[0], p[1]); else ctx.lineTo(p[0], p[1]); });
+    if(sketch.length > 1) ctx.stroke();
+    ctx.fillStyle = '#22c55e';
+    for(const i of [0, sketch.length - 1]){
+      const p = sketch[i];
+      ctx.beginPath();
+      ctx.arc(p[0], p[1], Math.max(4, 8 / drawScale), 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  if(hoverLoc){
+    ctx.strokeStyle = '#f59e0b';
+    ctx.lineWidth = Math.max(1.5, 2.2 / drawScale);
+    ctx.beginPath();
+    ctx.arc(hoverLoc.x, hoverLoc.y, Math.max(5, 10 / drawScale), 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawPointer(e){
+  const rect = $('draw').getBoundingClientRect();
+  const sx = e.clientX - rect.left, sy = e.clientY - rect.top;
+  return {x: (sx - drawOffX) / drawScale, y: (sy - drawOffY) / drawScale};
+}
+
+async function saveSketch(){
+  const {iw, ih} = planSize();
+  const body = {video: state && state.clip, coordinate_system: 'plan_pixels', img_w: iw, img_h: ih,
+    points: sketch, note: 'нарисовано по рёбрам графа на /final'};
+  const r = await fetch('/api/human/save', {method: 'POST',
+    headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
+  const j = await r.json();
+  if(!j.ok){ $('drawStatus').textContent = j.error || 'ошибка'; return; }
+  $('drawStatus').textContent = j.cleared ? 'рисунок удалён' : ('сохранено ' + j.saved_at);
+}
+
+function nodePos(id){
+  const n = graph.nodes && graph.nodes[id];
+  if(!n) return null;
+  return [n.x, n.y];
+}
+
+$('showEvery').addEventListener('click', async () => {
+  showEvery = !showEvery;
+  $('showEvery').textContent = showEvery ? 'Только это видео' : 'Траектории всех видео';
+  $('showEvery').classList.toggle('on', showEvery);
+  if(showEvery){
+    $('info').textContent = 'Загружаю траектории всех видео…';
+    const r = await fetch('/api/final/tracks');
+    const j = await r.json();
+    allTracks = j.tracks || [];
+  }
+  renderLegend();
+  drawPlan(+$('time').value);
+});
+$('showAll').addEventListener('click', () => {
+  showAll = !showAll;
+  $('showAll').textContent = showAll ? 'Только до текущего времени' : 'Увидеть всю траекторию';
+  $('showAll').classList.toggle('on', showAll);
+  drawPlan(+$('time').value);
+});
+const drawCanvas = $('draw');
+drawCanvas.addEventListener('mousedown', e => {
+  if(!graph) return;
+  if(e.button === 1 || (spaceDown && e.button === 0)){
+    drawPanning = true; lastPan = {x: e.clientX, y: e.clientY}; return;
+  }
+  if(e.button !== 0) return;
+  drawing = true;
+  gestureLen = sketch.length;
+  const p = drawPointer(e);
+  const prefer = sketchSeg.length ? sketchSeg[sketchSeg.length - 1] : null;
+  const loc = nearestOnGraph(p.x, p.y, prefer);
+  hoverLoc = loc;
+  extendSketch(loc);
+  $('drawStatus').textContent = 'не сохранено';
+  drawSketchCanvas();
+});
+drawCanvas.addEventListener('mousemove', e => {
+  if(drawPanning && lastPan){
+    drawOffX += e.clientX - lastPan.x;
+    drawOffY += e.clientY - lastPan.y;
+    lastPan = {x: e.clientX, y: e.clientY};
+    drawSketchCanvas();
+    return;
+  }
+  const p = drawPointer(e);
+  const prefer = hoverLoc ? hoverLoc.seg : (sketchSeg.length ? sketchSeg[sketchSeg.length - 1] : null);
+  const loc = nearestOnGraph(p.x, p.y, prefer);
+  hoverLoc = loc;
+  if(drawing && loc){
+    extendSketch(loc);
+    $('drawStatus').textContent = 'не сохранено';
+  }
+  drawSketchCanvas();
+});
+drawCanvas.addEventListener('mouseleave', () => { hoverLoc = null; drawSketchCanvas(); });
+drawCanvas.addEventListener('wheel', e => {
+  e.preventDefault();
+  const rect = drawCanvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const f = e.deltaY > 0 ? 0.9 : 1.1;
+  drawOffX = mx - f * (mx - drawOffX);
+  drawOffY = my - f * (my - drawOffY);
+  drawScale *= f;
+  drawSketchCanvas();
+}, {passive: false});
+window.addEventListener('mouseup', () => {
+  if(drawing && sketch.length > gestureLen){
+    sketchMarks = sketchMarks.filter(m => m <= gestureLen);
+    sketchMarks.push(sketch.length);
+  }
+  drawing = false; drawPanning = false; lastPan = null;
+});
+window.addEventListener('keydown', e => {
+  if(e.code === 'Space' && e.target === document.body){ spaceDown = true; e.preventDefault(); }
+});
+window.addEventListener('keyup', e => { if(e.code === 'Space') spaceDown = false; });
+$('drawFit').addEventListener('click', fitDraw);
+$('drawUndo').addEventListener('click', () => {
+  sketchMarks.pop();
+  const n = sketchMarks.length ? sketchMarks[sketchMarks.length - 1] : 0;
+  sketch = sketch.slice(0, n);
+  sketchSeg = sketchSeg.slice(0, n);
+  $('drawStatus').textContent = 'не сохранено';
+  drawSketchCanvas();
+});
+$('drawClear').addEventListener('click', () => {
+  sketch = []; sketchSeg = []; sketchMarks = [];
+  $('drawStatus').textContent = 'не сохранено';
+  drawSketchCanvas();
+});
+$('drawSave').addEventListener('click', () => { saveSketch().catch(err => { $('drawStatus').textContent = String(err); }); });
+$('clipSel').addEventListener('change', e => loadClip(e.target.value));
+$('time').addEventListener('input', e => {
+  const t = +e.target.value;
+  drawPlan(t);
+  const v = $('vid');
+  if(v.duration && isFinite(v.duration)) v.currentTime = t;
+});
+$('vid').addEventListener('timeupdate', () => {
+  const t = $('vid').currentTime;
+  $('time').value = t;
+  drawPlan(t);
+});
+
+loadList().catch(err => {
+  $('info').textContent = 'Ошибка загрузки: ' + err;
+});
+window.addEventListener('resize', () => { drawPlan(+$('time').value); drawSketchCanvas(); });
+</script>
+</body>
+</html>
