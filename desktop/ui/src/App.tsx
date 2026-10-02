@@ -286,7 +286,7 @@ export default function App() {
           <img src="/ui/favicon.png" alt="" className="h-9 w-9 rounded-lg" />
           <div>
             <div className="text-lg font-bold leading-tight">Fly Track</div>
-            <div className="text-xs text-muted-foreground">Маршрут человека по видео с камеры · мозг мухи → граф цеха</div>
+            <div className="text-xs text-muted-foreground">Маршрут человека по видео с камеры на плане цеха</div>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -312,7 +312,7 @@ export default function App() {
             <div className="space-y-4 p-5">
               <p className="text-sm leading-relaxed text-muted-foreground">
                 Сначала укажите старт и направление на плане. Затем выберите файл на диске или загрузите видео с экшен-камеры — Fly Track
-                прогонит его через мозг мухи и покажет маршрут.
+                проанализирует его и покажет маршрут.
               </p>
               <div className={cn("grid gap-2", desktop ? "grid-cols-2" : "grid-cols-1")}>
                 {desktop && (
@@ -360,7 +360,7 @@ export default function App() {
                   <div className="flex items-center gap-2.5 text-sm">
                     <StepIcon state="done" />
                     <span className="font-medium">Обработка видео</span>
-                    <span className="ml-auto text-xs text-muted-foreground">мозг мухи посчитан</span>
+                    <span className="ml-auto text-xs text-muted-foreground">анализ завершён</span>
                   </div>
                 )}
 

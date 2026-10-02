@@ -29,7 +29,7 @@ export default function DiagnosticsDialog({ open, onClose }: { open: boolean; on
       open={open}
       onClose={onClose}
       title="Проверка системы"
-      description="Видео → кадры → мозг мухи → трекер → маршрут на плане"
+      description="Видео → кадры → анализ → трекер → маршрут на плане"
       footer={
         <>
           {desktop && (

@@ -113,7 +113,7 @@ function createMenu() {
                 title: TITLE,
                 message: `Fly Track ${app.getVersion()}`,
                 detail:
-                  'Видео с камеры → мозг мухи (MaleCNS) → трекер на графе цеха (V1–V5).\n' +
+                  'Видео с камеры → анализ → трекер на графе цеха (V1–V5).\n' +
                   `Данные: ${L.workspace}`,
               }),
           },

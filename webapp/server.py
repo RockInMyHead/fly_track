@@ -358,7 +358,7 @@ def _diagnostics() -> dict:
     for name, min_mb in (("brain.npz", 40), ("weights.npz", 150)):
         f = brain_dir / name
         mb = f.stat().st_size / 1e6 if f.exists() else 0
-        add(name, f"Мозг мухи: {name}", mb >= min_mb, f"{mb:.0f} МБ" if mb else f"нет файла в {brain_dir}")
+        add(name, f"Файлы модели: {name}", mb >= min_mb, f"{mb:.0f} МБ" if mb else f"нет файла в {brain_dir}")
     try:
         import numba  # noqa: F401
         import numpy  # noqa: F401

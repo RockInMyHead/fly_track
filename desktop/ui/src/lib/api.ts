@@ -1,9 +1,9 @@
 export type Version = "v1" | "v2" | "v3" | "v4" | "v5";
 export const VERSIONS: Version[] = ["v5", "v4", "v3", "v2", "v1"];
 export const VERSION_INFO: Record<Version, { color: string; title: string }> = {
-  v5: { color: "#facc15", title: "V5 — маршрут V1, стоит по мухе и шагам" },
+  v5: { color: "#facc15", title: "V5 — маршрут V1, стояние по видео и шагам" },
   v4: { color: "#f43f5e", title: "V4 — развилки V1 + стояние" },
-  v3: { color: "#22c55e", title: "V3 — стоит по мухе и шагам" },
+  v3: { color: "#22c55e", title: "V3 — стояние по видео и шагам" },
   v2: { color: "#38bdf8", title: "V2 — стоит по пикселям" },
   v1: { color: "#c084fc", title: "V1 — первая замороженная" },
 };
