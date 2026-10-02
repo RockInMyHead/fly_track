@@ -117,28 +117,7 @@ export default function PlanView({
       ctx.fillRect(0, 0, graph.img_w, graph.img_h);
     }
 
-    if (graph) {
-      const edgePath = () => {
-        ctx.beginPath();
-        for (const e of graph.edges) {
-          const a = nodes.get(e.from);
-          const b = nodes.get(e.to);
-          if (!a || !b) continue;
-          ctx.moveTo(a.x, a.y);
-          ctx.lineTo(b.x, b.y);
-        }
-      };
-      ctx.lineCap = "round";
-      ctx.strokeStyle = "rgba(7, 17, 31, 0.85)";
-      ctx.lineWidth = px(6);
-      edgePath();
-      ctx.stroke();
-      ctx.strokeStyle = runs.length ? "rgba(125, 211, 252, 0.45)" : "rgba(125, 211, 252, 0.95)";
-      ctx.lineWidth = px(2.5);
-      edgePath();
-      ctx.stroke();
-    }
-
+    ctx.lineCap = "round";
     const ordered = [...runs].sort((a, b) => (a.version === "v5" ? 1 : b.version === "v5" ? -1 : 0));
     for (const r of ordered) {
       if (r.rows.length < 2) continue;
@@ -154,24 +133,6 @@ export default function PlanView({
     }
 
     if (place) {
-      if (mode === "direction" && !toward) {
-        for (const end of place.ends) {
-          ctx.strokeStyle = "rgba(250, 204, 21, 0.9)";
-          ctx.lineWidth = px(2.5);
-          ctx.setLineDash([px(6), px(5)]);
-          ctx.beginPath();
-          ctx.moveTo(place.x, place.y);
-          ctx.lineTo(end.x, end.y);
-          ctx.stroke();
-          ctx.setLineDash([]);
-          ctx.fillStyle = "rgba(250, 204, 21, 0.25)";
-          ctx.strokeStyle = "#facc15";
-          ctx.beginPath();
-          ctx.arc(end.x, end.y, px(13), 0, Math.PI * 2);
-          ctx.fill();
-          ctx.stroke();
-        }
-      }
       const end = toward ? place.ends.find((e) => e.id === toward) : null;
       if (end) {
         const dx = end.x - place.x;
