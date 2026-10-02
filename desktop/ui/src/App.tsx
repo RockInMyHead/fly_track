@@ -117,6 +117,26 @@ export default function App() {
 
   const clip: Clip | null = useMemo(() => data?.clips.find((c) => c.id === activeId) ?? null, [data, activeId]);
 
+  const clipStartKey = clip?.start ? `${clip.id}|${clip.start.x}|${clip.start.y}|${clip.start.toward}` : "";
+  useEffect(() => {
+    const s = clip?.start;
+    if (!s) return;
+    let alive = true;
+    api
+      .place(s.x, s.y, s.toward)
+      .then((p) => {
+        if (!alive) return;
+        setPlace(p);
+        setToward(s.toward);
+        setMode("view");
+      })
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clipStartKey]);
+
   const runsKey = clip ? `${clip.id}|${clip.track_status}|${JSON.stringify(clip.runs)}` : "";
   useEffect(() => {
     if (!clip) {
@@ -126,7 +146,7 @@ export default function App() {
     }
     let alive = true;
     const vers = VERSIONS.filter((v) => clip.runs?.[v]);
-    if (clip.track_status === "running" || clip.track_status === "queued") {
+    if (clip.track_status === "running" || clip.track_status === "queued" || clip.track_status === "waiting") {
       setRuns([]);
     } else {
       Promise.all(vers.map((v) => api.run(clip.id, v).catch(() => null))).then((rs) => {
@@ -261,7 +281,7 @@ export default function App() {
   const importing = imp?.state === "running";
   const importPct = imp && imp.total_bytes ? (imp.done_bytes / imp.total_bytes) * 100 : 0;
   const processing = clip && (clip.status === "queued" || clip.status === "running");
-  const tracking = clip && (clip.track_status === "queued" || clip.track_status === "running");
+  const tracking = clip && (clip.track_status === "waiting" || clip.track_status === "queued" || clip.track_status === "running");
   const shownRuns = runs.filter((r) => !hidden.has(r.version));
   const startChanged =
     clip && start && clip.tracker_ready && !tracking &&
@@ -312,7 +332,8 @@ export default function App() {
             <div className="space-y-4 p-5">
               <p className="text-sm leading-relaxed text-muted-foreground">
                 Сначала укажите старт и направление на плане. Затем выберите файл на диске или загрузите видео с экшен-камеры — Fly Track
-                проанализирует его и покажет маршрут.
+                проанализирует его и покажет маршрут. Если выбрать несколько роликов, они идут по порядку имён, и каждый
+                следующий начинается там, где закончился предыдущий.
               </p>
               <div className={cn("grid gap-2", desktop ? "grid-cols-2" : "grid-cols-1")}>
                 {desktop && (
@@ -405,11 +426,17 @@ export default function App() {
                     />
                     <span className="font-medium">Маршрут V1–V5</span>
                     <span className="ml-auto text-xs text-muted-foreground">
+                      {clip.track_status === "waiting" && `ждёт конца маршрута ${clip.chain_from}`}
                       {clip.track_status === "queued" && (processing ? "после обработки" : "в очереди")}
                       {clip.track_status === "running" && "считаем…"}
                       {clip.track_status === "error" && "ошибка"}
                       {!clip.track_status && !runs.length && "задайте старт и нажмите «Построить»"}
                     </span>
+                  </div>
+                )}
+                {clip && (clip.chain_from || clip.start?.from_clip) && (
+                  <div className="text-xs text-muted-foreground">
+                    Старт: продолжение {clip.start?.from_clip ?? clip.chain_from} — с конца его маршрута V3 и в том же направлении
                   </div>
                 )}
                 {clip?.track_status === "error" && <div className="rounded-md bg-destructive/10 p-3 text-xs text-destructive">{clip.track_error}</div>}

@@ -17,6 +17,7 @@ export function clipBadge(c: Clip) {
         <Loader2 className="h-3 w-3 animate-spin" /> маршрут
       </Badge>
     );
+  if (c.track_status === "waiting") return <Badge tone="warning">ждёт {c.chain_from}</Badge>;
   if (c.track_status === "error") return <Badge tone="destructive">маршрут: ошибка</Badge>;
   if (c.runs?.v5) return <Badge tone="success">{c.runs.v5.meters} м</Badge>;
   if (Object.keys(c.runs || {}).length) return <Badge tone="success">есть маршрут</Badge>;

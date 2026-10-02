@@ -328,7 +328,38 @@ def _track_hook(clip: str, start: dict) -> tuple[int, str]:
         return int(_START_JOB.get("code") or 0), str(_START_JOB.get("error") or "")
 
 
+CHAIN_VERSION = "v3"
+
+
+def _chain_start(clip: str) -> tuple[dict | None, str]:
+    """End point and heading of the clip's route; the next clip of the recording starts there."""
+    run = RUN_BASES[CHAIN_VERSION] / clip
+    try:
+        with (run / "edge_sequence.csv").open(encoding="utf-8") as fh:
+            last_edge = list(csv.DictReader(fh))[-1]
+        with (run / "trajectory.csv").open(encoding="utf-8") as fh:
+            last = list(csv.DictReader(fh))[-1]
+    except (OSError, IndexError) as e:
+        return None, f"нет маршрута {CHAIN_VERSION.upper()}: {e}"
+    g = _load_graph()
+    a, b = last_edge["from_node"], last_edge["to_node"]
+    ax, ay = g.pos(a)
+    bx, by = g.pos(b)
+    dx, dy = bx - ax, by - ay
+    span = dx * dx + dy * dy or 1.0
+    # strictly inside the edge so that snapping cannot pick a neighbour at the node
+    t = ((float(last["x"]) - ax) * dx + (float(last["y"]) - ay) * dy) / span
+    t = max(0.03, min(0.97, t))
+    start = {"x": round(ax + dx * t, 2), "y": round(ay + dy * t, 2), "toward": b,
+             "from_clip": clip, "edge": last_edge["edge"]}
+    place = snap_on_graph(start["x"], start["y"], b)
+    if not place.get("ok"):
+        return None, place.get("error") or "конец маршрута не на графе"
+    return start, ""
+
+
 app_backend.track_hook = _track_hook
+app_backend.chain_start_hook = _chain_start
 
 
 def _runs_summary(clip: str) -> dict:
@@ -996,7 +1027,8 @@ class Handler(BaseHTTPRequestHandler):
                 place = snap_on_graph(start["x"], start["y"], start["toward"])
                 if not place.get("ok"):
                     return self._json(place, 400)
-            res = app_backend.start_import([str(p) for p in paths], start)
+            res = app_backend.start_import([str(p) for p in paths], start,
+                                           chain=bool(payload.get("chain", True)))
             return self._json(res, 200 if res.get("ok") else 409)
         if path == "/api/app/track":
             clip = str(payload.get("clip") or "")

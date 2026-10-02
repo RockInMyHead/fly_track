@@ -9,7 +9,7 @@ export const VERSION_INFO: Record<Version, { color: string; title: string }> = {
 };
 
 export type Step = { id: string; title: string; done: boolean };
-export type StartPoint = { x: number; y: number; toward: string };
+export type StartPoint = { x: number; y: number; toward: string; from_clip?: string };
 export type RunSummary = { meters: number | null; stop_fraction: number | null };
 
 export type Clip = {
@@ -29,8 +29,9 @@ export type Clip = {
   source_name?: string;
   imported_at?: number;
   start?: StartPoint;
-  track_status?: "queued" | "running" | "done" | "error";
+  track_status?: "waiting" | "queued" | "running" | "done" | "error";
   track_error?: string;
+  chain_from?: string | null;
   runs: Partial<Record<Version, RunSummary>>;
 };
 

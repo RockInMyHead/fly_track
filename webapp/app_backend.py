@@ -59,6 +59,8 @@ _IMPORT = {"state": "idle", "file": "", "done_bytes": 0, "total_bytes": 0,
 _worker_started = False
 # set by server.py: track_hook(cid, start) -> (code, error); runs V1..V5 from a plan start
 track_hook = None
+# set by server.py: chain_start_hook(cid) -> (start | None, error); where the clip's route ended
+chain_start_hook = None
 
 
 # --------------------------------------------------------------------------- helpers
@@ -270,23 +272,28 @@ def _copy_verified(src: Path, dst: Path) -> str:
     return src_hash
 
 
-def _track_fields(start: dict | None) -> dict:
+def _track_fields(start: dict | None, chain_from: str | None = None) -> dict:
+    if chain_from:
+        return {"start": None, "chain_from": chain_from, "track_status": "waiting", "track_error": ""}
     if not start:
         return {}
-    return {"start": start, "track_status": "queued", "track_error": ""}
+    return {"start": start, "chain_from": None, "track_status": "queued", "track_error": ""}
 
 
-def _import_worker(paths: list[str], start: dict | None = None) -> None:
+def _import_worker(paths: list[str], start: dict | None = None, chain: bool = True) -> None:
     known = _imported_fingerprints()
+    prev = None
     try:
         for p in map(Path, paths):
             with _LOCK:
                 _IMPORT["file"] = p.name
             fp = fingerprint(p)
+            fields = _track_fields(start, prev if chain and start else None)
             if fp in known:
-                if start:
-                    _save_clip(known[fp], **_track_fields(start))
+                if fields:
+                    _save_clip(known[fp], **fields)
                     _WAKE.set()
+                prev = known[fp]
                 with _LOCK:
                     _IMPORT["done_bytes"] += p.stat().st_size
                     _IMPORT["files_done"] += 1
@@ -302,8 +309,9 @@ def _import_worker(paths: list[str], start: dict | None = None) -> None:
                        source_mtime=st.st_mtime,
                        source_mtime_text=time.strftime("%d.%m.%Y %H:%M", time.localtime(st.st_mtime)),
                        fingerprint=fp, sha256=sha, imported_at=time.time(),
-                       status="queued", step=None, error="", log="", **_track_fields(start))
+                       status="queued", step=None, error="", log="", **fields)
             known[fp] = cid
+            prev = cid
             with _LOCK:
                 _IMPORT["files_done"] += 1
                 _IMPORT["imported"].append(cid)
@@ -316,18 +324,19 @@ def _import_worker(paths: list[str], start: dict | None = None) -> None:
             _IMPORT["error"] = str(e)
 
 
-def start_import(paths: list[str], start: dict | None = None) -> dict:
+def start_import(paths: list[str], start: dict | None = None, chain: bool = True) -> dict:
     with _LOCK:
         if _IMPORT["state"] == "running":
             return {"ok": False, "error": "копирование уже идёт"}
-        good = [p for p in paths if Path(p).is_file() and Path(p).suffix.lower() == ".avi"]
+        good = sorted((p for p in paths if Path(p).is_file() and Path(p).suffix.lower() == ".avi"),
+                      key=lambda p: Path(p).name.lower())
         if not good:
             return {"ok": False, "error": "не выбрано ни одного AVI"}
         P01R.mkdir(parents=True, exist_ok=True)
         _IMPORT.update(state="running", file="", done_bytes=0,
                        total_bytes=sum(Path(p).stat().st_size for p in good),
                        files_done=0, files_total=len(good), error="", imported=[])
-    threading.Thread(target=_import_worker, args=(good, start), daemon=True).start()
+    threading.Thread(target=_import_worker, args=(good, start, chain), daemon=True).start()
     ensure_worker()
     return {"ok": True}
 
@@ -506,6 +515,27 @@ def _track(cid: str) -> None:
         code, err = 1, str(e)
     _save_clip(cid, track_status="done" if code == 0 else "error",
                track_error="" if code == 0 else (err or f"код {code}"), track_finished=time.time())
+    _advance_chain(cid, ok=code == 0)
+
+
+def _advance_chain(cid: str, ok: bool) -> None:
+    """Hand the end of a finished clip to the clip that continues it."""
+    for nxt, r in sorted(_clips()["clips"].items()):
+        if r.get("chain_from") != cid or r.get("track_status") != "waiting":
+            continue
+        if not ok:
+            _save_clip(nxt, track_status="error",
+                       track_error=f"маршрут предыдущего ролика {cid} не построен — задайте старт вручную")
+            continue
+        try:
+            start, err = chain_start_hook(cid) if chain_start_hook else (None, "нет расчёта конца маршрута")
+        except Exception as e:
+            start, err = None, str(e)
+        if start:
+            _save_clip(nxt, start=start, track_status="queued", track_error="")
+        else:
+            _save_clip(nxt, track_status="error", track_error=f"нет конца маршрута {cid}: {err}")
+    _WAKE.set()
 
 
 def _worker() -> None:
