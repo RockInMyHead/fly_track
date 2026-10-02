@@ -12,6 +12,8 @@ permissions:
 env:
   PY_NUGET: "3.12.10"
   STAGE: dist\win\FlyTrack
+  PYTHONUTF8: "1"
+  PYTHONIOENCODING: utf-8
 
 jobs:
   build:
