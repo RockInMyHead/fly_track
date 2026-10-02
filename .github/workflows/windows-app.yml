@@ -75,6 +75,8 @@ jobs:
       - name: Interface
         working-directory: desktop
         run: |
+          $PSNativeCommandUseErrorActionPreference = $true
+          $ErrorActionPreference = "Stop"
           npm ci --no-audit --no-fund
           npm version $env:APP_VERSION --no-git-tag-version --allow-same-version
           npx tsc --noEmit

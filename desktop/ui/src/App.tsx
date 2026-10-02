@@ -370,7 +370,7 @@ export default function App() {
                       <span className="font-medium">Обработка видео</span>
                       <span className="tabular-nums text-muted-foreground">{Math.round(procPct)}%</span>
                     </div>
-                    <Progress value={procPct} tone={clip.status === "done" ? "success" : "primary"} />
+                    <Progress value={procPct} />
                     <div className="mt-3 space-y-1.5">
                       {clip.steps.map((s) => {
                         const st = s.done ? "done" : clip.step === s.id ? (clip.status === "error" ? "error" : "active") : "todo";
