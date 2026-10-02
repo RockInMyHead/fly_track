@@ -298,6 +298,9 @@ def main() -> None:
     rows = []
     summary = {}
     for name in VIDEOS:
+        if not Path(VIDEOS[name]["trace"]).exists():
+            print(f"  {name}: нет записи мозга, пропускаю")
+            continue
         t, fired, col = load_video(name)
         rates = channel_rates(fired, col)
         sig = build_signals(rates, pol, max(int(round(args.smooth_s * FPS)), 1))
@@ -375,7 +378,9 @@ def main() -> None:
                          "correct": bool(np.sign(v) == (-1 if x["kind"] == "RIGHT" else 1))})
 
     with (OUT / "yaw_validation.csv").open("w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+        w = csv.DictWriter(f, fieldnames=list(rows[0].keys()) if rows else
+                           ["video", "id", "t0", "t1", "label", "yaw", "yaw_deadband",
+                            "yaw_pair", "correct"])
         w.writeheader()
         w.writerows(rows)
 

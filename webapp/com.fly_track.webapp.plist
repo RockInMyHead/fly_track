@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.fly_track.webapp</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/artem/test_fly/.venv/bin/python</string>
+		<string>/Users/artem/test_fly/webapp/server.py</string>
+		<string>--port</string>
+		<string>8765</string>
+	</array>
+	<key>WorkingDirectory</key>
+	<string>/Users/artem/test_fly</string>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PYTHONPATH</key>
+		<string>/Users/artem/test_fly</string>
+		<key>PATH</key>
+		<string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+	</dict>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<true/>
+	<key>StandardOutPath</key>
+	<string>/Users/artem/test_fly/output/webapp_server.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/artem/test_fly/output/webapp_server.log</string>
+</dict>
+</plist>

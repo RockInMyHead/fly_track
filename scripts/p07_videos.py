@@ -128,10 +128,14 @@ def main() -> None:
     doc = {}
     if REGISTRY.exists():
         doc = json.loads(REGISTRY.read_text(encoding="utf-8"))
-    doc[args.add] = {
-        "trace": str(trace if trace.is_absolute() else ROOT / trace),
-        "targets": str(targets if targets.is_absolute() else ROOT / targets),
-    }
+    def stored(p: Path) -> str:
+        p = (p if p.is_absolute() else ROOT / p).resolve()
+        try:
+            return p.relative_to(ROOT.resolve()).as_posix()
+        except ValueError:
+            return str(p)
+
+    doc[args.add] = {"trace": stored(trace), "targets": stored(targets)}
     REGISTRY.parent.mkdir(parents=True, exist_ok=True)
     REGISTRY.write_text(json.dumps(doc, indent=2, ensure_ascii=False), encoding="utf-8")
     print(f"добавлено {args.add} -> {REGISTRY}")

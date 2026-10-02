@@ -1,0 +1,3393 @@
+{
+  "schema": "p08.graph.v1",
+  "source_file": "production.topology-graph.v1.json",
+  "source_schema": "trackai.floorplan_graph.v1",
+  "map_id": "kerama_marazzi_2025",
+  "image": "plan.png",
+  "img_w": 5298,
+  "img_h": 3743,
+  "meters_per_pixel": 0.049629166698546515,
+  "minimum_edge_meters": 1.5,
+  "known_distance": null,
+  "start": {
+    "type": "edge",
+    "edge": "J5__J6",
+    "from": "J6",
+    "to": "J5",
+    "note": "направление обратное: человек на узле J6 идёт в сторону J5",
+    "source": "уточнено человеком 2026-09-22: направление было в другую сторону",
+    "previous": {
+      "type": "at_node",
+      "node": "J6",
+      "from_node": "J5"
+    }
+  },
+  "nodes": [
+    {
+      "id": "A",
+      "x": 0.483019,
+      "y": 0.274934,
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "B",
+      "x": 0.472566,
+      "y": 0.277771,
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "C",
+      "x": 0.463259,
+      "y": 0.277163,
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "D",
+      "x": 0.491798,
+      "y": 0.275105,
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "E",
+      "x": 0.38057,
+      "y": 0.230588,
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "E1",
+      "x": 0.15619,
+      "y": 0.184279,
+      "orig_id": "node_0081",
+      "kind": "endpoint",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "E10",
+      "x": 0.523971,
+      "y": 0.519369,
+      "orig_id": "node_0101",
+      "kind": "endpoint",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "E11",
+      "x": 0.580834,
+      "y": 0.518318,
+      "orig_id": "node_0102",
+      "kind": "endpoint",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "E3",
+      "x": 0.158647,
+      "y": 0.204843,
+      "orig_id": "node_0084",
+      "kind": "endpoint",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "E4",
+      "x": 0.558701,
+      "y": 0.288539,
+      "orig_id": "node_0089",
+      "kind": "endpoint",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "E5",
+      "x": 0.301567,
+      "y": 0.249915,
+      "orig_id": "node_0090",
+      "kind": "endpoint",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "E6",
+      "x": 0.112684,
+      "y": 0.318461,
+      "orig_id": "node_0091",
+      "kind": "endpoint",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "E7",
+      "x": 0.519441,
+      "y": 0.403954,
+      "orig_id": "node_0092",
+      "kind": "endpoint",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "E8",
+      "x": 0.579841,
+      "y": 0.438151,
+      "orig_id": "node_0093",
+      "kind": "endpoint",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "E9",
+      "x": 0.556036,
+      "y": 0.469485,
+      "orig_id": "node_0100",
+      "kind": "endpoint",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "F",
+      "x": 0.45698,
+      "y": 0.276132,
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "G",
+      "x": 0.447679,
+      "y": 0.276132,
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "H",
+      "x": 0.43533,
+      "y": 0.275678,
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "I",
+      "x": 0.422179,
+      "y": 0.27477,
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J",
+      "x": 0.410472,
+      "y": 0.274089,
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J1",
+      "x": 0.457952,
+      "y": 0.154577,
+      "orig_id": "node_0003",
+      "kind": "junction",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "J10",
+      "x": 0.306908,
+      "y": 0.181405,
+      "orig_id": "node_0012",
+      "kind": "junction",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "J11",
+      "x": 0.442246,
+      "y": 0.187617,
+      "orig_id": "node_0013",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J12",
+      "x": 0.13632,
+      "y": 0.205311,
+      "orig_id": "node_0014",
+      "kind": "junction",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "J13",
+      "x": 0.188832,
+      "y": 0.189844,
+      "orig_id": "node_0015",
+      "kind": "junction",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "J14",
+      "x": 0.217963,
+      "y": 0.190522,
+      "orig_id": "node_0016",
+      "kind": "junction",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "J15",
+      "x": 0.281678,
+      "y": 0.19076,
+      "orig_id": "node_0017",
+      "kind": "junction",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "J16",
+      "x": 0.258211,
+      "y": 0.190222,
+      "orig_id": "node_0018",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J17",
+      "x": 0.303353,
+      "y": 0.196172,
+      "orig_id": "node_0019",
+      "kind": "junction",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "J18",
+      "x": 0.281527,
+      "y": 0.213973,
+      "orig_id": "node_0020",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J19",
+      "x": 0.232772,
+      "y": 0.203273,
+      "orig_id": "node_0021",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J2",
+      "x": 0.166131,
+      "y": 0.18806,
+      "orig_id": "node_0004",
+      "kind": "junction",
+      "degree": 4,
+      "geometry_source": ""
+    },
+    {
+      "id": "J20",
+      "x": 0.264407,
+      "y": 0.207753,
+      "orig_id": "node_0022",
+      "kind": "junction",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "J21",
+      "x": 0.446036,
+      "y": 0.216389,
+      "orig_id": "node_0024",
+      "kind": "junction",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "J22",
+      "x": 0.163636,
+      "y": 0.233919,
+      "orig_id": "node_0025",
+      "kind": "junction",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "J23",
+      "x": 0.212029,
+      "y": 0.231982,
+      "orig_id": "node_0026",
+      "kind": "junction",
+      "degree": 6,
+      "geometry_source": ""
+    },
+    {
+      "id": "J24",
+      "x": 0.280991,
+      "y": 0.230397,
+      "orig_id": "node_0028",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J25",
+      "x": 0.200887,
+      "y": 0.222498,
+      "orig_id": "node_0029",
+      "kind": "junction",
+      "degree": 5,
+      "geometry_source": ""
+    },
+    {
+      "id": "J26",
+      "x": 0.29301,
+      "y": 0.213452,
+      "orig_id": "node_0030",
+      "kind": "junction",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "J27",
+      "x": 0.124804,
+      "y": 0.235447,
+      "orig_id": "node_0032",
+      "kind": "junction",
+      "degree": 4,
+      "geometry_source": ""
+    },
+    {
+      "id": "J28",
+      "x": 0.435313,
+      "y": 0.222303,
+      "orig_id": "node_0034",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J29",
+      "x": 0.206871,
+      "y": 0.245792,
+      "orig_id": "node_0036",
+      "kind": "junction",
+      "degree": 7,
+      "geometry_source": ""
+    },
+    {
+      "id": "J3",
+      "x": 0.303511,
+      "y": 0.158162,
+      "orig_id": "node_0005",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J30",
+      "x": 0.409966,
+      "y": 0.242853,
+      "orig_id": "node_0037",
+      "kind": "junction",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "J31",
+      "x": 0.131863,
+      "y": 0.256236,
+      "orig_id": "node_0038",
+      "kind": "junction",
+      "degree": 5,
+      "geometry_source": ""
+    },
+    {
+      "id": "J32",
+      "x": 0.271801,
+      "y": 0.250067,
+      "orig_id": "node_0039",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J33",
+      "x": 0.280466,
+      "y": 0.247858,
+      "orig_id": "node_0043",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J34",
+      "x": 0.255191,
+      "y": 0.258616,
+      "orig_id": "node_0044",
+      "kind": "junction",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "J35",
+      "x": 0.295132,
+      "y": 0.253803,
+      "orig_id": "node_0045",
+      "kind": "junction",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "J36",
+      "x": 0.287289,
+      "y": 0.262944,
+      "orig_id": "node_0047",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J37",
+      "x": 0.163024,
+      "y": 0.263136,
+      "orig_id": "node_0048",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J38",
+      "x": 0.48368,
+      "y": 0.25862,
+      "orig_id": "node_0050",
+      "kind": "junction",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "J39",
+      "x": 0.503666,
+      "y": 0.28897,
+      "orig_id": "node_0053",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J4",
+      "x": 0.279351,
+      "y": 0.160299,
+      "orig_id": "node_0006",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J40",
+      "x": 0.537561,
+      "y": 0.290676,
+      "orig_id": "node_0054",
+      "kind": "junction",
+      "degree": 5,
+      "geometry_source": ""
+    },
+    {
+      "id": "J41",
+      "x": 0.536051,
+      "y": 0.401817,
+      "orig_id": "node_0055",
+      "kind": "junction",
+      "degree": 4,
+      "geometry_source": ""
+    },
+    {
+      "id": "J42",
+      "x": 0.548131,
+      "y": 0.416778,
+      "orig_id": "node_0056",
+      "kind": "junction",
+      "degree": 4,
+      "geometry_source": ""
+    },
+    {
+      "id": "J43",
+      "x": 0.569271,
+      "y": 0.416778,
+      "orig_id": "node_0057",
+      "kind": "junction",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "J44",
+      "x": 0.562455,
+      "y": 0.427685,
+      "orig_id": "node_0058",
+      "kind": "junction",
+      "degree": 4,
+      "geometry_source": ""
+    },
+    {
+      "id": "J45",
+      "x": 0.568049,
+      "y": 0.450769,
+      "orig_id": "node_0059",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J46",
+      "x": 0.537358,
+      "y": 0.449596,
+      "orig_id": "node_0060",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J47",
+      "x": 0.575288,
+      "y": 0.458039,
+      "orig_id": "node_0062",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J48",
+      "x": 0.576019,
+      "y": 0.476094,
+      "orig_id": "node_0064",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J49",
+      "x": 0.575897,
+      "y": 0.490266,
+      "orig_id": "node_0065",
+      "kind": "junction",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "J5",
+      "x": 0.412883,
+      "y": 0.188147,
+      "orig_id": "node_0007",
+      "kind": "junction",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "J50",
+      "x": 0.586267,
+      "y": 0.504039,
+      "orig_id": "node_0066",
+      "kind": "junction",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "J51",
+      "x": 0.600098,
+      "y": 0.493848,
+      "orig_id": "node_0067",
+      "kind": "junction",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "J52",
+      "x": 0.569157,
+      "y": 0.495997,
+      "orig_id": "node_0068",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J53",
+      "x": 0.598905,
+      "y": 0.465936,
+      "orig_id": "node_0069",
+      "kind": "junction",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "J54",
+      "x": 0.596746,
+      "y": 0.538368,
+      "orig_id": "node_0070",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J55",
+      "x": 0.537148,
+      "y": 0.533365,
+      "orig_id": "node_0071",
+      "kind": "junction",
+      "degree": 4,
+      "geometry_source": ""
+    },
+    {
+      "id": "J56",
+      "x": 0.580408,
+      "y": 0.543414,
+      "orig_id": "node_0072",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J57",
+      "x": 0.600986,
+      "y": 0.522887,
+      "orig_id": "node_0073",
+      "kind": "junction",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "J58",
+      "x": 0.595164,
+      "y": 0.560556,
+      "orig_id": "node_0076",
+      "kind": "junction",
+      "degree": 4,
+      "geometry_source": ""
+    },
+    {
+      "id": "J59",
+      "x": 0.540986,
+      "y": 0.552308,
+      "orig_id": "node_0077",
+      "kind": "junction",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "J6",
+      "x": 0.420589,
+      "y": 0.183331,
+      "orig_id": "node_0008",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J60",
+      "x": 0.55533,
+      "y": 0.561874,
+      "orig_id": "node_0078",
+      "kind": "junction",
+      "degree": 4,
+      "geometry_source": ""
+    },
+    {
+      "id": "J7",
+      "x": 0.206871,
+      "y": 0.166711,
+      "orig_id": "node_0009",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J8",
+      "x": 0.250661,
+      "y": 0.168849,
+      "orig_id": "node_0010",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "J9",
+      "x": 0.248409,
+      "y": 0.190698,
+      "orig_id": "node_0011",
+      "kind": "junction",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "K",
+      "x": 0.399086,
+      "y": 0.276132,
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "L",
+      "x": 0.389143,
+      "y": 0.275678,
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "M",
+      "x": 0.384011,
+      "y": 0.274316,
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "M1",
+      "x": 0.410792,
+      "y": 0.153579,
+      "orig_id": "node_0104",
+      "kind": "manual",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "M10",
+      "x": 0.310029,
+      "y": 0.187627,
+      "orig_id": "node_0113",
+      "kind": "manual",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "M11",
+      "x": 0.273593,
+      "y": 0.189443,
+      "orig_id": "node_0114",
+      "kind": "manual",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "M12",
+      "x": 0.302036,
+      "y": 0.182282,
+      "orig_id": "node_0115",
+      "kind": "manual",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "M13",
+      "x": 0.300231,
+      "y": 0.191138,
+      "orig_id": "node_0116",
+      "kind": "manual",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "M14",
+      "x": 0.199302,
+      "y": 0.201392,
+      "orig_id": "node_0117",
+      "kind": "manual",
+      "degree": 5,
+      "geometry_source": ""
+    },
+    {
+      "id": "M15",
+      "x": 0.218097,
+      "y": 0.21678,
+      "orig_id": "node_0118",
+      "kind": "manual",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "M16",
+      "x": 0.208445,
+      "y": 0.21629,
+      "orig_id": "node_0119",
+      "kind": "manual",
+      "degree": 7,
+      "geometry_source": ""
+    },
+    {
+      "id": "M17",
+      "x": 0.153423,
+      "y": 0.196328,
+      "orig_id": "node_0120",
+      "kind": "manual",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "M18",
+      "x": 0.138344,
+      "y": 0.236695,
+      "orig_id": "node_0121",
+      "kind": "manual",
+      "degree": 4,
+      "geometry_source": ""
+    },
+    {
+      "id": "M19",
+      "x": 0.132595,
+      "y": 0.225878,
+      "orig_id": "node_0122",
+      "kind": "manual",
+      "degree": 4,
+      "geometry_source": ""
+    },
+    {
+      "id": "M20",
+      "x": 0.511118,
+      "y": 0.288563,
+      "orig_id": "node_0125",
+      "kind": "manual",
+      "degree": 4,
+      "geometry_source": ""
+    },
+    {
+      "id": "M21",
+      "x": 0.343102,
+      "y": 0.228903,
+      "orig_id": "node_0126",
+      "kind": "manual",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "M22",
+      "x": 0.498526,
+      "y": 0.26418,
+      "orig_id": "node_0127",
+      "kind": "manual",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "M23",
+      "x": 0.534716,
+      "y": 0.329588,
+      "orig_id": "node_0128",
+      "kind": "manual",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "M24",
+      "x": 0.594996,
+      "y": 0.509409,
+      "orig_id": "node_0130",
+      "kind": "manual",
+      "degree": 4,
+      "geometry_source": ""
+    },
+    {
+      "id": "M25",
+      "x": 0.572992,
+      "y": 0.538676,
+      "orig_id": "node_0131",
+      "kind": "manual",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "M26",
+      "x": 0.572039,
+      "y": 0.553428,
+      "orig_id": "node_0132",
+      "kind": "manual",
+      "degree": 4,
+      "geometry_source": ""
+    },
+    {
+      "id": "M27",
+      "x": 0.565744,
+      "y": 0.542537,
+      "orig_id": "node_0133",
+      "kind": "manual",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "M28",
+      "x": 0.567565,
+      "y": 0.516851,
+      "orig_id": "node_0134",
+      "kind": "manual",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "M29",
+      "x": 0.57182,
+      "y": 0.563158,
+      "orig_id": "node_0135",
+      "kind": "manual",
+      "degree": 4,
+      "geometry_source": ""
+    },
+    {
+      "id": "M3",
+      "x": 0.446319,
+      "y": 0.246828,
+      "orig_id": "node_0106",
+      "kind": "manual",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "M30",
+      "x": 0.558688,
+      "y": 0.530231,
+      "orig_id": "node_0136",
+      "kind": "manual",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "M31",
+      "x": 0.554995,
+      "y": 0.51121,
+      "orig_id": "node_0137",
+      "kind": "manual",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "M4",
+      "x": 0.454715,
+      "y": 0.257965,
+      "orig_id": "node_0107",
+      "kind": "manual",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "M5",
+      "x": 0.380743,
+      "y": 0.241791,
+      "orig_id": "node_0108",
+      "kind": "manual",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "M6",
+      "x": 0.435839,
+      "y": 0.236569,
+      "orig_id": "node_0109",
+      "kind": "manual",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "M7",
+      "x": 0.392561,
+      "y": 0.225773,
+      "orig_id": "node_0110",
+      "kind": "manual",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "M8",
+      "x": 0.421279,
+      "y": 0.226392,
+      "orig_id": "node_0111",
+      "kind": "manual",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "M9",
+      "x": 0.424907,
+      "y": 0.234511,
+      "orig_id": "node_0112",
+      "kind": "manual",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T1",
+      "x": 0.480559,
+      "y": 0.160032,
+      "orig_id": "repair__edge_00007__s003__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T10",
+      "x": 0.52869,
+      "y": 0.523377,
+      "orig_id": "repair__edge_00110__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T11",
+      "x": 0.539071,
+      "y": 0.541811,
+      "orig_id": "repair__edge_00111__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T12",
+      "x": 0.42148,
+      "y": 0.186481,
+      "orig_id": "repair__edge_00121__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T14",
+      "x": 0.307286,
+      "y": 0.184344,
+      "orig_id": "repair__edge_00139__p002",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T16",
+      "x": 0.151755,
+      "y": 0.235106,
+      "orig_id": "repair__edge_00161__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T2",
+      "x": 0.483579,
+      "y": 0.155757,
+      "orig_id": "repair__edge_00007__s003__p002",
+      "kind": "turn",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "T21",
+      "x": 0.576444,
+      "y": 0.541277,
+      "orig_id": "repair__edge_00205__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T22",
+      "x": 0.542658,
+      "y": 0.544216,
+      "orig_id": "repair__edge_00212__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T23",
+      "x": 0.481691,
+      "y": 0.145338,
+      "orig_id": "turn__edge_00002__p001",
+      "kind": "turn",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "T24",
+      "x": 0.443941,
+      "y": 0.15175,
+      "orig_id": "turn__edge_00006__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T25",
+      "x": 0.474141,
+      "y": 0.164574,
+      "orig_id": "turn__edge_00007__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T26",
+      "x": 0.474141,
+      "y": 0.177398,
+      "orig_id": "turn__edge_00007__p002",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T27",
+      "x": 0.135037,
+      "y": 0.188035,
+      "orig_id": "turn__edge_00009__p001",
+      "kind": "turn",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "T28",
+      "x": 0.178956,
+      "y": 0.18717,
+      "orig_id": "turn__edge_00010__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T29",
+      "x": 0.327671,
+      "y": 0.153887,
+      "orig_id": "turn__edge_00012__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T3",
+      "x": 0.442997,
+      "y": 0.191825,
+      "orig_id": "repair__edge_00027__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T31",
+      "x": 0.258211,
+      "y": 0.160299,
+      "orig_id": "turn__edge_00014__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T32",
+      "x": 0.400297,
+      "y": 0.187567,
+      "orig_id": "turn__edge_00017__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T33",
+      "x": 0.324979,
+      "y": 0.189129,
+      "orig_id": "turn__edge_00017__p002",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T34",
+      "x": 0.202341,
+      "y": 0.166711,
+      "orig_id": "turn__edge_00019__p001",
+      "kind": "turn",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "T35",
+      "x": 0.211401,
+      "y": 0.160299,
+      "orig_id": "turn__edge_00020__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T36",
+      "x": 0.241601,
+      "y": 0.160299,
+      "orig_id": "turn__edge_00020__p002",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T37",
+      "x": 0.216501,
+      "y": 0.179628,
+      "orig_id": "turn__edge_00021__p001",
+      "kind": "turn",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "T38",
+      "x": 0.302869,
+      "y": 0.205927,
+      "orig_id": "turn__edge_00037__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T39",
+      "x": 0.304617,
+      "y": 0.213306,
+      "orig_id": "turn__edge_00037__p002",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T40",
+      "x": 0.217086,
+      "y": 0.203891,
+      "orig_id": "turn__edge_00039__p001",
+      "kind": "turn",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "T41",
+      "x": 0.246319,
+      "y": 0.207587,
+      "orig_id": "turn__edge_00040__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T42",
+      "x": 0.256975,
+      "y": 0.207368,
+      "orig_id": "turn__edge_00040__p002",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T43",
+      "x": 0.223506,
+      "y": 0.232883,
+      "orig_id": "turn__edge_00048__p001",
+      "kind": "turn",
+      "degree": 4,
+      "geometry_source": ""
+    },
+    {
+      "id": "T44",
+      "x": 0.243432,
+      "y": 0.237026,
+      "orig_id": "turn__edge_00048__p002",
+      "kind": "turn",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "T45",
+      "x": 0.311565,
+      "y": 0.219876,
+      "orig_id": "turn__edge_00052__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T46",
+      "x": 0.310777,
+      "y": 0.226578,
+      "orig_id": "turn__edge_00052__p002",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T47",
+      "x": 0.294896,
+      "y": 0.232419,
+      "orig_id": "turn__edge_00054__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T48",
+      "x": 0.32108,
+      "y": 0.228746,
+      "orig_id": "turn__edge_00059__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T49",
+      "x": 0.19781,
+      "y": 0.260753,
+      "orig_id": "turn__edge_00064__p001",
+      "kind": "turn",
+      "degree": 5,
+      "geometry_source": ""
+    },
+    {
+      "id": "T50",
+      "x": 0.214421,
+      "y": 0.254074,
+      "orig_id": "turn__edge_00065__p001",
+      "kind": "turn",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "T51",
+      "x": 0.113467,
+      "y": 0.261636,
+      "orig_id": "turn__edge_00066__p001",
+      "kind": "turn",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "T52",
+      "x": 0.272642,
+      "y": 0.261202,
+      "orig_id": "turn__edge_00075__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T53",
+      "x": 0.281066,
+      "y": 0.275246,
+      "orig_id": "turn__edge_00075__p002",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T54",
+      "x": 0.129088,
+      "y": 0.263072,
+      "orig_id": "turn__edge_00081__p001",
+      "kind": "turn",
+      "degree": 4,
+      "geometry_source": ""
+    },
+    {
+      "id": "T55",
+      "x": 0.504943,
+      "y": 0.274924,
+      "orig_id": "turn__edge_00082__p001",
+      "kind": "turn",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "T56",
+      "x": 0.11286,
+      "y": 0.300627,
+      "orig_id": "turn__edge_00083__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T57",
+      "x": 0.533031,
+      "y": 0.284264,
+      "orig_id": "turn__edge_00084__p001",
+      "kind": "turn",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "T58",
+      "x": 0.543601,
+      "y": 0.406091,
+      "orig_id": "turn__edge_00088__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T59",
+      "x": 0.573801,
+      "y": 0.410366,
+      "orig_id": "turn__edge_00091__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T6",
+      "x": 0.220272,
+      "y": 0.254609,
+      "orig_id": "repair__edge_00065__s002__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T60",
+      "x": 0.594941,
+      "y": 0.410366,
+      "orig_id": "turn__edge_00091__p002",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T61",
+      "x": 0.600982,
+      "y": 0.416778,
+      "orig_id": "turn__edge_00091__p003",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T62",
+      "x": 0.622122,
+      "y": 0.421053,
+      "orig_id": "turn__edge_00091__p004",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T63",
+      "x": 0.6328,
+      "y": 0.423035,
+      "orig_id": "turn__edge_00091__p005",
+      "kind": "turn",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "T64",
+      "x": 0.604255,
+      "y": 0.560678,
+      "orig_id": "turn__edge_00091__p008",
+      "kind": "turn",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "T65",
+      "x": 0.537522,
+      "y": 0.468801,
+      "orig_id": "turn__edge_00096__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T66",
+      "x": 0.53666,
+      "y": 0.483826,
+      "orig_id": "turn__edge_00096__p002",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T67",
+      "x": 0.535464,
+      "y": 0.508285,
+      "orig_id": "turn__edge_00096__p003",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T68",
+      "x": 0.576518,
+      "y": 0.501442,
+      "orig_id": "turn__edge_00101__p001",
+      "kind": "turn",
+      "degree": 1,
+      "geometry_source": ""
+    },
+    {
+      "id": "T69",
+      "x": 0.601894,
+      "y": 0.509136,
+      "orig_id": "turn__edge_00113__p001",
+      "kind": "turn",
+      "degree": 3,
+      "geometry_source": ""
+    },
+    {
+      "id": "T7",
+      "x": 0.224802,
+      "y": 0.256212,
+      "orig_id": "repair__edge_00065__s002__p002",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    },
+    {
+      "id": "T9",
+      "x": 0.589845,
+      "y": 0.504408,
+      "orig_id": "repair__edge_00102__p001",
+      "kind": "turn",
+      "degree": 2,
+      "geometry_source": ""
+    }
+  ],
+  "edges": [
+    {
+      "id": "A__B",
+      "from": "A",
+      "to": "B",
+      "bidirectional": true,
+      "length_meters": 2.7985
+    },
+    {
+      "id": "A__D",
+      "from": "A",
+      "to": "D",
+      "bidirectional": true,
+      "length_meters": 2.3085
+    },
+    {
+      "id": "A__J38",
+      "from": "A",
+      "to": "J38",
+      "bidirectional": true,
+      "length_meters": 3.0355
+    },
+    {
+      "id": "B__C",
+      "from": "B",
+      "to": "C",
+      "bidirectional": true,
+      "length_meters": 2.4497
+    },
+    {
+      "id": "C__F",
+      "from": "C",
+      "to": "F",
+      "bidirectional": true,
+      "length_meters": 1.662,
+      "note": "соединено вручную: коридор F..M был не привязан"
+    },
+    {
+      "id": "E__M21",
+      "from": "E",
+      "to": "M21",
+      "bidirectional": true,
+      "length_meters": 9.8566
+    },
+    {
+      "id": "E__M5",
+      "from": "E",
+      "to": "M5",
+      "bidirectional": true,
+      "length_meters": 2.0816
+    },
+    {
+      "id": "F__G",
+      "from": "F",
+      "to": "G",
+      "bidirectional": true,
+      "length_meters": 2.4456
+    },
+    {
+      "id": "G__H",
+      "from": "G",
+      "to": "H",
+      "bidirectional": true,
+      "length_meters": 3.2481
+    },
+    {
+      "id": "H__I",
+      "from": "H",
+      "to": "I",
+      "bidirectional": true,
+      "length_meters": 3.462
+    },
+    {
+      "id": "I__J",
+      "from": "I",
+      "to": "J",
+      "bidirectional": true,
+      "length_meters": 3.0808
+    },
+    {
+      "id": "J10__J17",
+      "from": "J10",
+      "to": "J17",
+      "bidirectional": true,
+      "length_meters": 2.898,
+      "width_median_m": null,
+      "orig_id": "edge_00025"
+    },
+    {
+      "id": "J10__M12",
+      "from": "J10",
+      "to": "M12",
+      "bidirectional": true,
+      "length_meters": 1.2913,
+      "width_median_m": null,
+      "orig_id": "edge_00137"
+    },
+    {
+      "id": "J11__T12",
+      "from": "J11",
+      "to": "T12",
+      "bidirectional": true,
+      "length_meters": 5.4642,
+      "width_median_m": null,
+      "orig_id": "edge_00121"
+    },
+    {
+      "id": "J11__T3",
+      "from": "J11",
+      "to": "T3",
+      "bidirectional": true,
+      "length_meters": 0.8062,
+      "width_median_m": null,
+      "orig_id": "edge_00027"
+    },
+    {
+      "id": "J12__E3",
+      "from": "J12",
+      "to": "E3",
+      "bidirectional": true,
+      "length_meters": 5.8712,
+      "width_median_m": 4.123,
+      "orig_id": "edge_00029"
+    },
+    {
+      "id": "J13__M14",
+      "from": "J13",
+      "to": "M14",
+      "bidirectional": true,
+      "length_meters": 3.49,
+      "width_median_m": 13.82,
+      "orig_id": "edge_00031"
+    },
+    {
+      "id": "J14__T40",
+      "from": "J14",
+      "to": "T40",
+      "bidirectional": true,
+      "length_meters": 2.4941,
+      "width_median_m": null,
+      "orig_id": "edge_00138"
+    },
+    {
+      "id": "J15__J18",
+      "from": "J15",
+      "to": "J18",
+      "bidirectional": true,
+      "length_meters": 4.3123,
+      "width_median_m": 4.407,
+      "orig_id": "edge_00035"
+    },
+    {
+      "id": "J15__M11",
+      "from": "J15",
+      "to": "M11",
+      "bidirectional": true,
+      "length_meters": 2.1399,
+      "width_median_m": 2.555,
+      "orig_id": "edge_00034"
+    },
+    {
+      "id": "J17__T38",
+      "from": "J17",
+      "to": "T38",
+      "bidirectional": true,
+      "length_meters": 1.8166,
+      "width_median_m": 2.079,
+      "orig_id": "edge_00037"
+    },
+    {
+      "id": "J18__J24",
+      "from": "J18",
+      "to": "J24",
+      "bidirectional": true,
+      "length_meters": 3.0542,
+      "width_median_m": 6.047,
+      "orig_id": "edge_00038"
+    },
+    {
+      "id": "J19__T40",
+      "from": "J19",
+      "to": "T40",
+      "bidirectional": true,
+      "length_meters": 4.126,
+      "width_median_m": 4.163,
+      "orig_id": "edge_00039"
+    },
+    {
+      "id": "J19__T41",
+      "from": "J19",
+      "to": "T41",
+      "bidirectional": true,
+      "length_meters": 3.651,
+      "width_median_m": null,
+      "orig_id": "edge_00040"
+    },
+    {
+      "id": "J1__T24",
+      "from": "J1",
+      "to": "T24",
+      "bidirectional": true,
+      "length_meters": 3.7212,
+      "width_median_m": 4.764,
+      "orig_id": "edge_00006"
+    },
+    {
+      "id": "J1__T25",
+      "from": "J1",
+      "to": "T25",
+      "bidirectional": true,
+      "length_meters": 4.6441,
+      "width_median_m": 2.011,
+      "orig_id": "edge_00007"
+    },
+    {
+      "id": "J21__M3",
+      "from": "J21",
+      "to": "M3",
+      "bidirectional": true,
+      "length_meters": 5.6549,
+      "width_median_m": null,
+      "orig_id": "edge_00122"
+    },
+    {
+      "id": "J23__J29",
+      "from": "J23",
+      "to": "J29",
+      "bidirectional": true,
+      "length_meters": 2.9018,
+      "width_median_m": null,
+      "orig_id": "edge_00146"
+    },
+    {
+      "id": "J23__M16",
+      "from": "J23",
+      "to": "M16",
+      "bidirectional": true,
+      "length_meters": 3.0635,
+      "width_median_m": 9.141,
+      "orig_id": "edge_00047"
+    },
+    {
+      "id": "J23__T43",
+      "from": "J23",
+      "to": "T43",
+      "bidirectional": true,
+      "length_meters": 3.0223,
+      "width_median_m": 1.588,
+      "orig_id": "edge_00048"
+    },
+    {
+      "id": "J24__J33",
+      "from": "J24",
+      "to": "J33",
+      "bidirectional": true,
+      "length_meters": 3.2465,
+      "width_median_m": 5.726,
+      "orig_id": "edge_00050"
+    },
+    {
+      "id": "J25__J23",
+      "from": "J25",
+      "to": "J23",
+      "bidirectional": true,
+      "length_meters": 3.4186,
+      "width_median_m": null,
+      "orig_id": "edge_00152"
+    },
+    {
+      "id": "J25__J29",
+      "from": "J25",
+      "to": "J29",
+      "bidirectional": true,
+      "length_meters": 4.6043,
+      "width_median_m": 9.174,
+      "orig_id": "edge_00051"
+    },
+    {
+      "id": "J25__T49",
+      "from": "J25",
+      "to": "T49",
+      "bidirectional": true,
+      "length_meters": 7.1522,
+      "width_median_m": null,
+      "orig_id": "edge_00148"
+    },
+    {
+      "id": "J26__T45",
+      "from": "J26",
+      "to": "T45",
+      "bidirectional": true,
+      "length_meters": 5.0226,
+      "width_median_m": 2.246,
+      "orig_id": "edge_00052"
+    },
+    {
+      "id": "J26__T47",
+      "from": "J26",
+      "to": "T47",
+      "bidirectional": true,
+      "length_meters": 3.5581,
+      "width_median_m": 2.246,
+      "orig_id": "edge_00054"
+    },
+    {
+      "id": "J27__J31",
+      "from": "J27",
+      "to": "J31",
+      "bidirectional": true,
+      "length_meters": 4.2847,
+      "width_median_m": null,
+      "orig_id": "edge_00058"
+    },
+    {
+      "id": "J27__M18",
+      "from": "J27",
+      "to": "M18",
+      "bidirectional": true,
+      "length_meters": 3.5677,
+      "width_median_m": null,
+      "orig_id": "edge_00158"
+    },
+    {
+      "id": "J27__M19",
+      "from": "J27",
+      "to": "M19",
+      "bidirectional": true,
+      "length_meters": 2.7122,
+      "width_median_m": null,
+      "orig_id": "edge_00157"
+    },
+    {
+      "id": "J27__T54",
+      "from": "J27",
+      "to": "T54",
+      "bidirectional": true,
+      "length_meters": 5.2538,
+      "width_median_m": null,
+      "orig_id": "edge_00170"
+    },
+    {
+      "id": "J28__J21",
+      "from": "J28",
+      "to": "J21",
+      "bidirectional": true,
+      "length_meters": 3.0259,
+      "width_median_m": null,
+      "orig_id": "edge_00127"
+    },
+    {
+      "id": "J28__M6",
+      "from": "J28",
+      "to": "M6",
+      "bidirectional": true,
+      "length_meters": 2.6537,
+      "width_median_m": null,
+      "orig_id": "edge_00136"
+    },
+    {
+      "id": "J29__T43",
+      "from": "J29",
+      "to": "T43",
+      "bidirectional": true,
+      "length_meters": 4.9882,
+      "width_median_m": null,
+      "orig_id": "edge_00149"
+    },
+    {
+      "id": "J29__T49",
+      "from": "J29",
+      "to": "T49",
+      "bidirectional": true,
+      "length_meters": 3.6606,
+      "width_median_m": 3.97,
+      "orig_id": "edge_00064"
+    },
+    {
+      "id": "J29__T50",
+      "from": "J29",
+      "to": "T50",
+      "bidirectional": true,
+      "length_meters": 2.5115,
+      "width_median_m": null,
+      "orig_id": "edge_00065"
+    },
+    {
+      "id": "J2__E1",
+      "from": "J2",
+      "to": "E1",
+      "bidirectional": true,
+      "length_meters": 2.7066,
+      "width_median_m": 5.587,
+      "orig_id": "edge_00008"
+    },
+    {
+      "id": "J2__T27",
+      "from": "J2",
+      "to": "T27",
+      "bidirectional": true,
+      "length_meters": 8.1757,
+      "width_median_m": 4.83,
+      "orig_id": "edge_00009"
+    },
+    {
+      "id": "J2__T28",
+      "from": "J2",
+      "to": "T28",
+      "bidirectional": true,
+      "length_meters": 3.3762,
+      "width_median_m": 8.552,
+      "orig_id": "edge_00010"
+    },
+    {
+      "id": "J30__M5",
+      "from": "J30",
+      "to": "M5",
+      "bidirectional": true,
+      "length_meters": 7.6863,
+      "width_median_m": null,
+      "orig_id": "edge_00129"
+    },
+    {
+      "id": "J31__M18",
+      "from": "J31",
+      "to": "M18",
+      "bidirectional": true,
+      "length_meters": 4.0101,
+      "width_median_m": null,
+      "orig_id": "repair__edge_00168__s002"
+    },
+    {
+      "id": "J31__T51",
+      "from": "J31",
+      "to": "T51",
+      "bidirectional": true,
+      "length_meters": 4.9399,
+      "width_median_m": null,
+      "orig_id": "repair__edge_00066__s001"
+    },
+    {
+      "id": "J31__T54",
+      "from": "J31",
+      "to": "T54",
+      "bidirectional": true,
+      "length_meters": 1.4646,
+      "width_median_m": null,
+      "orig_id": "edge_00171"
+    },
+    {
+      "id": "J32__J33",
+      "from": "J32",
+      "to": "J33",
+      "bidirectional": true,
+      "length_meters": 2.315,
+      "width_median_m": 4.83,
+      "orig_id": "edge_00068"
+    },
+    {
+      "id": "J32__J34",
+      "from": "J32",
+      "to": "J34",
+      "bidirectional": true,
+      "length_meters": 4.6471,
+      "width_median_m": 3.97,
+      "orig_id": "edge_00069"
+    },
+    {
+      "id": "J34__T52",
+      "from": "J34",
+      "to": "T52",
+      "bidirectional": true,
+      "length_meters": 4.6136,
+      "width_median_m": 2.382,
+      "orig_id": "edge_00075"
+    },
+    {
+      "id": "J35__E5",
+      "from": "J35",
+      "to": "E5",
+      "bidirectional": true,
+      "length_meters": 1.8397,
+      "width_median_m": 4.163,
+      "orig_id": "edge_00077"
+    },
+    {
+      "id": "J35__J36",
+      "from": "J35",
+      "to": "J36",
+      "bidirectional": true,
+      "length_meters": 2.6713,
+      "width_median_m": 7.191,
+      "orig_id": "edge_00076"
+    },
+    {
+      "id": "J37__T54",
+      "from": "J37",
+      "to": "T54",
+      "bidirectional": true,
+      "length_meters": 8.923,
+      "width_median_m": 2.382,
+      "orig_id": "edge_00081"
+    },
+    {
+      "id": "J38__M22",
+      "from": "J38",
+      "to": "M22",
+      "bidirectional": true,
+      "length_meters": 4.0379,
+      "width_median_m": null,
+      "orig_id": "edge_00176"
+    },
+    {
+      "id": "J39__M20",
+      "from": "J39",
+      "to": "M20",
+      "bidirectional": true,
+      "length_meters": 1.9609,
+      "width_median_m": 2.246,
+      "orig_id": "edge_00084"
+    },
+    {
+      "id": "J39__T55",
+      "from": "J39",
+      "to": "T55",
+      "bidirectional": true,
+      "length_meters": 2.6307,
+      "width_median_m": null,
+      "orig_id": "edge_00177"
+    },
+    {
+      "id": "J3__J4",
+      "from": "J3",
+      "to": "J4",
+      "bidirectional": true,
+      "length_meters": 6.3649,
+      "width_median_m": 6.353,
+      "orig_id": "edge_00011"
+    },
+    {
+      "id": "J3__T29",
+      "from": "J3",
+      "to": "T29",
+      "bidirectional": true,
+      "length_meters": 6.402,
+      "width_median_m": 5.558,
+      "orig_id": "edge_00012"
+    },
+    {
+      "id": "J40__E4",
+      "from": "J40",
+      "to": "E4",
+      "bidirectional": true,
+      "length_meters": 5.5726,
+      "width_median_m": 3.176,
+      "orig_id": "edge_00085"
+    },
+    {
+      "id": "J40__J41",
+      "from": "J40",
+      "to": "J41",
+      "bidirectional": true,
+      "length_meters": 20.6496,
+      "width_median_m": null,
+      "orig_id": "edge_00190"
+    },
+    {
+      "id": "J40__M23",
+      "from": "J40",
+      "to": "M23",
+      "bidirectional": true,
+      "length_meters": 7.267,
+      "width_median_m": 3.97,
+      "orig_id": "edge_00086"
+    },
+    {
+      "id": "J41__E7",
+      "from": "J41",
+      "to": "E7",
+      "bidirectional": true,
+      "length_meters": 4.3854,
+      "width_median_m": 3.97,
+      "orig_id": "edge_00087"
+    },
+    {
+      "id": "J41__T58",
+      "from": "J41",
+      "to": "T58",
+      "bidirectional": true,
+      "length_meters": 2.138,
+      "width_median_m": 4.73,
+      "orig_id": "edge_00088"
+    },
+    {
+      "id": "J42__J43",
+      "from": "J42",
+      "to": "J43",
+      "bidirectional": true,
+      "length_meters": 5.5585,
+      "width_median_m": 7.147,
+      "orig_id": "edge_00090"
+    },
+    {
+      "id": "J42__J44",
+      "from": "J42",
+      "to": "J44",
+      "bidirectional": true,
+      "length_meters": 4.2767,
+      "width_median_m": null,
+      "orig_id": "edge_00191"
+    },
+    {
+      "id": "J42__J46",
+      "from": "J42",
+      "to": "J46",
+      "bidirectional": true,
+      "length_meters": 6.7223,
+      "width_median_m": 4.01,
+      "orig_id": "edge_00089"
+    },
+    {
+      "id": "J43__J44",
+      "from": "J43",
+      "to": "J44",
+      "bidirectional": true,
+      "length_meters": 2.705,
+      "width_median_m": 5.781,
+      "orig_id": "edge_00092"
+    },
+    {
+      "id": "J43__T59",
+      "from": "J43",
+      "to": "T59",
+      "bidirectional": true,
+      "length_meters": 1.6845,
+      "width_median_m": 3.97,
+      "orig_id": "edge_00091"
+    },
+    {
+      "id": "J44__E8",
+      "from": "J44",
+      "to": "E8",
+      "bidirectional": true,
+      "length_meters": 4.9676,
+      "width_median_m": 4.123,
+      "orig_id": "edge_00093"
+    },
+    {
+      "id": "J44__J45",
+      "from": "J44",
+      "to": "J45",
+      "bidirectional": true,
+      "length_meters": 4.5334,
+      "width_median_m": 3.274,
+      "orig_id": "edge_00094"
+    },
+    {
+      "id": "J45__J47",
+      "from": "J45",
+      "to": "J47",
+      "bidirectional": true,
+      "length_meters": 2.3338,
+      "width_median_m": null,
+      "orig_id": "edge_00192"
+    },
+    {
+      "id": "J46__T65",
+      "from": "J46",
+      "to": "T65",
+      "bidirectional": true,
+      "length_meters": 3.5678,
+      "width_median_m": 3.274,
+      "orig_id": "edge_00096"
+    },
+    {
+      "id": "J47__J48",
+      "from": "J47",
+      "to": "J48",
+      "bidirectional": true,
+      "length_meters": 3.3594,
+      "width_median_m": 2.447,
+      "orig_id": "edge_00098"
+    },
+    {
+      "id": "J48__J49",
+      "from": "J48",
+      "to": "J49",
+      "bidirectional": true,
+      "length_meters": 2.6328,
+      "width_median_m": 2.382,
+      "orig_id": "edge_00100"
+    },
+    {
+      "id": "J49__T68",
+      "from": "J49",
+      "to": "T68",
+      "bidirectional": true,
+      "length_meters": 2.0825,
+      "width_median_m": 3.176,
+      "orig_id": "edge_00101"
+    },
+    {
+      "id": "J4__T31",
+      "from": "J4",
+      "to": "T31",
+      "bidirectional": true,
+      "length_meters": 5.5585,
+      "width_median_m": 6.353,
+      "orig_id": "edge_00014"
+    },
+    {
+      "id": "J50__T9",
+      "from": "J50",
+      "to": "T9",
+      "bidirectional": true,
+      "length_meters": 0.9433,
+      "width_median_m": null,
+      "orig_id": "edge_00102"
+    },
+    {
+      "id": "J51__J53",
+      "from": "J51",
+      "to": "J53",
+      "bidirectional": true,
+      "length_meters": 5.1945,
+      "width_median_m": null,
+      "orig_id": "edge_00104"
+    },
+    {
+      "id": "J52__J49",
+      "from": "J52",
+      "to": "J49",
+      "bidirectional": true,
+      "length_meters": 2.0674,
+      "width_median_m": null,
+      "orig_id": "edge_00199"
+    },
+    {
+      "id": "J52__M28",
+      "from": "J52",
+      "to": "M28",
+      "bidirectional": true,
+      "length_meters": 3.8964,
+      "width_median_m": 2.447,
+      "orig_id": "edge_00106"
+    },
+    {
+      "id": "J54__J57",
+      "from": "J54",
+      "to": "J57",
+      "bidirectional": true,
+      "length_meters": 3.0843,
+      "width_median_m": 3.369,
+      "orig_id": "edge_00108"
+    },
+    {
+      "id": "J54__J58",
+      "from": "J54",
+      "to": "J58",
+      "bidirectional": true,
+      "length_meters": 4.1426,
+      "width_median_m": 5.615,
+      "orig_id": "edge_00109"
+    },
+    {
+      "id": "J55__T10",
+      "from": "J55",
+      "to": "T10",
+      "bidirectional": true,
+      "length_meters": 2.8962,
+      "width_median_m": null,
+      "orig_id": "edge_00110"
+    },
+    {
+      "id": "J55__T11",
+      "from": "J55",
+      "to": "T11",
+      "bidirectional": true,
+      "length_meters": 1.6484,
+      "width_median_m": null,
+      "orig_id": "edge_00111"
+    },
+    {
+      "id": "J55__T22",
+      "from": "J55",
+      "to": "T22",
+      "bidirectional": true,
+      "length_meters": 2.4823,
+      "width_median_m": null,
+      "orig_id": "edge_00212"
+    },
+    {
+      "id": "J56__E11",
+      "from": "J56",
+      "to": "E11",
+      "bidirectional": true,
+      "length_meters": 4.6632,
+      "width_median_m": null,
+      "orig_id": "edge_00112"
+    },
+    {
+      "id": "J56__T21",
+      "from": "J56",
+      "to": "T21",
+      "bidirectional": true,
+      "length_meters": 1.1153,
+      "width_median_m": null,
+      "orig_id": "edge_00205"
+    },
+    {
+      "id": "J57__T69",
+      "from": "J57",
+      "to": "T69",
+      "bidirectional": true,
+      "length_meters": 2.5655,
+      "width_median_m": 1.588,
+      "orig_id": "edge_00113"
+    },
+    {
+      "id": "J58__M26",
+      "from": "J58",
+      "to": "M26",
+      "bidirectional": true,
+      "length_meters": 6.2229,
+      "width_median_m": null,
+      "orig_id": "edge_00210"
+    },
+    {
+      "id": "J58__M29",
+      "from": "J58",
+      "to": "M29",
+      "bidirectional": true,
+      "length_meters": 6.157,
+      "width_median_m": 4.764,
+      "orig_id": "edge_00116"
+    },
+    {
+      "id": "J59__J60",
+      "from": "J59",
+      "to": "J60",
+      "bidirectional": true,
+      "length_meters": 4.1692,
+      "width_median_m": 3.97,
+      "orig_id": "edge_00118"
+    },
+    {
+      "id": "J59__M29",
+      "from": "J59",
+      "to": "M29",
+      "bidirectional": true,
+      "length_meters": 8.3541,
+      "width_median_m": null,
+      "orig_id": "edge_00211"
+    },
+    {
+      "id": "J5__J6",
+      "from": "J5",
+      "to": "J6",
+      "bidirectional": true,
+      "length_meters": 2.2149,
+      "width_median_m": 4.764,
+      "orig_id": "edge_00120"
+    },
+    {
+      "id": "J5__T32",
+      "from": "J5",
+      "to": "T32",
+      "bidirectional": true,
+      "length_meters": 3.3111,
+      "width_median_m": 2.382,
+      "orig_id": "edge_00017"
+    },
+    {
+      "id": "J60__M26",
+      "from": "J60",
+      "to": "M26",
+      "bidirectional": true,
+      "length_meters": 4.6651,
+      "width_median_m": null,
+      "orig_id": "edge_00209"
+    },
+    {
+      "id": "J7__T34",
+      "from": "J7",
+      "to": "T34",
+      "bidirectional": true,
+      "length_meters": 1.1911,
+      "width_median_m": 14.577,
+      "orig_id": "edge_00019"
+    },
+    {
+      "id": "J7__T35",
+      "from": "J7",
+      "to": "T35",
+      "bidirectional": true,
+      "length_meters": 1.6845,
+      "width_median_m": 7.147,
+      "orig_id": "edge_00020"
+    },
+    {
+      "id": "J9__J14",
+      "from": "J9",
+      "to": "J14",
+      "bidirectional": true,
+      "length_meters": 8.0054,
+      "width_median_m": 7.98,
+      "orig_id": "edge_00023"
+    },
+    {
+      "id": "J9__J16",
+      "from": "J9",
+      "to": "J16",
+      "bidirectional": true,
+      "length_meters": 2.5788,
+      "width_median_m": 7.651,
+      "orig_id": "edge_00024"
+    },
+    {
+      "id": "J__K",
+      "from": "J",
+      "to": "K",
+      "bidirectional": true,
+      "length_meters": 3.0177
+    },
+    {
+      "id": "K__L",
+      "from": "K",
+      "to": "L",
+      "bidirectional": true,
+      "length_meters": 2.6157
+    },
+    {
+      "id": "L__M",
+      "from": "L",
+      "to": "M",
+      "bidirectional": true,
+      "length_meters": 1.3729
+    },
+    {
+      "id": "M10__T14",
+      "from": "M10",
+      "to": "T14",
+      "bidirectional": true,
+      "length_meters": 0.9445,
+      "width_median_m": null,
+      "orig_id": "edge_00139"
+    },
+    {
+      "id": "M11__J16",
+      "from": "M11",
+      "to": "J16",
+      "bidirectional": true,
+      "length_meters": 4.0471,
+      "width_median_m": 2.555,
+      "orig_id": "edge_00140"
+    },
+    {
+      "id": "M12__M13",
+      "from": "M12",
+      "to": "M13",
+      "bidirectional": true,
+      "length_meters": 1.7122,
+      "width_median_m": null,
+      "orig_id": "edge_00141"
+    },
+    {
+      "id": "M13__J15",
+      "from": "M13",
+      "to": "J15",
+      "bidirectional": true,
+      "length_meters": 4.8787,
+      "width_median_m": null,
+      "orig_id": "edge_00142"
+    },
+    {
+      "id": "M13__J17",
+      "from": "M13",
+      "to": "J17",
+      "bidirectional": true,
+      "length_meters": 1.2443,
+      "width_median_m": null,
+      "orig_id": "edge_00143"
+    },
+    {
+      "id": "M14__J23",
+      "from": "M14",
+      "to": "J23",
+      "bidirectional": true,
+      "length_meters": 6.5946,
+      "width_median_m": null,
+      "orig_id": "edge_00173"
+    },
+    {
+      "id": "M14__J25",
+      "from": "M14",
+      "to": "J25",
+      "bidirectional": true,
+      "length_meters": 3.9428,
+      "width_median_m": 13.82,
+      "orig_id": "edge_00145"
+    },
+    {
+      "id": "M14__J29",
+      "from": "M14",
+      "to": "J29",
+      "bidirectional": true,
+      "length_meters": 8.4845,
+      "width_median_m": null,
+      "orig_id": "edge_00172"
+    },
+    {
+      "id": "M14__M16",
+      "from": "M14",
+      "to": "M16",
+      "bidirectional": true,
+      "length_meters": 3.6658,
+      "width_median_m": null,
+      "orig_id": "edge_00163"
+    },
+    {
+      "id": "M15__J23",
+      "from": "M15",
+      "to": "J23",
+      "bidirectional": true,
+      "length_meters": 3.2435,
+      "width_median_m": 4.163,
+      "orig_id": "edge_00150"
+    },
+    {
+      "id": "M15__M16",
+      "from": "M15",
+      "to": "M16",
+      "bidirectional": true,
+      "length_meters": 2.5395,
+      "width_median_m": null,
+      "orig_id": "edge_00164"
+    },
+    {
+      "id": "M16__J25",
+      "from": "M16",
+      "to": "J25",
+      "bidirectional": true,
+      "length_meters": 2.2976,
+      "width_median_m": 9.141,
+      "orig_id": "edge_00151"
+    },
+    {
+      "id": "M16__J29",
+      "from": "M16",
+      "to": "J29",
+      "bidirectional": true,
+      "length_meters": 5.496,
+      "width_median_m": null,
+      "orig_id": "edge_00153"
+    },
+    {
+      "id": "M16__T43",
+      "from": "M16",
+      "to": "T43",
+      "bidirectional": true,
+      "length_meters": 5.0183,
+      "width_median_m": null,
+      "orig_id": "edge_00155"
+    },
+    {
+      "id": "M16__T49",
+      "from": "M16",
+      "to": "T49",
+      "bidirectional": true,
+      "length_meters": 8.7201,
+      "width_median_m": null,
+      "orig_id": "edge_00154"
+    },
+    {
+      "id": "M17__J13",
+      "from": "M17",
+      "to": "J13",
+      "bidirectional": true,
+      "length_meters": 9.3879,
+      "width_median_m": 5.405,
+      "orig_id": "edge_00156"
+    },
+    {
+      "id": "M17__J2",
+      "from": "M17",
+      "to": "J2",
+      "bidirectional": true,
+      "length_meters": 3.6775,
+      "width_median_m": null,
+      "orig_id": "edge_00165"
+    },
+    {
+      "id": "M18__T16",
+      "from": "M18",
+      "to": "T16",
+      "bidirectional": true,
+      "length_meters": 3.5386,
+      "width_median_m": null,
+      "orig_id": "edge_00161"
+    },
+    {
+      "id": "M19__J12",
+      "from": "M19",
+      "to": "J12",
+      "bidirectional": true,
+      "length_meters": 3.9441,
+      "width_median_m": null,
+      "orig_id": "edge_00162"
+    },
+    {
+      "id": "M19__J31",
+      "from": "M19",
+      "to": "J31",
+      "bidirectional": true,
+      "length_meters": 5.6426,
+      "width_median_m": null,
+      "orig_id": "edge_00169"
+    },
+    {
+      "id": "M19__M18",
+      "from": "M19",
+      "to": "M18",
+      "bidirectional": true,
+      "length_meters": 2.5145,
+      "width_median_m": null,
+      "orig_id": "edge_00167"
+    },
+    {
+      "id": "M1__J5",
+      "from": "M1",
+      "to": "J5",
+      "bidirectional": true,
+      "length_meters": 6.4449,
+      "width_median_m": 5.558,
+      "orig_id": "edge_00012__s003"
+    },
+    {
+      "id": "M20__J40",
+      "from": "M20",
+      "to": "J40",
+      "bidirectional": true,
+      "length_meters": 6.9639,
+      "width_median_m": null,
+      "orig_id": "edge_00181"
+    },
+    {
+      "id": "M20__T57",
+      "from": "M20",
+      "to": "T57",
+      "bidirectional": true,
+      "length_meters": 5.8168,
+      "width_median_m": 2.246,
+      "orig_id": "edge_00179"
+    },
+    {
+      "id": "M21__T48",
+      "from": "M21",
+      "to": "T48",
+      "bidirectional": true,
+      "length_meters": 5.7904,
+      "width_median_m": 3.97,
+      "orig_id": "edge_00184"
+    },
+    {
+      "id": "M22__T55",
+      "from": "M22",
+      "to": "T55",
+      "bidirectional": true,
+      "length_meters": 2.6135,
+      "width_median_m": null,
+      "orig_id": "edge_00186"
+    },
+    {
+      "id": "M23__J41",
+      "from": "M23",
+      "to": "J41",
+      "bidirectional": true,
+      "length_meters": 13.422,
+      "width_median_m": 3.97,
+      "orig_id": "edge_00188"
+    },
+    {
+      "id": "M24__J51",
+      "from": "M24",
+      "to": "J51",
+      "bidirectional": true,
+      "length_meters": 3.1868,
+      "width_median_m": 2.246,
+      "orig_id": "edge_00194"
+    },
+    {
+      "id": "M24__J57",
+      "from": "M24",
+      "to": "J57",
+      "bidirectional": true,
+      "length_meters": 2.9579,
+      "width_median_m": null,
+      "orig_id": "edge_00196"
+    },
+    {
+      "id": "M25__M26",
+      "from": "M25",
+      "to": "M26",
+      "bidirectional": true,
+      "length_meters": 2.7518,
+      "width_median_m": 2.447,
+      "orig_id": "edge_00200"
+    },
+    {
+      "id": "M26__M29",
+      "from": "M26",
+      "to": "M29",
+      "bidirectional": true,
+      "length_meters": 1.8084,
+      "width_median_m": null,
+      "orig_id": "edge_00204"
+    },
+    {
+      "id": "M27__M25",
+      "from": "M27",
+      "to": "M25",
+      "bidirectional": true,
+      "length_meters": 2.0363,
+      "width_median_m": 2.447,
+      "orig_id": "edge_00201"
+    },
+    {
+      "id": "M27__M30",
+      "from": "M27",
+      "to": "M30",
+      "bidirectional": true,
+      "length_meters": 2.9441,
+      "width_median_m": null,
+      "orig_id": "edge_00206"
+    },
+    {
+      "id": "M28__M27",
+      "from": "M28",
+      "to": "M27",
+      "bidirectional": true,
+      "length_meters": 4.7954,
+      "width_median_m": 2.447,
+      "orig_id": "edge_00202"
+    },
+    {
+      "id": "M29__J60",
+      "from": "M29",
+      "to": "J60",
+      "bidirectional": true,
+      "length_meters": 4.3424,
+      "width_median_m": 4.764,
+      "orig_id": "edge_00203"
+    },
+    {
+      "id": "M30__M31",
+      "from": "M30",
+      "to": "M31",
+      "bidirectional": true,
+      "length_meters": 3.6644,
+      "width_median_m": null,
+      "orig_id": "edge_00207"
+    },
+    {
+      "id": "M31__E9",
+      "from": "M31",
+      "to": "E9",
+      "bidirectional": true,
+      "length_meters": 7.7557,
+      "width_median_m": null,
+      "orig_id": "edge_00208"
+    },
+    {
+      "id": "M3__M4",
+      "from": "M3",
+      "to": "M4",
+      "bidirectional": true,
+      "length_meters": 3.0255,
+      "width_median_m": null,
+      "orig_id": "edge_00123"
+    },
+    {
+      "id": "M4__J38",
+      "from": "M4",
+      "to": "J38",
+      "bidirectional": true,
+      "length_meters": 7.6169,
+      "width_median_m": null,
+      "orig_id": "edge_00124"
+    },
+    {
+      "id": "M5__M7",
+      "from": "M5",
+      "to": "M7",
+      "bidirectional": true,
+      "length_meters": 4.3023
+    },
+    {
+      "id": "M6__M9",
+      "from": "M6",
+      "to": "M9",
+      "bidirectional": true,
+      "length_meters": 2.8997,
+      "width_median_m": null,
+      "orig_id": "edge_00131"
+    },
+    {
+      "id": "M7__E",
+      "from": "M7",
+      "to": "E",
+      "bidirectional": true,
+      "length_meters": 3.2773
+    },
+    {
+      "id": "M8__M7",
+      "from": "M8",
+      "to": "M7",
+      "bidirectional": true,
+      "length_meters": 7.5519,
+      "width_median_m": null,
+      "orig_id": "edge_00134"
+    },
+    {
+      "id": "M9__M8",
+      "from": "M9",
+      "to": "M8",
+      "bidirectional": true,
+      "length_meters": 1.7846,
+      "width_median_m": null,
+      "orig_id": "edge_00135"
+    },
+    {
+      "id": "T10__E10",
+      "from": "T10",
+      "to": "E10",
+      "bidirectional": true,
+      "length_meters": 1.447,
+      "width_median_m": null,
+      "orig_id": "repair__edge_00110__s001"
+    },
+    {
+      "id": "T11__J59",
+      "from": "T11",
+      "to": "J59",
+      "bidirectional": true,
+      "length_meters": 2.0139,
+      "width_median_m": null,
+      "orig_id": "repair__edge_00111__s001"
+    },
+    {
+      "id": "T12__J6",
+      "from": "T12",
+      "to": "J6",
+      "bidirectional": true,
+      "length_meters": 0.6303,
+      "width_median_m": null,
+      "orig_id": "repair__edge_00121__s001"
+    },
+    {
+      "id": "T14__J10",
+      "from": "T14",
+      "to": "J10",
+      "bidirectional": true,
+      "length_meters": 0.5549,
+      "width_median_m": null,
+      "orig_id": "repair__edge_00139__s002"
+    },
+    {
+      "id": "T16__J22",
+      "from": "T16",
+      "to": "J22",
+      "bidirectional": true,
+      "length_meters": 3.1317,
+      "width_median_m": null,
+      "orig_id": "repair__edge_00161__s001"
+    },
+    {
+      "id": "T1__T2",
+      "from": "T1",
+      "to": "T2",
+      "bidirectional": true,
+      "length_meters": 1.123,
+      "width_median_m": null,
+      "orig_id": "repair__edge_00007__s003__s001"
+    },
+    {
+      "id": "T21__M25",
+      "from": "T21",
+      "to": "M25",
+      "bidirectional": true,
+      "length_meters": 1.0282,
+      "width_median_m": null,
+      "orig_id": "repair__edge_00205__s001"
+    },
+    {
+      "id": "T22__J60",
+      "from": "T22",
+      "to": "J60",
+      "bidirectional": true,
+      "length_meters": 4.6756,
+      "width_median_m": null,
+      "orig_id": "repair__edge_00212__s001"
+    },
+    {
+      "id": "T23__J1",
+      "from": "T23",
+      "to": "J1",
+      "bidirectional": true,
+      "length_meters": 6.4735,
+      "width_median_m": 3.761,
+      "orig_id": "edge_00002__s002"
+    },
+    {
+      "id": "T24__M1",
+      "from": "T24",
+      "to": "M1",
+      "bidirectional": true,
+      "length_meters": 8.7227,
+      "width_median_m": 4.764,
+      "orig_id": "edge_00006__s002"
+    },
+    {
+      "id": "T25__T26",
+      "from": "T25",
+      "to": "T26",
+      "bidirectional": true,
+      "length_meters": 2.3822,
+      "width_median_m": 2.011,
+      "orig_id": "edge_00007__s002"
+    },
+    {
+      "id": "T26__T1",
+      "from": "T26",
+      "to": "T1",
+      "bidirectional": true,
+      "length_meters": 3.6407,
+      "width_median_m": null,
+      "orig_id": "edge_00007__s003"
+    },
+    {
+      "id": "T27__J12",
+      "from": "T27",
+      "to": "J12",
+      "bidirectional": true,
+      "length_meters": 3.2269,
+      "width_median_m": 4.83,
+      "orig_id": "edge_00009__s002"
+    },
+    {
+      "id": "T27__M17",
+      "from": "T27",
+      "to": "M17",
+      "bidirectional": true,
+      "length_meters": 5.0738,
+      "width_median_m": null,
+      "orig_id": "edge_00166"
+    },
+    {
+      "id": "T28__J13",
+      "from": "T28",
+      "to": "J13",
+      "bidirectional": true,
+      "length_meters": 2.6438,
+      "width_median_m": 8.552,
+      "orig_id": "edge_00010__s002"
+    },
+    {
+      "id": "T29__M1",
+      "from": "T29",
+      "to": "M1",
+      "bidirectional": true,
+      "length_meters": 21.8555,
+      "width_median_m": 5.558,
+      "orig_id": "edge_00012__s002"
+    },
+    {
+      "id": "T31__J8",
+      "from": "T31",
+      "to": "J8",
+      "bidirectional": true,
+      "length_meters": 2.5423,
+      "width_median_m": 6.353,
+      "orig_id": "edge_00014__s002"
+    },
+    {
+      "id": "T32__T33",
+      "from": "T32",
+      "to": "T33",
+      "bidirectional": true,
+      "length_meters": 19.8059,
+      "width_median_m": 2.382,
+      "orig_id": "edge_00017__s002"
+    },
+    {
+      "id": "T33__M10",
+      "from": "T33",
+      "to": "M10",
+      "bidirectional": true,
+      "length_meters": 3.9408,
+      "width_median_m": 2.382,
+      "orig_id": "edge_00017__s003"
+    },
+    {
+      "id": "T35__T36",
+      "from": "T35",
+      "to": "T36",
+      "bidirectional": true,
+      "length_meters": 7.9406,
+      "width_median_m": 7.147,
+      "orig_id": "edge_00020__s002"
+    },
+    {
+      "id": "T36__J8",
+      "from": "T36",
+      "to": "J8",
+      "bidirectional": true,
+      "length_meters": 2.8631,
+      "width_median_m": 7.147,
+      "orig_id": "edge_00020__s003"
+    },
+    {
+      "id": "T37__J14",
+      "from": "T37",
+      "to": "J14",
+      "bidirectional": true,
+      "length_meters": 2.0599,
+      "width_median_m": 3.274,
+      "orig_id": "edge_00021__s002"
+    },
+    {
+      "id": "T38__T39",
+      "from": "T38",
+      "to": "T39",
+      "bidirectional": true,
+      "length_meters": 1.4457,
+      "width_median_m": 2.079,
+      "orig_id": "edge_00037__s002"
+    },
+    {
+      "id": "T39__J26",
+      "from": "T39",
+      "to": "J26",
+      "bidirectional": true,
+      "length_meters": 3.052,
+      "width_median_m": 2.079,
+      "orig_id": "edge_00037__s003"
+    },
+    {
+      "id": "T3__J21",
+      "from": "T3",
+      "to": "J21",
+      "bidirectional": true,
+      "length_meters": 4.6325,
+      "width_median_m": null,
+      "orig_id": "repair__edge_00027__s001"
+    },
+    {
+      "id": "T40__M15",
+      "from": "T40",
+      "to": "M15",
+      "bidirectional": true,
+      "length_meters": 2.409,
+      "width_median_m": 4.163,
+      "orig_id": "edge_00039__s002"
+    },
+    {
+      "id": "T41__T42",
+      "from": "T41",
+      "to": "T42",
+      "bidirectional": true,
+      "length_meters": 2.8021,
+      "width_median_m": null,
+      "orig_id": "edge_00040__s002"
+    },
+    {
+      "id": "T42__J20",
+      "from": "T42",
+      "to": "J20",
+      "bidirectional": true,
+      "length_meters": 1.9554,
+      "width_median_m": 1.588,
+      "orig_id": "edge_00040__s003"
+    },
+    {
+      "id": "T43__T44",
+      "from": "T43",
+      "to": "T44",
+      "bidirectional": true,
+      "length_meters": 5.2955,
+      "width_median_m": 1.588,
+      "orig_id": "edge_00048__s002"
+    },
+    {
+      "id": "T45__T46",
+      "from": "T45",
+      "to": "T46",
+      "bidirectional": true,
+      "length_meters": 1.2621,
+      "width_median_m": 2.246,
+      "orig_id": "edge_00052__s002"
+    },
+    {
+      "id": "T46__T48",
+      "from": "T46",
+      "to": "T48",
+      "bidirectional": true,
+      "length_meters": 2.7388,
+      "width_median_m": null,
+      "orig_id": "edge_00185"
+    },
+    {
+      "id": "T47__J35",
+      "from": "T47",
+      "to": "J35",
+      "bidirectional": true,
+      "length_meters": 3.9728,
+      "width_median_m": 2.246,
+      "orig_id": "edge_00054__s002"
+    },
+    {
+      "id": "T49__J37",
+      "from": "T49",
+      "to": "J37",
+      "bidirectional": true,
+      "length_meters": 9.1572,
+      "width_median_m": 3.97,
+      "orig_id": "edge_00064__s002"
+    },
+    {
+      "id": "T49__T50",
+      "from": "T49",
+      "to": "T50",
+      "bidirectional": true,
+      "length_meters": 4.5404,
+      "width_median_m": null,
+      "orig_id": "edge_00147"
+    },
+    {
+      "id": "T50__T6",
+      "from": "T50",
+      "to": "T6",
+      "bidirectional": true,
+      "length_meters": 1.5416,
+      "width_median_m": null,
+      "orig_id": "edge_00065__s002"
+    },
+    {
+      "id": "T51__T56",
+      "from": "T51",
+      "to": "T56",
+      "bidirectional": true,
+      "length_meters": 7.2448,
+      "width_median_m": null,
+      "orig_id": "edge_00159"
+    },
+    {
+      "id": "T52__T53",
+      "from": "T52",
+      "to": "T53",
+      "bidirectional": true,
+      "length_meters": 3.4223,
+      "width_median_m": 2.382,
+      "orig_id": "edge_00075__s002"
+    },
+    {
+      "id": "T53__J36",
+      "from": "T53",
+      "to": "J36",
+      "bidirectional": true,
+      "length_meters": 2.8106,
+      "width_median_m": 2.382,
+      "orig_id": "edge_00075__s003"
+    },
+    {
+      "id": "T54__T51",
+      "from": "T54",
+      "to": "T51",
+      "bidirectional": true,
+      "length_meters": 4.116,
+      "width_median_m": null,
+      "orig_id": "edge_00160"
+    },
+    {
+      "id": "T55__M20",
+      "from": "T55",
+      "to": "M20",
+      "bidirectional": true,
+      "length_meters": 3.0092,
+      "width_median_m": null,
+      "orig_id": "edge_00187"
+    },
+    {
+      "id": "T56__E6",
+      "from": "T56",
+      "to": "E6",
+      "bidirectional": true,
+      "length_meters": 3.3132,
+      "width_median_m": null,
+      "orig_id": "edge_00083__s002"
+    },
+    {
+      "id": "T57__J40",
+      "from": "T57",
+      "to": "J40",
+      "bidirectional": true,
+      "length_meters": 1.6845,
+      "width_median_m": 2.246,
+      "orig_id": "edge_00084__s002"
+    },
+    {
+      "id": "T57__M23",
+      "from": "T57",
+      "to": "M23",
+      "bidirectional": true,
+      "length_meters": 8.4311,
+      "width_median_m": null,
+      "orig_id": "edge_00189"
+    },
+    {
+      "id": "T58__J42",
+      "from": "T58",
+      "to": "J42",
+      "bidirectional": true,
+      "length_meters": 2.3151,
+      "width_median_m": 4.73,
+      "orig_id": "edge_00088__s002"
+    },
+    {
+      "id": "T59__T60",
+      "from": "T59",
+      "to": "T60",
+      "bidirectional": true,
+      "length_meters": 5.5585,
+      "width_median_m": 3.97,
+      "orig_id": "edge_00091__s002"
+    },
+    {
+      "id": "T60__T61",
+      "from": "T60",
+      "to": "T61",
+      "bidirectional": true,
+      "length_meters": 1.9854,
+      "width_median_m": 3.97,
+      "orig_id": "edge_00091__s003"
+    },
+    {
+      "id": "T61__T62",
+      "from": "T61",
+      "to": "T62",
+      "bidirectional": true,
+      "length_meters": 5.6149,
+      "width_median_m": 3.97,
+      "orig_id": "edge_00091__s004"
+    },
+    {
+      "id": "T62__T63",
+      "from": "T62",
+      "to": "T63",
+      "bidirectional": true,
+      "length_meters": 2.8317,
+      "width_median_m": 3.97,
+      "orig_id": "edge_00091__s005"
+    },
+    {
+      "id": "T64__J58",
+      "from": "T64",
+      "to": "J58",
+      "bidirectional": true,
+      "length_meters": 2.3905,
+      "width_median_m": 3.97,
+      "orig_id": "edge_00091__s009"
+    },
+    {
+      "id": "T65__T66",
+      "from": "T65",
+      "to": "T66",
+      "bidirectional": true,
+      "length_meters": 2.8003,
+      "width_median_m": 3.274,
+      "orig_id": "edge_00096__s002"
+    },
+    {
+      "id": "T66__T67",
+      "from": "T66",
+      "to": "T67",
+      "bidirectional": true,
+      "length_meters": 4.5544,
+      "width_median_m": 3.274,
+      "orig_id": "edge_00096__s003"
+    },
+    {
+      "id": "T67__J55",
+      "from": "T67",
+      "to": "J55",
+      "bidirectional": true,
+      "length_meters": 4.6799,
+      "width_median_m": 3.274,
+      "orig_id": "edge_00096__s004"
+    },
+    {
+      "id": "T69__J51",
+      "from": "T69",
+      "to": "J51",
+      "bidirectional": true,
+      "length_meters": 2.8789,
+      "width_median_m": null,
+      "orig_id": "edge_00195"
+    },
+    {
+      "id": "T69__M24",
+      "from": "T69",
+      "to": "M24",
+      "bidirectional": true,
+      "length_meters": 1.8144,
+      "width_median_m": null,
+      "orig_id": "edge_00197"
+    },
+    {
+      "id": "T6__T7",
+      "from": "T6",
+      "to": "T7",
+      "bidirectional": true,
+      "length_meters": 1.2278,
+      "width_median_m": null,
+      "orig_id": "repair__edge_00065__s002__s001"
+    },
+    {
+      "id": "T7__J34",
+      "from": "T7",
+      "to": "J34",
+      "bidirectional": true,
+      "length_meters": 8.0028,
+      "width_median_m": null,
+      "orig_id": "repair__edge_00065__s002__s002"
+    },
+    {
+      "id": "T9__M24",
+      "from": "T9",
+      "to": "M24",
+      "bidirectional": true,
+      "length_meters": 1.6424,
+      "width_median_m": null,
+      "orig_id": "repair__edge_00102__s001"
+    }
+  ],
+  "saved_at": "2026-09-22T03:48:04"
+}

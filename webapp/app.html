@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Fly Track</title>
+<style>
+  :root{
+    --bg:#0b0d12; --panel:#141821; --line:#252b3a; --fg:#eef2f8; --dim:#8a94a8;
+    --accent:#5b8def; --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--fg);
+    font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+  header{display:flex;align-items:center;gap:14px;padding:14px 22px;background:var(--panel);
+    border-bottom:1px solid var(--line)}
+  header h1{font-size:17px;font-weight:650;letter-spacing:.01em}
+  header .sub{color:var(--dim);font-size:13px}
+  main{max-width:1100px;margin:0 auto;padding:22px;display:flex;flex-direction:column;gap:22px}
+  section{background:var(--panel);border:1px solid var(--line);border-radius:10px}
+  section > h2{font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--dim);
+    padding:12px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+  .body{padding:16px}
+  button{font:inherit;border:1px solid var(--line);background:#1b2130;color:var(--fg);
+    padding:8px 14px;border-radius:7px;cursor:pointer}
+  button:hover:not(:disabled){border-color:var(--accent)}
+  button:disabled{opacity:.45;cursor:default}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  a.btn{display:inline-block;text-decoration:none;color:var(--fg);border:1px solid var(--line);
+    background:#1b2130;padding:6px 12px;border-radius:7px;font-size:13px}
+  a.btn.go{background:var(--ok);border-color:var(--ok);color:#06210f;font-weight:650}
+  a.btn.off{pointer-events:none;opacity:.4}
+  .dim{color:var(--dim)}
+  .row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .cam{border:1px solid var(--line);border-radius:8px;margin-top:12px}
+  .cam h3{font-size:13px;padding:10px 12px;border-bottom:1px solid var(--line)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  td,th{padding:7px 12px;border-bottom:1px solid var(--line);text-align:left}
+  th{color:var(--dim);font-weight:500}
+  tr:last-child td{border-bottom:none}
+  .bar{height:8px;background:#0a0c10;border:1px solid var(--line);border-radius:5px;overflow:hidden}
+  .bar > i{display:block;height:100%;background:var(--accent);transition:width .4s}
+  .clip{padding:14px 16px;border-bottom:1px solid var(--line);display:grid;
+    grid-template-columns:1fr auto;gap:8px 16px}
+  .clip:last-child{border-bottom:none}
+  .clip .name{font-weight:600}
+  .steps{display:flex;gap:4px;margin-top:6px}
+  .steps span{flex:1;height:6px;border-radius:3px;background:#232a3a}
+  .steps span.done{background:var(--ok)}
+  .steps span.now{background:var(--accent)}
+  .actions{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+  .err{color:var(--bad);font-size:13px}
+  pre{background:#07090d;border:1px solid var(--line);border-radius:6px;padding:8px;font-size:11px;
+    color:#aab3c5;max-height:160px;overflow:auto;white-space:pre-wrap;margin-top:8px}
+  .pill{font-size:11px;padding:2px 8px;border-radius:9px;background:#232a3a;color:var(--dim)}
+  .pill.ok{background:#12351f;color:#7ee2a2}
+  .pill.run{background:#172447;color:#9db8ff}
+  .pill.bad{background:#3a1515;color:#ff9b9b}
+  .empty{padding:26px 16px;color:var(--dim);text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <h1>Fly Track</h1>
+  <span class="sub">видео с камеры → мозг мухи → трекер на плане цеха</span>
+</header>
+<main>
+  <section>
+    <h2>Камера</h2>
+    <div class="body">
+      <div class="row">
+        <button class="primary" id="scan">Найти камеру и загрузить видео</button>
+        <span id="scanInfo" class="dim">Подключите камеру по USB (как флешку) и нажмите кнопку.</span>
+      </div>
+      <div id="importBox" hidden style="margin-top:14px">
+        <div class="row" style="justify-content:space-between">
+          <span id="importText"></span><span id="importPct" class="dim"></span>
+        </div>
+        <div class="bar" style="margin-top:6px"><i id="importBar" style="width:0"></i></div>
+      </div>
+      <div id="cams"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Ролики <span id="busy" class="pill" hidden></span></h2>
+    <div id="clips"><div class="empty">Загрузка…</div></div>
+  </section>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const fmtSize = b => b > 1e9 ? (b / 1e9).toFixed(2) + ' ГБ' : (b / 1e6).toFixed(0) + ' МБ';
+const fmtDur = s => {
+  if(!s) return '';
+  const m = Math.floor(s / 60), r = Math.round(s % 60);
+  return `${m}:${String(r).padStart(2, '0')}`;
+};
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let lastScan = null, openLogs = new Set();
+
+$('scan').onclick = async () => {
+  $('scan').disabled = true;
+  $('scanInfo').textContent = 'Ищу камеру…';
+  try{
+    const r = await fetch('/api/camera/scan');
+    lastScan = await r.json();
+    renderScan();
+  }catch(e){
+    $('scanInfo').textContent = 'Не удалось опросить диски: ' + e;
+  }
+  $('scan').disabled = false;
+};
+
+function renderScan(){
+  const cams = (lastScan && lastScan.cameras) || [];
+  const box = $('cams');
+  if(!cams.length){
+    $('scanInfo').innerHTML = '<span class="err">Камера не найдена.</span> Нужен подключённый диск с папкой DCIM и файлами .AVI.';
+    box.innerHTML = '';
+    return;
+  }
+  const total = cams.reduce((n, c) => n + c.files.length, 0);
+  const fresh = cams.reduce((n, c) => n + c.files.filter(f => !f.imported_as).length, 0);
+  $('scanInfo').textContent = `Найдено видео: ${total}, новых: ${fresh}. Камера не изменяется — файлы только копируются.`;
+  box.innerHTML = cams.map((c, ci) => `
+    <div class="cam">
+      <h3>${esc(c.label || c.root)} <span class="dim">${esc(c.dcim)}</span></h3>
+      ${c.files.length ? `<table>
+        <tr><th style="width:32px"></th><th>Файл на камере</th><th>Снято</th><th>Размер</th><th></th></tr>
+        ${c.files.map((f, fi) => `<tr>
+          <td><input type="checkbox" data-path="${esc(f.path)}" ${f.imported_as ? 'disabled' : 'checked'}></td>
+          <td>${esc(f.name)}</td><td>${esc(f.mtime_text)}</td><td>${fmtSize(f.size)}</td>
+          <td>${f.imported_as ? `<span class="pill ok">уже загружено как ${esc(f.imported_as)}</span>` : ''}</td>
+        </tr>`).join('')}
+      </table>` : '<div class="empty">В DCIM нет файлов .AVI</div>'}
+    </div>`).join('') + (fresh ? `<div class="row" style="margin-top:12px">
+      <button class="primary" id="doImport">Скачать выбранные</button>
+      <span class="dim">После копирования ролики сами встанут в очередь обработки.</span></div>` : '');
+  const btn = $('doImport');
+  if(btn) btn.onclick = startImport;
+}
+
+async function startImport(){
+  const paths = [...document.querySelectorAll('#cams input[type=checkbox]:checked:not(:disabled)')]
+    .map(x => x.dataset.path);
+  if(!paths.length) return;
+  $('doImport').disabled = true;
+  const r = await fetch('/api/camera/import', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({paths})});
+  const j = await r.json();
+  if(!j.ok){ $('scanInfo').innerHTML = `<span class="err">${esc(j.error)}</span>`; $('doImport').disabled = false; return; }
+  $('cams').innerHTML = '';
+  refresh();
+}
+
+function renderImport(st){
+  const box = $('importBox');
+  if(!st || st.state === 'idle'){ box.hidden = true; return; }
+  box.hidden = false;
+  const pct = st.total_bytes ? st.done_bytes / st.total_bytes : 0;
+  $('importBar').style.width = (pct * 100).toFixed(1) + '%';
+  if(st.state === 'running'){
+    $('importText').textContent = `Копирую ${st.file} (${st.files_done + 1} из ${st.files_total}) и сверяю контрольную сумму…`;
+    $('importPct').textContent = `${fmtSize(st.done_bytes)} из ${fmtSize(st.total_bytes)}`;
+  } else if(st.state === 'done'){
+    $('importText').textContent = `Скопировано и проверено: ${st.files_done} из ${st.files_total}. Камеру можно отключить.`;
+    $('importPct').textContent = '';
+  } else {
+    $('importText').innerHTML = `<span class="err">Копирование остановлено: ${esc(st.error)}</span>`;
+  }
+}
+
+function statusPill(c){
+  if(c.status === 'done' || (c.status === 'external' && c.tracker_ready)) return '<span class="pill ok">готов</span>';
+  if(c.status === 'running') return '<span class="pill run">обрабатывается</span>';
+  if(c.status === 'queued') return '<span class="pill">в очереди</span>';
+  if(c.status === 'error') return '<span class="pill bad">ошибка</span>';
+  return '<span class="pill">нет данных мозга</span>';
+}
+
+function renderClips(list){
+  const box = $('clips');
+  if(!list.length){
+    box.innerHTML = '<div class="empty">Роликов пока нет. Загрузите видео с камеры.</div>';
+    return;
+  }
+  const running = list.filter(c => c.status === 'running' || c.status === 'queued').length;
+  $('busy').hidden = !running;
+  $('busy').textContent = running ? `в работе: ${running}` : '';
+  box.innerHTML = list.map(c => {
+    const nowIdx = c.steps.findIndex(s => s.id === c.step);
+    const stepBar = `<div class="steps">${c.steps.map((s, i) =>
+      `<span class="${s.done ? 'done' : (i === nowIdx ? 'now' : '')}" title="${esc(s.title)}"></span>`).join('')}</div>`;
+    let line = '';
+    if(c.status === 'running' && c.step_title){
+      const p = c.step_progress != null ? ` — ${(c.step_progress * 100).toFixed(0)}%` : '';
+      line = `<div class="dim" style="font-size:13px;margin-top:4px">Шаг ${nowIdx + 1} из ${c.steps.length}: ${esc(c.step_title)}${p}</div>`;
+    } else if(c.status === 'queued'){
+      line = '<div class="dim" style="font-size:13px;margin-top:4px">Ждёт, пока обработаются ролики перед ним.</div>';
+    }
+    const err = c.status === 'error' ? `<div class="err" style="margin-top:4px">${esc(c.error)}</div>` : '';
+    const meta = [c.duration_s ? fmtDur(c.duration_s) : '', c.resolution || '', c.size ? fmtSize(c.size) : '']
+      .filter(Boolean).join(' · ');
+    const ready = c.tracker_ready && c.has_video;
+    const log = c.log ? `<details ${openLogs.has(c.id) ? 'open' : ''} data-id="${esc(c.id)}"><summary class="dim" style="font-size:12px;cursor:pointer;margin-top:6px">журнал</summary><pre>${esc(c.log)}</pre></details>` : '';
+    return `<div class="clip">
+      <div>
+        <div class="row"><span class="name">${esc(c.title)}</span>${statusPill(c)}</div>
+        <div class="dim" style="font-size:12px">${esc(meta)}</div>
+        ${c.status !== 'external' ? stepBar : ''}${line}${err}${log}
+      </div>
+      <div class="actions">
+        ${c.status === 'error' ? `<button data-retry="${esc(c.id)}">Повторить</button>` : ''}
+        <a class="btn go ${ready ? '' : 'off'}" href="/start?clip=${esc(c.id)}">Старт трекера</a>
+        <a class="btn ${ready ? '' : 'off'}" href="/final?clip=${esc(c.id)}&full=1">Разбор</a>
+        <a class="btn ${c.has_video ? '' : 'off'}" href="/final?clip=${esc(c.id)}&blind=1">Разметить стояния</a>
+      </div>
+    </div>`;
+  }).join('');
+  box.querySelectorAll('[data-retry]').forEach(b => b.onclick = async () => {
+    b.disabled = true;
+    await fetch('/api/app/retry', {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({clip: b.dataset.retry})});
+    refresh();
+  });
+  box.querySelectorAll('details').forEach(d => d.ontoggle = () => {
+    d.open ? openLogs.add(d.dataset.id) : openLogs.delete(d.dataset.id);
+  });
+}
+
+async function refresh(){
+  try{
+    const r = await fetch('/api/app/clips');
+    const j = await r.json();
+    renderImport(j.import);
+    renderClips(j.clips || []);
+  }catch(_e){ /* сервер перезапускается */ }
+}
+refresh();
+setInterval(refresh, 2000);
+</script>
+</body>
+</html>

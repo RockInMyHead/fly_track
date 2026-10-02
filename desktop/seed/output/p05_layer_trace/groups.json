@@ -1,0 +1,7797 @@
+{
+  "groups": [
+    {
+      "layer": 0,
+      "cell_type": "T4a",
+      "side": "L",
+      "n_cells": 835,
+      "mean_depth": 0.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 0,
+      "cell_type": "T4a",
+      "side": "R",
+      "n_cells": 849,
+      "mean_depth": 0.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 0,
+      "cell_type": "T4b",
+      "side": "L",
+      "n_cells": 844,
+      "mean_depth": 0.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 0,
+      "cell_type": "T4b",
+      "side": "R",
+      "n_cells": 846,
+      "mean_depth": 0.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 0,
+      "cell_type": "T5a",
+      "side": "L",
+      "n_cells": 826,
+      "mean_depth": 0.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 0,
+      "cell_type": "T5a",
+      "side": "R",
+      "n_cells": 838,
+      "mean_depth": 0.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 0,
+      "cell_type": "T5b",
+      "side": "L",
+      "n_cells": 863,
+      "mean_depth": 0.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 0,
+      "cell_type": "T5b",
+      "side": "R",
+      "n_cells": 852,
+      "mean_depth": 0.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "C3",
+      "side": "L",
+      "n_cells": 887,
+      "mean_depth": 1.0248027057497182,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "C3",
+      "side": "R",
+      "n_cells": 892,
+      "mean_depth": 1.0145739910313902,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "TmY20",
+      "side": "L",
+      "n_cells": 176,
+      "mean_depth": 1.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "TmY20",
+      "side": "R",
+      "n_cells": 167,
+      "mean_depth": 1.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "LPC1",
+      "side": "L",
+      "n_cells": 115,
+      "mean_depth": 1.0,
+      "superclass": "visual_projection"
+    },
+    {
+      "layer": 1,
+      "cell_type": "LPC1",
+      "side": "R",
+      "n_cells": 109,
+      "mean_depth": 1.0,
+      "superclass": "visual_projection"
+    },
+    {
+      "layer": 1,
+      "cell_type": "LLPC1",
+      "side": "L",
+      "n_cells": 143,
+      "mean_depth": 1.0,
+      "superclass": "visual_projection"
+    },
+    {
+      "layer": 1,
+      "cell_type": "LLPC1",
+      "side": "R",
+      "n_cells": 142,
+      "mean_depth": 1.0,
+      "superclass": "visual_projection"
+    },
+    {
+      "layer": 1,
+      "cell_type": "Y1",
+      "side": "L",
+      "n_cells": 94,
+      "mean_depth": 1.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "Y1",
+      "side": "R",
+      "n_cells": 99,
+      "mean_depth": 1.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "TmY9q__perp",
+      "side": "L",
+      "n_cells": 241,
+      "mean_depth": 1.004149377593361,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "TmY9q__perp",
+      "side": "R",
+      "n_cells": 230,
+      "mean_depth": 1.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "TmY9q",
+      "side": "L",
+      "n_cells": 249,
+      "mean_depth": 1.0160642570281124,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "TmY9q",
+      "side": "R",
+      "n_cells": 266,
+      "mean_depth": 1.0075187969924813,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "Y12",
+      "side": "L",
+      "n_cells": 97,
+      "mean_depth": 1.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "Y12",
+      "side": "R",
+      "n_cells": 89,
+      "mean_depth": 1.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "Tm27",
+      "side": "L",
+      "n_cells": 673,
+      "mean_depth": 1.0089153046062407,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "Tm27",
+      "side": "R",
+      "n_cells": 694,
+      "mean_depth": 1.0028818443804035,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "Y11",
+      "side": "L",
+      "n_cells": 77,
+      "mean_depth": 1.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "Y11",
+      "side": "R",
+      "n_cells": 76,
+      "mean_depth": 1.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "TmY5a",
+      "side": "L",
+      "n_cells": 686,
+      "mean_depth": 1.064139941690962,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "TmY5a",
+      "side": "R",
+      "n_cells": 678,
+      "mean_depth": 1.0501474926253687,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "LPi05",
+      "side": "L",
+      "n_cells": 49,
+      "mean_depth": 1.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "LPi05",
+      "side": "R",
+      "n_cells": 46,
+      "mean_depth": 1.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "LPi10",
+      "side": "L",
+      "n_cells": 27,
+      "mean_depth": 1.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "LPi10",
+      "side": "R",
+      "n_cells": 27,
+      "mean_depth": 1.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "Tlp5",
+      "side": "L",
+      "n_cells": 36,
+      "mean_depth": 1.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "Tlp5",
+      "side": "R",
+      "n_cells": 32,
+      "mean_depth": 1.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "TmY16",
+      "side": "L",
+      "n_cells": 88,
+      "mean_depth": 1.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "TmY16",
+      "side": "R",
+      "n_cells": 80,
+      "mean_depth": 1.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "Y4",
+      "side": "L",
+      "n_cells": 104,
+      "mean_depth": 1.0673076923076923,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "Y4",
+      "side": "R",
+      "n_cells": 104,
+      "mean_depth": 1.0384615384615385,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "LPi01",
+      "side": "L",
+      "n_cells": 17,
+      "mean_depth": 1.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "LPi01",
+      "side": "R",
+      "n_cells": 16,
+      "mean_depth": 1.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "T2",
+      "side": "L",
+      "n_cells": 808,
+      "mean_depth": 1.025990099009901,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "T2",
+      "side": "R",
+      "n_cells": 822,
+      "mean_depth": 1.0060827250608273,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "TmY15",
+      "side": "L",
+      "n_cells": 99,
+      "mean_depth": 1.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "TmY15",
+      "side": "R",
+      "n_cells": 110,
+      "mean_depth": 1.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "cLP01",
+      "side": "L",
+      "n_cells": 29,
+      "mean_depth": 1.4827586206896552,
+      "superclass": "visual_centrifugal"
+    },
+    {
+      "layer": 1,
+      "cell_type": "cLP01",
+      "side": "R",
+      "n_cells": 32,
+      "mean_depth": 1.40625,
+      "superclass": "visual_centrifugal"
+    },
+    {
+      "layer": 1,
+      "cell_type": "LPC2",
+      "side": "L",
+      "n_cells": 75,
+      "mean_depth": 1.76,
+      "superclass": "visual_projection"
+    },
+    {
+      "layer": 1,
+      "cell_type": "LPC2",
+      "side": "R",
+      "n_cells": 79,
+      "mean_depth": 1.6835443037974684,
+      "superclass": "visual_projection"
+    },
+    {
+      "layer": 1,
+      "cell_type": "LPT23",
+      "side": "L",
+      "n_cells": 3,
+      "mean_depth": 1.0,
+      "superclass": "visual_projection"
+    },
+    {
+      "layer": 1,
+      "cell_type": "LPT23",
+      "side": "R",
+      "n_cells": 3,
+      "mean_depth": 1.0,
+      "superclass": "visual_projection"
+    },
+    {
+      "layer": 1,
+      "cell_type": "Li05",
+      "side": "L",
+      "n_cells": 102,
+      "mean_depth": 1.9901960784313726,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "Li05",
+      "side": "R",
+      "n_cells": 105,
+      "mean_depth": 1.9714285714285715,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "LPT31",
+      "side": "L",
+      "n_cells": 4,
+      "mean_depth": 1.0,
+      "superclass": "visual_projection"
+    },
+    {
+      "layer": 1,
+      "cell_type": "LPT31",
+      "side": "R",
+      "n_cells": 4,
+      "mean_depth": 1.0,
+      "superclass": "visual_projection"
+    },
+    {
+      "layer": 1,
+      "cell_type": "LPTe02",
+      "side": "L",
+      "n_cells": 5,
+      "mean_depth": 1.2,
+      "superclass": "visual_projection"
+    },
+    {
+      "layer": 1,
+      "cell_type": "LPTe02",
+      "side": "R",
+      "n_cells": 6,
+      "mean_depth": 1.1666666666666667,
+      "superclass": "visual_projection"
+    },
+    {
+      "layer": 1,
+      "cell_type": "VST2",
+      "side": "L",
+      "n_cells": 3,
+      "mean_depth": 1.0,
+      "superclass": "visual_projection"
+    },
+    {
+      "layer": 1,
+      "cell_type": "VST2",
+      "side": "R",
+      "n_cells": 4,
+      "mean_depth": 1.0,
+      "superclass": "visual_projection"
+    },
+    {
+      "layer": 1,
+      "cell_type": "LLPt",
+      "side": "L",
+      "n_cells": 37,
+      "mean_depth": 1.027027027027027,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 1,
+      "cell_type": "LLPt",
+      "side": "R",
+      "n_cells": 32,
+      "mean_depth": 1.0,
+      "superclass": "ol_intrinsic"
+    },
+    {
+      "layer": 2,
+      "cell_type": "",
+      "side": "L",
+      "n_cells": 621,
+      "mean_depth": -0.0499194847020934,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "",
+      "side": "R",
+      "n_cells": 583,
+      "mean_depth": 0.06174957118353345,
+      "superclass": "cb_motor"
+    },
+    {
+      "layer": 2,
+      "cell_type": "CB0429",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "CB0429",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa01",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa01",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa02",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa02",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa03",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa03",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa04",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa04",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa05",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa05",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa06",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa06",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa07",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa07",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa08",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa08",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa09",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa09",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa10",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa10",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa11",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa11",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa13",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa13",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa14",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa14",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa15",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa15",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa16",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNa16",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNae001",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNae001",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNae002",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNae002",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNae003",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNae003",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNae004",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNae004",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNae005",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNae005",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNae006",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNae006",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNae007",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNae007",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNae008",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNae008",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNae009",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNae009",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNae010",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNae010",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNb01",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNb01",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNb02",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNb02",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNb03",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNb03",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNb04",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNb04",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNb05",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNb05",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNb06",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNb06",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNb07",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNb07",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNb08",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNb08",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNb09",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNb09",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNbe001",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNbe001",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNbe002",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNbe002",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNbe003",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNbe003",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNbe004",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNbe004",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNbe005",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNbe005",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNbe006",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNbe006",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNbe007",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNbe007",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNc01",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 1.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNc01",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 1.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNc02",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 1.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNc02",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 1.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNd02",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNd02",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNd03",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNd03",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNd04",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNd04",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNd05",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNd05",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNde001",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNde001",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNde002",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNde002",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNde003",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNde003",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNde005",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNde005",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNde006",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNde006",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNde007",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNde007",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg01",
+      "side": "L",
+      "n_cells": 5,
+      "mean_depth": 2.2,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg01",
+      "side": "R",
+      "n_cells": 4,
+      "mean_depth": 2.25,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg02_a",
+      "side": "L",
+      "n_cells": 5,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg02_a",
+      "side": "R",
+      "n_cells": 5,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg02_b",
+      "side": "L",
+      "n_cells": 3,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg02_b",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg02_c",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg02_c",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg02_d",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg02_d",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg02_e",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg02_e",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg02_f",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg02_f",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg02_g",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg02_g",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg03",
+      "side": "L",
+      "n_cells": 6,
+      "mean_depth": 2.3333333333333335,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg03",
+      "side": "R",
+      "n_cells": 6,
+      "mean_depth": 2.1666666666666665,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg04",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg04",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg05_a",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg05_a",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg05_b",
+      "side": "L",
+      "n_cells": 3,
+      "mean_depth": 2.3333333333333335,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg05_b",
+      "side": "R",
+      "n_cells": 3,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg06_a",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg06_a",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg06_b,DNg06_c",
+      "side": "L",
+      "n_cells": 3,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg06_b,DNg06_c",
+      "side": "R",
+      "n_cells": 3,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg07",
+      "side": "L",
+      "n_cells": 8,
+      "mean_depth": 2.375,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg07",
+      "side": "R",
+      "n_cells": 8,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg08_a,DNg08_b",
+      "side": "L",
+      "n_cells": 12,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg08_a,DNg08_b",
+      "side": "R",
+      "n_cells": 11,
+      "mean_depth": 2.090909090909091,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg09",
+      "side": "L",
+      "n_cells": 4,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg09",
+      "side": "R",
+      "n_cells": 4,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg10",
+      "side": "L",
+      "n_cells": 6,
+      "mean_depth": 2.8333333333333335,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg10",
+      "side": "R",
+      "n_cells": 6,
+      "mean_depth": 2.6666666666666665,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg100",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg100",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg101",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg101",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg102_a,DNg102_b",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg102_a,DNg102_b",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg103",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg103",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg104",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg104",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg105",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg105",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg106",
+      "side": "L",
+      "n_cells": 9,
+      "mean_depth": 2.4444444444444446,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg106",
+      "side": "R",
+      "n_cells": 7,
+      "mean_depth": 2.142857142857143,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg107",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg107",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg108",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg108",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg109",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg109",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg11",
+      "side": "L",
+      "n_cells": 3,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg11",
+      "side": "R",
+      "n_cells": 3,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg110_a",
+      "side": "L",
+      "n_cells": 3,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg110_a",
+      "side": "R",
+      "n_cells": 3,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg110_b",
+      "side": "L",
+      "n_cells": 3,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg110_b",
+      "side": "R",
+      "n_cells": 3,
+      "mean_depth": 2.3333333333333335,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg111",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg111",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg12_a",
+      "side": "L",
+      "n_cells": 4,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg12_a",
+      "side": "R",
+      "n_cells": 4,
+      "mean_depth": 2.75,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg12_b",
+      "side": "L",
+      "n_cells": 8,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg12_b",
+      "side": "R",
+      "n_cells": 8,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg12_c",
+      "side": "L",
+      "n_cells": 3,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg12_c",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg12_d",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg12_d",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg12_e",
+      "side": "L",
+      "n_cells": 3,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg12_e",
+      "side": "R",
+      "n_cells": 3,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg13",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg13",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg14",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg14",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg15",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg15",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg16",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg16",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg17",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg17",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg18_a",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg18_a",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg18_b",
+      "side": "L",
+      "n_cells": 3,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg18_b",
+      "side": "R",
+      "n_cells": 3,
+      "mean_depth": 2.6666666666666665,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg19",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg19",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg20",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg20",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg21",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg21",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg22",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg22",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg23",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg23",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg24",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg24",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg26",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg26",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg27",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg27",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg29",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg29",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg30",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg30",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg31",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg31",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg32",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg32",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg33",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg33",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg34",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg34",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg35",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg35",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg36_a",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg36_a",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg36_b",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg36_b",
+      "side": "R",
+      "n_cells": 3,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg37",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg37",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg38",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg38",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg39",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg39",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg40",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg40",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg41",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg41",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg42",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg42",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg43",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg43",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg44",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg44",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg45",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg45",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg46",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg46",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg47",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg47",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg48",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg48",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg49",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg49",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg50",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg50",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg51",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg51",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg52_a,DNg52_b",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg52_a,DNg52_b",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg53",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg53",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg54",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg54",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg56",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg56",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg57",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg57",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg58",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg58",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg59",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg59",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg60",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg60",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg61",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg61",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg62",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg62",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg63",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg63",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg64",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg64",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg65",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg65",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg67",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg67",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg68",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg68",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg69",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg69",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg70",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg70",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg71",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg71",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg72",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg72",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg73",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg73",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg74_a",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg74_a",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg74_b",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg74_b",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg75",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg75",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg76",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg76",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg77",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg77",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg78",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg78",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg79",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg79",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg80",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg80",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg81",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg81",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg82",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg82",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg83",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg83",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg84",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg84",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg85",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg85",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg86",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg86",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg87",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg87",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg88",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg88",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg89",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg89",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg90",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg90",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg91",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg91",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg92_a",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg92_a",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg92_b",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg92_b",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg93",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg93",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg94",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg94",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg95",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg95",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg96",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg96",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg97",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg97",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg98",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg98",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg99",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNg99",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge001",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge001",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge002",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge002",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge003",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge003",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge004",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge004",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge006",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge006",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge007",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge007",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge008",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge008",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge009",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge009",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge010",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge010",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge011",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge011",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge012",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge012",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge013",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge013",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge014",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge014",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge015",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge015",
+      "side": "R",
+      "n_cells": 3,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge016",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge016",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge017",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge017",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge018",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge018",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge019",
+      "side": "L",
+      "n_cells": 7,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge019",
+      "side": "R",
+      "n_cells": 7,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge020",
+      "side": "L",
+      "n_cells": 4,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge020",
+      "side": "R",
+      "n_cells": 4,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge021",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge021",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge022",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge022",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge023",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge023",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge024",
+      "side": "L",
+      "n_cells": 4,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge024",
+      "side": "R",
+      "n_cells": 3,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge025",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge025",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge026",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge026",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge027",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge027",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge028",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge028",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge029",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge029",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge030",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge030",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge031",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge031",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge032",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge032",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge033",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge033",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge034",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge034",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge035",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge035",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge036",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge036",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge037",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge037",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge038",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge038",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge039",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge039",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge040",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge040",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge041",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge041",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge042",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge042",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge043",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge043",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge044",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge044",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge045",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge045",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge046",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge046",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge047",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge047",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge048",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge048",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge049",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge049",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge050",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge050",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge051",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge051",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge052",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge052",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge053",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge053",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge054",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge054",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge055",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge055",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge056",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge056",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge057",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge057",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge058",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge058",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge059",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge059",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge060",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge060",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge061,DNge066",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge061,DNge066",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge062",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge062",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge063",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge063",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge064",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge064",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge065",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge065",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge067",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge067",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge068",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge068",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge069",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge069",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge070",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge070",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge071",
+      "side": "L",
+      "n_cells": 8,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge071",
+      "side": "R",
+      "n_cells": 8,
+      "mean_depth": 2.375,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge072",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge072",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge073",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge073",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge074",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge074",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge075",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge075",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge076",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge076",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge077",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge077",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge078",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge078",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge079",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge079",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge080",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge080",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge081",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge081",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge082",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge082",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge083",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge083",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge084",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge084",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge085",
+      "side": "L",
+      "n_cells": 4,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge085",
+      "side": "R",
+      "n_cells": 4,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge086",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge086",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge087",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge087",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge088",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge088",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge089",
+      "side": "L",
+      "n_cells": 3,
+      "mean_depth": 2.6666666666666665,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge089",
+      "side": "R",
+      "n_cells": 3,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge090",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge090",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge091",
+      "side": "L",
+      "n_cells": 9,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge091",
+      "side": "R",
+      "n_cells": 9,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge092",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge092",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge093",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge093",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge094",
+      "side": "L",
+      "n_cells": 6,
+      "mean_depth": 2.1666666666666665,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge094",
+      "side": "R",
+      "n_cells": 7,
+      "mean_depth": 2.142857142857143,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge095",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge095",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge096",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge096",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge097",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge097",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge098",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge098",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge099",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge099",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge100",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge100",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge101",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge101",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge102",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge102",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge103",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge103",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge104",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge104",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge105",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge105",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge106",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge106",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge107",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge107",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge108,DNge118",
+      "side": "L",
+      "n_cells": 3,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge108,DNge118",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge109",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge109",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge110",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge110",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge111",
+      "side": "L",
+      "n_cells": 3,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge111",
+      "side": "R",
+      "n_cells": 3,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge113",
+      "side": "L",
+      "n_cells": 3,
+      "mean_depth": 2.3333333333333335,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge113",
+      "side": "R",
+      "n_cells": 3,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge114",
+      "side": "L",
+      "n_cells": 4,
+      "mean_depth": 2.25,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge114",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge115",
+      "side": "L",
+      "n_cells": 4,
+      "mean_depth": 2.25,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge115",
+      "side": "R",
+      "n_cells": 4,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge116",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge116",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge117",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge117",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge119",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge119",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge120",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge120",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge121",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge121",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge122",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge122",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge123",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge123",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge124",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge124",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge125",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge125",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge126",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge126",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge127",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge127",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge128",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge128",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge129",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge129",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge130",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge130",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge131",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge131",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge132",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge132",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge133",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge133",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge134",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge134",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge135",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge135",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge136",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge136",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge137",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge137",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge139",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge139",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge140",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge140",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge141",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge141",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge142",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge142",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge143",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge143",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge144",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge144",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge145",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge145",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge146",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge146",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge147",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge147",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge148",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge148",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge153",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge153",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge154,DNge156",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge154,DNge156",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge172",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge172",
+      "side": "R",
+      "n_cells": 3,
+      "mean_depth": 2.6666666666666665,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge173",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge173",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge174",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNge174",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp01",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp01",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp02",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp02",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp03",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp03",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp04",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp04",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp05",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp05",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp06",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp06",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp07",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp07",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp08",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp08",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp09",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp09",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp10",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp10",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp101",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp101",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp102",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp102",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp103",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp103",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp104",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp104",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp11",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp11",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp12",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp12",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp13",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp13",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp14",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp14",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp15",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp15",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp16",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp16",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp17",
+      "side": "L",
+      "n_cells": 6,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp17",
+      "side": "R",
+      "n_cells": 6,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp18",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp18",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp19",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp19",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp20",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp20",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp22",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp22",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp23",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp23",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp24",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp24",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp25",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp25",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp26",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp26",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp27",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 1.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp27",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 1.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp28",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp28",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp29",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp29",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp30",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 1.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp30",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 1.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp31",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp31",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp32",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp32",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp33",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp33",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp34",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp34",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp35",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp35",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp36",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp36",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp38",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp38",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp39",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp39",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp40",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp40",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp41",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp41",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp42",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp42",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp43",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp43",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp44",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp44",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp45",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp45",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp46",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp46",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp47",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp47",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp48",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp48",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp49",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp49",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp51,DNpe019",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp51,DNpe019",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp52",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp52",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp53",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp53",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp54",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp54",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp55",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp55",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp56",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp56",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp57",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp57",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp58",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp58",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp59",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp59",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp60",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp60",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp62",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp62",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp63",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp63",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp64",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp64",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp65",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp65",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp66",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp66",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp67",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp67",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp68",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp68",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp69",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp69",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp70",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp70",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp71",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp71",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp72",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp72",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp73",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNp73",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe001",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe001",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe002",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe002",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe003",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe003",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe004",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe004",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe005",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe005",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe006",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe006",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe007",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe007",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe008",
+      "side": "L",
+      "n_cells": 9,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe008",
+      "side": "R",
+      "n_cells": 9,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe009",
+      "side": "L",
+      "n_cells": 5,
+      "mean_depth": 2.2,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe009",
+      "side": "R",
+      "n_cells": 5,
+      "mean_depth": 2.2,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe010",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe010",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe011",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe011",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe012",
+      "side": "L",
+      "n_cells": 4,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe012",
+      "side": "R",
+      "n_cells": 4,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe013",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe013",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe014",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe014",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe015",
+      "side": "L",
+      "n_cells": 6,
+      "mean_depth": 2.1666666666666665,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe015",
+      "side": "R",
+      "n_cells": 5,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe016",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe016",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe017",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe017",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe018",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe018",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe021",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe021",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe022",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe022",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe023",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe023",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe024",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe024",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe025",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe025",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe026",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe026",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe027",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe027",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe028",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe028",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe029",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe029",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe030",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe030",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe031",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe031",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe032",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe032",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe033",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe033",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe034",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe034",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe035",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe035",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe036",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe036",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe037",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe037",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe039",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe039",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe040",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe040",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe041",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe041",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe042",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe042",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe043",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe043",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe045",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe045",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe048",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe048",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe049",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe049",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe050",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe050",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe052",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe052",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe053",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe053",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe054",
+      "side": "L",
+      "n_cells": 4,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe054",
+      "side": "R",
+      "n_cells": 4,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe055",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe055",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe056",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNpe056",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNxl114",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "DNxl114",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "MDN",
+      "side": "L",
+      "n_cells": 2,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "MDN",
+      "side": "R",
+      "n_cells": 2,
+      "mean_depth": 2.5,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "aSP22",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "aSP22",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "pIP1",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "pIP1",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "pIP10",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "pIP10",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 3.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "pMP2",
+      "side": "L",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 2,
+      "cell_type": "pMP2",
+      "side": "R",
+      "n_cells": 1,
+      "mean_depth": 2.0,
+      "superclass": "descending_neuron"
+    },
+    {
+      "layer": 1,
+      "cell_type": "ALL_depth1",
+      "side": "L",
+      "n_cells": 10033,
+      "mean_depth": 1.0,
+      "superclass": "aggregate"
+    },
+    {
+      "layer": 1,
+      "cell_type": "ALL_depth1",
+      "side": "R",
+      "n_cells": 11049,
+      "mean_depth": 1.0,
+      "superclass": "aggregate"
+    }
+  ],
+  "n_neurons_watched": 40207
+}

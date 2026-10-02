@@ -11,3 +11,6 @@ data/
 .DS_Store
 .matplotlib/
 *.zip
+dist/
+!desktop/seed/data/
+!desktop/seed/output/

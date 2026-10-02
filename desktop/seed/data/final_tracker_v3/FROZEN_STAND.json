@@ -1,0 +1,40 @@
+{
+ "frozen_at": "2026-10-01 15:13:48",
+ "train_clip": "VID00020",
+ "train_labels": "data/final_tracker/VID00020_stand_labels.json",
+ "rule": {
+  "bias": 0.503207099803385,
+  "w_fly": 1.9921238664078387,
+  "w_bob": -4.207897827796824,
+  "smooth_s": 5.0,
+  "threshold": 0.31,
+  "step_band_hz": [
+   1.4,
+   2.6
+  ],
+  "bob_window_s": 6.0,
+  "grid_s": 0.5
+ },
+ "train_in_sample": {
+  "stand_s": 66.5,
+  "walk_s": 138.5,
+  "recall_stand": 0.782,
+  "walk_kept": 0.682,
+  "balanced": 0.732,
+  "note": "на том же ролике, где подбирались веса и порог — оптимистично"
+ },
+ "test_protocol": {
+  "clip": "любой ролик, кроме VID00020, размеченный ПОСЛЕ frozen_at",
+  "labels": "data/final_tracker/{clip}_stand_labels.json, отрезки «стоит» + reviewed_until",
+  "metric": "сбалансированная точность флага «стоит» V3 против V2 на одних секундах",
+  "pass": "V3 balanced > V2 balanced И V3 balanced > 0.5 с p < 0.05 (сдвиг разметки по кругу)",
+  "no_retune": "веса, сглаживание и порог не меняются после просмотра теста"
+ },
+ "code_sha256": {
+  "scripts/final_tracker_v3.py": "c0f7875e7cf5def715f7980e7fff039d28b352e6cd7983aaaca9f12d9cb14409",
+  "scripts/stand_freeze.py": "08897f0ba02583c5156c2324609e43a9407b571a79221f73e1c367de6270d313",
+  "scripts/final_tracker_v2.py": "1f460885d9c0c10443b3aa257ae96f4ee4ea722f4fb4198a83d62b330e480961",
+  "scripts/final_tracker.py": "6dc0c6e7f4a9bc5a1f5705fc120306a4e637bb6efadde9c10573df2fbfe5a013"
+ },
+ "revisions": []
+}

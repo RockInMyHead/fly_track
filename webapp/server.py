@@ -26,12 +26,16 @@ import json
 import math
 import os
 import re
+import socket
 import subprocess
 import sys
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import app_backend  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent
 PROJECT = ROOT.parent
@@ -75,14 +79,116 @@ P08_OUT = PROJECT / "output" / "p08"
 P083 = PROJECT / "output" / "p083_route_audit"
 FINAL_OUT = PROJECT / "output" / "final_tracker"
 FINAL_V2 = PROJECT / "output" / "final_tracker_v2"
+FINAL_V3 = PROJECT / "output" / "final_tracker_v3"
+FINAL_V4 = PROJECT / "output" / "final_tracker_v4"
+FINAL_V5 = PROJECT / "output" / "final_tracker_v5"
+RUN_BASES = {"v5": FINAL_V5, "v4": FINAL_V4, "v3": FINAL_V3, "v2": FINAL_V2, "v1": FINAL_OUT}
+
+
+def _versions(clip: str) -> list[str]:
+    return [v for v, base in RUN_BASES.items() if (base / clip / "trajectory.csv").exists()]
+
+
+def _run_dir(clip: str, ver: str | None = None) -> tuple[str, Path]:
+    have = _versions(clip)
+    if ver in have:
+        return ver, RUN_BASES[ver] / clip
+    if have:
+        return have[0], RUN_BASES[have[0]] / clip
+    return "v1", FINAL_OUT / clip
+
+
+def _run_names() -> set[str]:
+    names = set()
+    for base in RUN_BASES.values():
+        if base.exists():
+            for d in base.iterdir():
+                if d.is_dir() and d.name != "cache":
+                    names.add(d.name)
+    return names
 P01R = PROJECT / "data" / "p01r"
 P08_GRAPH = P08_DATA / "graph.json"
 P08_TRUTH = P08_DATA / "truth_route.json"
 P08_PLAN_STEM = P08_DATA / "plan"
-START_CLIP = "VID00001"
-START_VIDEO = MEDIA / "VID00001_legacy_fixed.mp4"
+START_PROFILES: dict[str, dict] = {
+    "VID00001": {
+        "media": MEDIA / "VID00001_legacy_fixed.mp4",
+        "title": "Старт VID00001",
+        "note": "Старая запись из Downloads, около 20 минут. Не трёхсекундный файл с карты.",
+    },
+    "VID00020": {
+        "media": MEDIA / "VID00020_5min_fixed.mp4",
+        "title": "Старт 5 минут (VID00020)",
+        "note": "5 мин без первых 50 с (одевание камеры вырезано). Укажите точку и направление, затем «Старт».",
+    },
+}
+DEFAULT_START_CLIP = "VID00001"
 _START_LOCK = threading.Lock()
-_START_JOB = {"state": "idle", "log": "", "error": "", "place": None, "code": None}
+_START_JOB = {"state": "idle", "log": "", "error": "", "place": None, "code": None, "clip": None}
+
+
+def _start_clip_from_path(path: str, query: str) -> str:
+    if path in ("/start5", "/start5.html"):
+        return "VID00020"
+    from urllib.parse import parse_qs
+    clip = (parse_qs(query).get("clip") or [DEFAULT_START_CLIP])[0]
+    if not re.fullmatch(r"VID[0-9]{5}", clip):
+        return DEFAULT_START_CLIP
+    return clip
+
+
+def _start_profile(clip: str) -> dict | None:
+    if clip in START_PROFILES:
+        return START_PROFILES[clip]
+    media = MEDIA / f"{clip}_fixed.mp4"
+    if not media.exists() and not app_backend.clip_record(clip):
+        return None
+    return {
+        "media": media,
+        "title": f"Старт {app_backend.clip_title(clip)}",
+        "note": "Укажите точку и направление, затем «Старт».",
+    }
+
+
+def _fly_motion_samples(clip: str) -> list[dict]:
+    """Same LEFT/RIGHT/SILENT reading as final_tracker (p12 yaw_at on 0.25 s grid)."""
+    yaw_path = PROJECT / "output" / "p07" / f"yaw_signal_{clip}.csv"
+    if not yaw_path.exists():
+        return []
+    sys.path.insert(0, str(PROJECT / "scripts"))
+    import numpy as np
+    import p12_channels as C
+
+    ch = C.yaw_channel(clip)
+    t_end = float(ch["t"][-1])
+    out: list[dict] = []
+    t = 0.0
+    while t <= t_end + 1e-9:
+        y = C.yaw_at(ch, t)
+        cls = y["class"]
+        out.append({
+            "t": round(t, 2),
+            "dir": "STRAIGHT" if not cls else cls,
+            "yaw": round(float(y["integral"]), 5),
+            "strength": round(float(y["confidence"]), 4),
+        })
+        t += 0.25
+    return out
+
+
+def _stand_path(clip: str) -> Path:
+    return PROJECT / "data" / "final_tracker" / f"{clip}_stand_labels.json"
+
+
+def _tracker_inputs_ready(clip: str) -> bool:
+    brain = PROJECT / "output" / "p10" / f"brain_{clip}.npz"
+    yaw = PROJECT / "output" / "p07" / f"yaw_signal_{clip}.csv"
+    return brain.exists() and yaw.exists()
+
+
+def _start_video_ready(profile: dict) -> bool:
+    media = profile["media"]
+    return media.exists() and media.stat().st_size > 1_000_000
 
 CHUNK = 1 << 20
 MIME = {
@@ -151,37 +257,24 @@ def snap_on_graph(x: float, y: float, toward: str | None = None) -> dict:
     return out
 
 
-def _start_worker(place: dict) -> None:
-    cmd = [
-        str(PROJECT / ".venv" / "bin" / "python"),
-        str(PROJECT / "scripts" / "final_tracker_v2.py"),
-        "--video", START_CLIP,
-        "--start-edge", place["edge"],
-        "--start-from", place["start_from"],
-        "--start-progress", f"{place['progress_m']:.4f}",
-    ]
-    env = os.environ.copy()
-    env["PYTHONPATH"] = str(PROJECT)
+TRACKER_SCRIPTS = {"v1": "final_tracker.py", "v2": "final_tracker_v2.py",
+                   "v3": "final_tracker_v3.py", "v4": "final_tracker_v4.py",
+                   "v5": "final_tracker_v5.py"}
+
+
+def _start_worker(place: dict, clip: str, ver: str = "v5") -> None:
+    vers = list(TRACKER_SCRIPTS) if ver == "all" else [ver]
     lines: list[str] = []
-    try:
-        proc = subprocess.Popen(
-            cmd, cwd=str(PROJECT), env=env,
-            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True,
-        )
-        assert proc.stdout is not None
-        for line in proc.stdout:
-            lines.append(line)
-            if len(lines) > 40:
-                del lines[:-40]
-            with _START_LOCK:
-                _START_JOB["log"] = "".join(lines)
-        code = proc.wait()
-    except Exception as exc:
-        code = 1
-        lines.append(str(exc) + "\n")
+    code = 0
+    for v in vers:
+        lines.append(f"=== {v.upper()} ===\n")
+        code = _run_tracker(place, clip, v, lines)
+        if code != 0:
+            lines.append(f"{v.upper()} остановился (код {code})\n")
+            break
     with _START_LOCK:
         _START_JOB["code"] = code
-        _START_JOB["log"] = "".join(lines)
+        _START_JOB["log"] = "".join(lines[-60:])
         if code == 0:
             _START_JOB["state"] = "done"
             _START_JOB["error"] = ""
@@ -191,14 +284,39 @@ def _start_worker(place: dict) -> None:
             _START_JOB["error"] = text[-1] if text else "трекер остановился"
 
 
+def _run_tracker(place: dict, clip: str, ver: str, lines: list[str]) -> int:
+    cmd = [
+        app_backend.python_exe(),
+        str(PROJECT / "scripts" / TRACKER_SCRIPTS[ver]),
+        "--video", clip,
+        "--start-edge", place["edge"],
+        "--start-from", place["start_from"],
+    ]
+    # V1 (и V4/V5 поверх него) без --start-progress: стартуют от узла start_from.
+    if ver not in ("v1", "v4", "v5"):
+        cmd += ["--start-progress", f"{place['progress_m']:.4f}"]
+    try:
+        proc = subprocess.Popen(cmd, **app_backend.popen_kwargs())
+        assert proc.stdout is not None
+        for line in proc.stdout:
+            lines.append(line)
+            with _START_LOCK:
+                _START_JOB["log"] = "".join(lines[-60:])
+        return proc.wait()
+    except Exception as exc:
+        lines.append(str(exc) + "\n")
+        return 1
+
+
 def final_video_url(clip: str) -> str:
     """The file the tracker page should play.
 
     VID00001_fixed.mp4 is the 3-second camera stub. The run on this page is the
     older 20-minute recording, which lives in VID00001_legacy_fixed.mp4.
     """
-    if clip == START_CLIP and START_VIDEO.exists() and START_VIDEO.stat().st_size > 1_000_000:
-        return f"/media/{START_VIDEO.name}"
+    prof = _start_profile(clip)
+    if prof and _start_video_ready(prof):
+        return f"/media/{prof['media'].name}"
     for name in (f"{clip}_fixed.mp4", f"{clip}.mp4"):
         if (MEDIA / name).exists():
             return f"/media/{name}"
@@ -271,6 +389,18 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:  # noqa: N802
         path = self.path.split("?", 1)[0]
 
+        if path in ("/app", "/app.html") or (path == "/" and os.environ.get("FLY_APP") == "1"):
+            return self._serve(ROOT / "app.html")
+        if path == "/api/app/clips":
+            app_backend.ensure_worker()
+            return self._json({"ok": True, "clips": app_backend.clips_overview(_tracker_inputs_ready),
+                               "import": app_backend.import_status(),
+                               "app_mode": os.environ.get("FLY_APP") == "1"})
+        if path == "/api/camera/scan":
+            return self._json(app_backend.scan_camera())
+        if path == "/api/camera/import":
+            return self._json(app_backend.import_status())
+
         if path in ("/", "/index.html"):
             return self._serve(ROOT / "index.html")
         if path in ("/review", "/review.html"):
@@ -313,16 +443,28 @@ class Handler(BaseHTTPRequestHandler):
         if path in ("/final", "/final.html"):
             return self._serve(ROOT / "final.html")
 
-        if path in ("/start", "/start.html"):
+        if path in ("/start", "/start.html", "/start5", "/start5.html"):
             return self._serve(ROOT / "start.html")
 
         if path == "/api/start/state":
-            ready = START_VIDEO.exists() and START_VIDEO.stat().st_size > 1_000_000
+            from urllib.parse import parse_qs
+            q = self.path.split("?", 1)[-1] if "?" in self.path else ""
+            clip = _start_clip_from_path(path, q)
+            prof = _start_profile(clip)
+            if not prof:
+                return self._json({"ok": False, "error": f"неизвестный clip {clip}"}, 400)
+            vready = _start_video_ready(prof)
+            tready = _tracker_inputs_ready(clip)
+            note = prof["note"]
+            if not tready:
+                note += " Сейчас готовятся brain и yaw — «Старт» включится, когда цепочка дойдёт."
             return self._json({
                 "ok": True,
-                "clip": START_CLIP,
-                "video_url": f"/media/{START_VIDEO.name}" if ready else "",
-                "note": "Старая запись из Downloads, около 20 минут. Не трёхсекундный файл с карты.",
+                "clip": clip,
+                "title": prof["title"],
+                "video_url": f"/media/{prof['media'].name}" if vready else "",
+                "tracker_ready": tready,
+                "note": note,
                 "plan_url": "/api/p08/plan",
             })
 
@@ -355,79 +497,105 @@ class Handler(BaseHTTPRequestHandler):
                 "video_url": final_video_url(clip),
             })
 
-        if path == "/api/final/tracks":
-            names = set()
-            for base in (FINAL_V2, FINAL_OUT):
-                if base.exists():
-                    for d in base.iterdir():
-                        if d.is_dir() and d.name != "cache":
-                            names.add(d.name)
+        if path.startswith("/api/stand/state"):
+            from urllib.parse import parse_qs
+            clip = (parse_qs(self.path.split("?", 1)[-1]).get("clip") or [""])[0]
+            if not re.fullmatch(r"VID[0-9]{5}", clip):
+                return self._json({"ok": False, "error": "bad clip id"}, 400)
+            doc = read_json(_stand_path(clip), {})
+            return self._json({"ok": True, "clip": clip, "stand": doc.get("stand", []),
+                               "reviewed_until": doc.get("reviewed_until", 0),
+                               "saved_at": doc.get("saved_at", "")})
+
+        if path.startswith("/api/fly/motion"):
+            from urllib.parse import parse_qs
+            clip = (parse_qs(self.path.split("?", 1)[-1]).get("clip") or [""])[0]
+            if not re.fullmatch(r"VID[0-9]{5}", clip):
+                return self._json({"ok": False, "error": "bad clip id"}, 400)
+            samples = _fly_motion_samples(clip)
+            return self._json({
+                "ok": True, "clip": clip, "samples": samples,
+                "method": "p12_yaw_at",
+                "note": "Тот же канал, что у трекера: интеграл yaw за окно + порог (не сырой P07). "
+                        "STRAIGHT = ниже порога. yaw>0 → камера влево.",
+            })
+
+        if path.startswith("/api/final/tracks"):
+            from urllib.parse import parse_qs
+            q = parse_qs(self.path.split("?", 1)[-1]) if "?" in self.path else {}
+            want = (q.get("ver") or [None])[0]
             tracks = []
-            for name in sorted(names):
-                v2 = (FINAL_V2 / name / "trajectory.csv").exists()
-                traj_path = (FINAL_V2 if v2 else FINAL_OUT) / name / "trajectory.csv"
+            for name in sorted(_run_names()):
+                ver, run_dir = _run_dir(name, want)
+                traj_path = run_dir / "trajectory.csv"
                 if not traj_path.exists():
                     continue
                 pts = []
                 with traj_path.open(encoding="utf-8") as fh:
                     for r in csv.DictReader(fh):
                         pts.append([round(float(r["x"]), 1), round(float(r["y"]), 1)])
-                tracks.append({"id": name, "version": "v2" if v2 else "v1", "points": pts})
+                tracks.append({"id": name, "version": ver, "points": pts})
             return self._json({"tracks": tracks})
 
         if path == "/api/final/list":
-            names = set()
-            for base in (FINAL_V2, FINAL_OUT):
-                if not base.exists():
-                    continue
-                for d in base.iterdir():
-                    if d.is_dir() and d.name != "cache":
-                        names.add(d.name)
             clips = []
-            for name in sorted(names):
-                v2 = (FINAL_V2 / name / "trajectory.csv").exists()
-                rep = (FINAL_V2 if v2 else FINAL_OUT) / name / "report.json"
-                clips.append({"id": name, "ok": rep.exists(), "version": "v2" if v2 else "v1",
+            for name in sorted(_run_names()):
+                ver, run_dir = _run_dir(name)
+                rep = run_dir / "report.json"
+                clips.append({"id": name, "ok": rep.exists(), "version": ver,
+                              "versions": _versions(name),
                               "report_path": str(rep) if rep.exists() else ""})
             return self._json({"clips": clips})
 
         if path.startswith("/api/final/state"):
             q = self.path.split("?", 1)
-            clip = "VID00010"
+            clip, want = "VID00010", None
             if len(q) > 1:
                 from urllib.parse import parse_qs
-                clip = (parse_qs(q[1]).get("clip") or [clip])[0]
+                qs = parse_qs(q[1])
+                clip = (qs.get("clip") or [clip])[0]
+                want = (qs.get("ver") or [None])[0]
             if not re.fullmatch(r"VID[0-9]{5}", clip):
                 return self._text("bad clip id", 400)
-            run_dir = FINAL_V2 / clip if (FINAL_V2 / clip / "trajectory.csv").exists() else FINAL_OUT / clip
+            ver, run_dir = _run_dir(clip, want)
             traj_path = run_dir / "trajectory.csv"
             dec_path = run_dir / "decisions.csv"
             rep_path = run_dir / "report.json"
             if not traj_path.exists():
-                return self._json({"ok": False, "clip": clip,
-                                   "error": "нет trajectory.csv — сначала final_tracker.py"})
+                return self._json({"ok": True, "clip": clip, "version": None, "versions": [],
+                                   "trajectory": [], "decisions": [], "alternatives": [],
+                                   "report": None, "duration": 0.0, "tracker_duration": 0.0,
+                                   "start_xy": None, "video_url": final_video_url(clip),
+                                   "graph": read_json(P08_GRAPH, {}),
+                                   "note": "прогона трекера ещё нет"})
             traj = list(csv.DictReader(traj_path.open(encoding="utf-8")))
             decs = list(csv.DictReader(dec_path.open())) if dec_path.exists() else []
             alt_path = run_dir / "alternatives.csv"
             alts = list(csv.DictReader(alt_path.open(encoding="utf-8"))) if alt_path.exists() else []
             report = read_json(rep_path, {})
             duration = float(traj[-1]["time"]) if traj else 0.0
+            start_xy = None
+            if traj:
+                start_xy = {"x": float(traj[0]["x"]), "y": float(traj[0]["y"]),
+                            "edge": traj[0].get("edge"), "t": float(traj[0]["time"])}
             return self._json({
-                "ok": True, "clip": clip, "version": "v2" if run_dir.is_relative_to(FINAL_V2) else "v1",
+                "ok": True, "clip": clip, "version": ver, "versions": _versions(clip),
                 "trajectory": traj, "decisions": decs, "alternatives": alts,
-                "report": report, "duration": duration, "video_url": final_video_url(clip),
+                "report": report, "duration": duration, "tracker_duration": duration,
+                "start_xy": start_xy,
+                "video_url": final_video_url(clip),
                 "graph": read_json(P08_GRAPH, {}),
-                "trajectory_png": f"/api/final/png?clip={clip}",
+                "trajectory_png": f"/api/final/png?clip={clip}&ver={ver}",
             })
 
         if path.startswith("/api/final/png"):
             from urllib.parse import parse_qs
-            clip = (parse_qs(self.path.split("?", 1)[-1]).get("clip") or ["VID00010"])[0]
+            qs = parse_qs(self.path.split("?", 1)[-1])
+            clip = (qs.get("clip") or ["VID00010"])[0]
             if not re.fullmatch(r"VID[0-9]{5}", clip):
                 return self._text("bad clip id", 400)
-            png = FINAL_V2 / clip / "trajectory.png"
-            if not png.exists():
-                png = FINAL_OUT / clip / "trajectory.png"
+            _ver, run_dir = _run_dir(clip, (qs.get("ver") or [None])[0])
+            png = run_dir / "trajectory.png"
             if not png.exists():
                 return self._text("no png", 404)
             return self._serve(png)
@@ -729,6 +897,18 @@ class Handler(BaseHTTPRequestHandler):
         path = self.path.split("?", 1)[0]
         payload = self._body()
 
+        if path == "/api/camera/import":
+            paths = payload.get("paths") or []
+            if not isinstance(paths, list):
+                return self._json({"ok": False, "error": "paths: список файлов"}, 400)
+            res = app_backend.start_import([str(p) for p in paths])
+            return self._json(res, 200 if res.get("ok") else 409)
+        if path == "/api/app/retry":
+            clip = str(payload.get("clip") or "")
+            if not re.fullmatch(r"VID[0-9]{5}", clip):
+                return self._json({"ok": False, "error": "bad clip id"}, 400)
+            return self._json(app_backend.retry(clip))
+
         if path == "/api/start/place":
             try:
                 x, y = float(payload.get("x")), float(payload.get("y"))
@@ -744,9 +924,22 @@ class Handler(BaseHTTPRequestHandler):
                 x, y = float(payload.get("x")), float(payload.get("y"))
             except (TypeError, ValueError):
                 return self._json({"ok": False, "error": "нужны координаты на плане"}, 400)
+            clip = str(payload.get("clip") or DEFAULT_START_CLIP)
+            if not re.fullmatch(r"VID[0-9]{5}", clip):
+                return self._json({"ok": False, "error": "bad clip id"}, 400)
+            if not _start_profile(clip):
+                return self._json({"ok": False, "error": f"clip {clip} не настроен на /start"}, 400)
+            if not _tracker_inputs_ready(clip):
+                return self._json({
+                    "ok": False,
+                    "error": "brain/yaw для этого ролика ещё не готовы — подождите минуту и обновите страницу",
+                }, 503)
             toward = str(payload.get("toward") or "")
             if not toward:
                 return self._json({"ok": False, "error": "выберите направление"}, 400)
+            ver = str(payload.get("ver") or "all")
+            if ver not in (*TRACKER_SCRIPTS, "all"):
+                return self._json({"ok": False, "error": "ver: v1…v5 или all"}, 400)
             place = snap_on_graph(x, y, toward)
             if not place.get("ok"):
                 return self._json(place, 400)
@@ -754,9 +947,34 @@ class Handler(BaseHTTPRequestHandler):
                 if _START_JOB["state"] == "running":
                     return self._json({"ok": False, "error": "прогон уже идёт"}, 409)
                 _START_JOB.update(state="running", log="запуск…\n", error="",
-                                  place=place, code=None)
-            threading.Thread(target=_start_worker, args=(place,), daemon=True).start()
-            return self._json({"ok": True, "state": "running", "place": place})
+                                  place=place, code=None, clip=clip, ver=ver)
+            threading.Thread(target=_start_worker, args=(place, clip, ver), daemon=True).start()
+            return self._json({"ok": True, "state": "running", "place": place, "clip": clip, "ver": ver})
+
+        if path == "/api/stand/save":
+            clip = str(payload.get("clip") or "")
+            if not re.fullmatch(r"VID[0-9]{5}", clip):
+                return self._json({"ok": False, "error": "bad clip id"}, 400)
+            stand = []
+            for iv in payload.get("stand") or []:
+                try:
+                    a, b = float(iv[0]), float(iv[1])
+                except (TypeError, ValueError, IndexError):
+                    return self._json({"ok": False, "error": f"плохой отрезок {iv}"}, 400)
+                if b <= a:
+                    return self._json({"ok": False, "error": f"конец раньше начала: {iv}"}, 400)
+                stand.append([round(a, 2), round(b, 2)])
+            stand.sort()
+            reviewed = float(payload.get("reviewed_until") or 0)
+            doc = {"clip": clip, "stand": stand, "reviewed_until": round(reviewed, 2),
+                   "time_base": "секунды видео /final (= время трекера при сдвиге 0)",
+                   "rule": "всё внутри reviewed_until и вне отрезков stand считается ходьбой",
+                   "source": "человек, по видео",
+                   "saved_at": time.strftime("%Y-%m-%d %H:%M:%S")}
+            out = _stand_path(clip)
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
+            return self._json({"ok": True, **doc})
 
         if path == "/api/human/save":
             clip = str(payload.get("video") or "")
@@ -1042,22 +1260,44 @@ class Handler(BaseHTTPRequestHandler):
         return self._text("not found", 404)
 
 
+class _DualStackHTTPServer(ThreadingHTTPServer):
+    """Listen on IPv6 :: with V6ONLY=0 so http://localhost works on macOS (::1 first)."""
+
+    address_family = socket.AF_INET6
+
+    def server_bind(self) -> None:
+        self.socket.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, 0)
+        super().server_bind()
+
+
+def create_server(host: str = "127.0.0.1", port: int = 0) -> ThreadingHTTPServer:
+    """Bound server for the desktop shell; port 0 picks a free one."""
+    MEDIA.mkdir(parents=True, exist_ok=True)
+    srv = ThreadingHTTPServer((host, port), Handler)
+    srv.daemon_threads = True
+    app_backend.ensure_worker()
+    return srv
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", type=int, default=8765)
-    ap.add_argument("--host", default="127.0.0.1")
+    ap.add_argument("--host", default="::", help=":: = localhost IPv4+IPv6 (default on macOS)")
     args = ap.parse_args()
 
     MEDIA.mkdir(parents=True, exist_ok=True)
     video = MEDIA / serve_video_name()
     print("fly_vo annotation tool")
-    print(f"  app      http://{args.host}:{args.port}")
+    print(f"  app      http://127.0.0.1:{args.port}  (и http://localhost:{args.port})")
     print(f"  video    {video}  ({'present' if video.exists() else 'MISSING - transcode still running?'})")
     print(f"  saves to {SAVE_JSON}")
     print(f"  exports  {EXPORT_CSV}")
     print("  ctrl-c to stop\n")
 
-    server = ThreadingHTTPServer((args.host, args.port), Handler)
+    if ":" in args.host:
+        server = _DualStackHTTPServer((args.host, args.port), Handler)
+    else:
+        server = ThreadingHTTPServer((args.host, args.port), Handler)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

@@ -31,8 +31,32 @@
   #legend div{display:flex;align-items:center;gap:6px;margin:2px 0;white-space:nowrap}
   #legend i{width:16px;height:3px;border-radius:2px;display:inline-block}
   canvas{display:block;width:100%;height:100%}
-  #videoWrap{flex:1;display:flex;align-items:center;justify-content:center;background:#000;min-height:0}
+  main > .pane:first-child{overflow-y:auto}
+  #videoCol{display:flex;flex-direction:column;flex:none}
+  #videoWrap{height:34vh;min-height:160px;display:flex;align-items:center;justify-content:center;background:#000}
+  #flyBlock{flex:none;border-top:1px solid var(--line);background:#0a0c10;display:flex;flex-direction:column}
+  #flyBlock h3{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--dim);
+    padding:6px 12px;border-bottom:1px solid var(--line)}
+  #flyPlayer{height:250px;position:relative;background:#000}
+  #flyView{display:block;width:100%;height:100%}
+  #flyLabel{font-size:11px;color:var(--dim);padding:6px 12px 8px;line-height:1.45;border-top:1px solid var(--line)}
+  #flyLabel b{color:var(--fg)}
+  body.blind #planWrap, body.blind #meta, body.blind #verSel, body.blind #modelSync{visibility:hidden}
+  #modelSync{padding:8px 12px;border-top:1px solid var(--line);font-size:12px;color:var(--dim);background:#10141c}
+  #modelSync label{display:flex;align-items:center;gap:8px;margin-top:6px}
+  #modelSync input[type=range]{flex:1}
+  #syncWarn{color:var(--warn);font-size:11px;margin-top:6px;line-height:1.4}
+  #standBlock{padding:8px 12px;border-top:1px solid var(--line);background:#10141c;font-size:12px;color:var(--dim)}
+  #standBlock h3{font-size:11px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+  #standBtns{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  #standBtns button{padding:5px 9px}
+  #standStart.on{background:#3d2a0a;border-color:var(--warn);color:#fcd34d}
+  #standList{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px}
+  .siv{background:#2a2110;border:1px solid #7a5518;border-radius:6px;padding:2px 6px;color:#fcd34d;cursor:pointer}
+  .siv:hover{text-decoration:line-through}
+  #standStatus{margin-top:6px;line-height:1.4}
   video{max-width:100%;max-height:100%}
+  #decisions{flex:none;min-height:80px}
   #controls{padding:10px 12px;border-top:1px solid var(--line);background:var(--panel)}
   #showAll,#showEvery{margin:0 8px 8px 0}
   input[type=range]{width:100%}
@@ -61,15 +85,42 @@
 <body>
 <div id="app">
   <header>
-    <h1>FINAL TRACKER V2</h1>
+    <h1>FINAL TRACKER</h1>
     <select id="clipSel"></select>
+    <select id="verSel" title="версия трекера"></select>
     <span id="meta" style="color:var(--dim);font-size:12px"></span>
-    <a href="/start" style="margin-left:auto;color:var(--accent);font-size:13px">Старт VID00001</a>
+    <a href="/app" style="margin-left:auto;color:var(--accent);font-size:13px">← Ролики</a>
   </header>
   <main>
     <section class="pane">
       <h2>Видео</h2>
-      <div id="videoWrap"><video id="vid" controls playsinline></video></div>
+      <div id="videoCol">
+        <div id="videoWrap"><video id="vid" controls playsinline></video></div>
+        <div id="flyBlock">
+          <h3>Сигнал мухи — куда поворачивает камера</h3>
+          <div id="flyPlayer"><canvas id="flyView"></canvas></div>
+          <div id="flyLabel">Загрузка yaw…</div>
+        </div>
+        <div id="modelSync">
+          Сдвиг модели относительно видео (сек):
+          <label><span id="offVal">0</span>
+            <input type="range" id="modelOffset" min="0" max="120" step="1" value="0">
+          </label>
+          <div id="syncWarn">Точка на карте = модель трекера (1 с ≈ 1 с brain), не «человек вышел».
+            Если камера шевелится, а человек стоит, модель всё равно идёт по графу.</div>
+        </div>
+        <div id="standBlock">
+          <h3>Разметка: где человек стоит</h3>
+          <div id="standBtns">
+            <button type="button" id="standStart" title="клавиша S">Стоит — начало (S)</button>
+            <button type="button" id="standEnd" title="клавиша E" disabled>Пошёл — конец (E)</button>
+            <button type="button" id="standSave">Сохранить</button>
+          </div>
+          <div id="standList"></div>
+          <div id="standStatus">Смотри видео и отмечай ВСЕ места, где человек стоит. Всё остальное до
+            «просмотрено до» считается ходьбой. Клик по отрезку — удалить.</div>
+        </div>
+      </div>
       <div id="decisions"></div>
     </section>
     <section class="pane">
@@ -83,7 +134,7 @@
       </div>
     </section>
     <section class="pane">
-      <h2>Моя траектория на графе</h2>
+      <h2>Моя траектория — точка трекера в реальном времени</h2>
       <div id="drawWrap">
         <canvas id="draw"></canvas>
         <div id="drawHint"><b>Только по графу.</b> Линия идёт по рёбрам, мимо стен не режет.
@@ -99,9 +150,78 @@
     </section>
   </main>
 </div>
+<script src="/playback_sync.js"></script>
+<script src="/fly_panel.js"></script>
 <script>
 const $ = id => document.getElementById(id);
+function modelTime(videoT){
+  const cap = state && state.tracker_duration != null ? +state.tracker_duration : 1e9;
+  return Math.max(0, Math.min(+videoT - modelOffset, cap));
+}
+function syncAll(videoT){
+  const tm = modelTime(videoT);
+  $('time').value = tm;
+  $('time').max = state && state.tracker_duration ? state.tracker_duration : 100;
+  drawPlan(tm);
+  flyPanel.draw(tm);
+  drawSketchCanvas(tm);
+}
+const BLIND = new URLSearchParams(location.search).get('blind') === '1';
+if(BLIND) document.body.classList.add('blind');
+const flyPanel = FlyMotionPanel.bind({
+  canvasId: 'flyView', labelId: 'flyLabel', videoId: 'vid', blind: BLIND,
+  getRows: () => traj,
+  getStand: () => ({stand: standIv, open: standOpen, reviewed: standReviewed}),
+  onTime(t){ syncAll(t); },
+});
 let state = null, planImg = null, graph = null, traj = [], decs = [], alts = [];
+let startPin = null, modelOffset = 0;
+let standIv = [], standOpen = null, standReviewed = 0, standDirty = false;
+
+function fmtT(s){ const m = Math.floor(s / 60), r = s - m * 60; return m + ':' + r.toFixed(1).padStart(4, '0'); }
+function renderStand(){
+  $('standList').innerHTML = standIv.map((iv, i) =>
+    `<span class="siv" data-i="${i}">${fmtT(iv[0])}–${fmtT(iv[1])}</span>`).join('');
+  $('standStart').classList.toggle('on', standOpen != null);
+  $('standStart').textContent = standOpen != null ? ('стоит с ' + fmtT(standOpen) + '…') : 'Стоит — начало (S)';
+  $('standEnd').disabled = standOpen == null;
+  const total = standIv.reduce((s, iv) => s + iv[1] - iv[0], 0);
+  $('standStatus').innerHTML = `отрезков <b>${standIv.length}</b>, стоит ${total.toFixed(0)} с · `
+    + `просмотрено до <b>${fmtT(standReviewed)}</b>` + (standDirty ? ' · <b style="color:#f59e0b">не сохранено</b>' : '');
+  flyPanel.draw(modelTime($('vid').currentTime || 0));
+}
+async function loadStand(id){
+  standIv = []; standOpen = null; standReviewed = 0; standDirty = false;
+  try{
+    const j = await (await fetch('/api/stand/state?clip=' + encodeURIComponent(id))).json();
+    if(j.ok){ standIv = j.stand || []; standReviewed = +j.reviewed_until || 0; }
+  }catch(_e){}
+  renderStand();
+}
+async function saveStand(){
+  if(!state || !state.clip) return;
+  const r = await fetch('/api/stand/save', {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({clip: state.clip, stand: standIv, reviewed_until: standReviewed})});
+  const j = await r.json();
+  if(!j.ok){ $('standStatus').textContent = j.error || 'ошибка'; return; }
+  standDirty = false;
+  renderStand();
+}
+function markStandStart(){
+  standOpen = $('vid').currentTime || 0;
+  renderStand();
+}
+function markStandEnd(){
+  if(standOpen == null) return;
+  const b = $('vid').currentTime || 0;
+  if(b <= standOpen){ $('standStatus').textContent = 'конец должен быть позже начала'; return; }
+  standIv.push([+standOpen.toFixed(2), +b.toFixed(2)]);
+  standIv.sort((x, y) => x[0] - y[0]);
+  standOpen = null;
+  standReviewed = Math.max(standReviewed, b);
+  standDirty = true;
+  saveStand();
+}
 let showAll = false, showEvery = false, allTracks = null, onlyClip = false;
 let sketch = [], sketchSeg = [], sketchMarks = [], drawScale = 1, drawOffX = 0, drawOffY = 0;
 let drawing = false, drawPanning = false, spaceDown = false, lastPan = null;
@@ -129,17 +249,41 @@ async function loadList(){
     $('showEvery').hidden = true;
   }
   const ids = j.clips.map(c => c.id);
+  if(want && /^VID\d{5}$/.test(want) && !ids.includes(want)){
+    const o = document.createElement('option');
+    o.value = want; o.textContent = want + ' (нет прогона)';
+    sel.prepend(o);
+    ids.unshift(want);
+  }
   const pick = want && ids.includes(want) ? want : (ids[0] || '');
-  if(pick){ sel.value = pick; await loadClip(pick); }
+  if(pick){ sel.value = pick; await loadClip(pick, q.get('ver')); }
 }
 
-async function loadClip(id){
-  const r = await fetch('/api/final/state?clip=' + encodeURIComponent(id));
+const VER_NAMES = {v5: 'V5 — маршрут V1, стоит по мухе и шагам', v4: 'V4 — развилки V1 + стоит по мухе и шагам', v3: 'V3 — стоит по мухе и шагам', v2: 'V2', v1: 'V1'};
+
+async function loadClip(id, ver){
+  let url = '/api/final/state?clip=' + encodeURIComponent(id);
+  if(ver) url += '&ver=' + encodeURIComponent(ver);
+  const r = await fetch(url);
   state = await r.json();
+  const vs = $('verSel');
+  vs.innerHTML = '';
+  for(const v of state.versions || []){
+    const o = document.createElement('option');
+    o.value = v; o.textContent = VER_NAMES[v] || v;
+    vs.appendChild(o);
+  }
+  vs.value = state.version || '';
+  vs.hidden = (state.versions || []).length < 2;
   graph = indexGraph(state.graph || {});
   traj = state.trajectory || [];
+  startPin = state.start_xy || (traj.length ? {x:+traj[0].x, y:+traj[0].y} : null);
   decs = state.decisions || [];
   alts = state.alternatives || [];
+  const offKey = 'model_offset_' + id;
+  modelOffset = +localStorage.getItem(offKey) || 0;
+  $('modelOffset').value = modelOffset;
+  $('offVal').textContent = modelOffset;
   $('planTitle').textContent = onlyClip ? ('Только ' + id) : 'План — только рёбра графа';
   $('meta').textContent = state.report
     ? `${onlyClip ? 'только ' + id + ' · ' : ''}${state.version || ''} ${state.report.stats.route_meters} м, ${state.report.stats.edges_traversed} рёбер`
@@ -148,6 +292,8 @@ async function loadClip(id){
   $('time').value = 0;
   $('vid').src = state.video_url || '';
   $('vid').load();
+  await flyPanel.load(id);
+  await loadStand(id);
   renderDecisions();
   await loadPlan();
   renderLegend();
@@ -191,11 +337,8 @@ async function loadPlan(){
 }
 
 function sampleAt(t){
-  if(!traj.length) return null;
-  let i = traj.findIndex(r => +r.time >= t);
-  if(i < 0) i = traj.length - 1;
-  if(i > 0 && +traj[i].time - t > t - +traj[i-1].time) i--;
-  return traj[i];
+  if(BLIND) return null;
+  return PlaybackSync.sampleTraj(traj, t);
 }
 
 function indexGraph(g){
@@ -308,6 +451,17 @@ function drawPlan(t){
     });
     ctx.stroke();
   }
+  }
+  if(startPin){
+    ctx.fillStyle = '#f59e0b';
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(tx(startPin.x), ty(startPin.y), 7, 0, Math.PI*2);
+    ctx.fill(); ctx.stroke();
+    ctx.font = '11px sans-serif';
+    ctx.fillStyle = '#fcd34d';
+    ctx.fillText('старт', tx(startPin.x)+9, ty(startPin.y)-8);
   }
   const cur = sampleAt(t);
   if(cur){
@@ -539,7 +693,8 @@ function fitDraw(){
   drawSketchCanvas();
 }
 
-function drawSketchCanvas(){
+function drawSketchCanvas(liveT){
+  const t = liveT != null ? liveT : +$('time').value;
   const c = $('draw'), wrap = $('drawWrap');
   const w = wrap.clientWidth, h = wrap.clientHeight;
   if(w < 10 || h < 10) return;
@@ -595,6 +750,26 @@ function drawSketchCanvas(){
     ctx.lineWidth = Math.max(1.5, 2.2 / drawScale);
     ctx.beginPath();
     ctx.arc(hoverLoc.x, hoverLoc.y, Math.max(5, 10 / drawScale), 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  const cur = sampleAt(t);
+  if(startPin){
+    ctx.fillStyle = '#f59e0b';
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = Math.max(1.5, 2.5 / drawScale);
+    ctx.beginPath();
+    ctx.arc(startPin.x, startPin.y, Math.max(6, 10 / drawScale), 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+  }
+  if(cur && traj.length){
+    const px = +cur.x, py = +cur.y;
+    const stopped = cur.is_stop === '1' || cur.is_stop === 1;
+    ctx.fillStyle = stopped ? '#f59e0b' : '#22c55e';
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = Math.max(1.5, 2.5 / drawScale);
+    ctx.beginPath();
+    ctx.arc(px, py, Math.max(7, 12 / drawScale), 0, Math.PI * 2);
+    ctx.fill();
     ctx.stroke();
   }
   ctx.restore();
@@ -715,16 +890,47 @@ $('drawClear').addEventListener('click', () => {
 });
 $('drawSave').addEventListener('click', () => { saveSketch().catch(err => { $('drawStatus').textContent = String(err); }); });
 $('clipSel').addEventListener('change', e => loadClip(e.target.value));
+$('verSel').addEventListener('change', e => loadClip($('clipSel').value, e.target.value));
 $('time').addEventListener('input', e => {
-  const t = +e.target.value;
-  drawPlan(t);
+  const tm = +e.target.value;
+  drawPlan(tm);
+  flyPanel.draw(tm);
+  drawSketchCanvas(tm);
   const v = $('vid');
-  if(v.duration && isFinite(v.duration)) v.currentTime = t;
+  if(v.duration && isFinite(v.duration)) v.currentTime = tm + modelOffset;
 });
+$('standStart').addEventListener('click', markStandStart);
+$('standEnd').addEventListener('click', markStandEnd);
+$('standSave').addEventListener('click', () => { saveStand(); });
+$('standList').addEventListener('click', e => {
+  const el = e.target.closest('.siv');
+  if(!el) return;
+  standIv.splice(+el.dataset.i, 1);
+  standDirty = true;
+  saveStand();
+});
+window.addEventListener('keydown', e => {
+  if(e.target && /INPUT|SELECT|TEXTAREA/.test(e.target.tagName) && e.target.type !== 'range') return;
+  if(e.metaKey || e.ctrlKey || e.altKey) return;
+  if(e.key === 's' || e.key === 'S' || e.key === 'ы' || e.key === 'Ы'){ markStandStart(); e.preventDefault(); }
+  if(e.key === 'e' || e.key === 'E' || e.key === 'у' || e.key === 'У'){ markStandEnd(); e.preventDefault(); }
+});
+let lastPlayT = null;
 $('vid').addEventListener('timeupdate', () => {
-  const t = $('vid').currentTime;
-  $('time').value = t;
-  drawPlan(t);
+  const v = $('vid'), t = v.currentTime || 0;
+  if(!v.paused && lastPlayT != null && t - lastPlayT > 0 && t - lastPlayT < 2 && t > standReviewed){
+    standReviewed = t;
+    standDirty = true;
+    if(Math.floor(t) % 5 === 0) renderStand();
+  }
+  lastPlayT = t;
+});
+$('vid').addEventListener('pause', () => { if(standDirty) saveStand(); });
+$('modelOffset').addEventListener('input', e => {
+  modelOffset = +e.target.value;
+  $('offVal').textContent = modelOffset;
+  if(state && state.clip) localStorage.setItem('model_offset_' + state.clip, String(modelOffset));
+  syncAll($('vid').currentTime || 0);
 });
 
 loadList().catch(err => {

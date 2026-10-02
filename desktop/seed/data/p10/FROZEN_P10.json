@@ -1,0 +1,1002 @@
+{
+  "phase": "P10 — где теряется информация о движении тела",
+  "what_this_is": "P10 measures one thing: at which level of the pipeline — raw video, brain input, early visual cells, descending cells, or the two current readouts — the difference between these three kinds of movement is still present. Nothing is repaired in this phase. The levels are all measured with the same classifier and the same held-out-clip split, so the answer is which level to work on next, not a new percentage on the current signal.",
+  "n_events": 60,
+  "categories": [
+    "SAME_DIRECTION",
+    "DIFFERENT_DIRECTION",
+    "NO_NET_DISPLACEMENT"
+  ],
+  "category_counts": {
+    "SAME_DIRECTION": 19,
+    "DIFFERENT_DIRECTION": 21,
+    "NO_NET_DISPLACEMENT": 20
+  },
+  "old_to_new": {
+    "LOOK": "SAME_DIRECTION",
+    "TURN": "DIFFERENT_DIRECTION",
+    "NO_LOCOMOTION": "NO_NET_DISPLACEMENT"
+  },
+  "why_not_static": "NO_NET_DISPLACEMENT means the drawn path left and came back: path length is close to the other two categories while net displacement is about half. The person walked; he did not stand. The name says no net displacement, never no motion.",
+  "labels": [
+    {
+      "event_id": "r001",
+      "clip": "VID00005",
+      "time": 516.5,
+      "clip_file": "clips/e060.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "SAME_DIRECTION",
+      "old_name": "LOOK",
+      "drawn_from_drawing": true,
+      "net_deg": 0,
+      "total_deg": 156.2
+    },
+    {
+      "event_id": "r002",
+      "clip": "VID00009",
+      "time": 413.58,
+      "clip_file": "clips/e035.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "SAME_DIRECTION",
+      "old_name": "LOOK",
+      "drawn_from_drawing": true,
+      "net_deg": 0,
+      "total_deg": 466.3
+    },
+    {
+      "event_id": "r003",
+      "clip": "VID00001",
+      "time": 1135.76,
+      "clip_file": "clips/e046.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "SAME_DIRECTION",
+      "old_name": "LOOK",
+      "drawn_from_drawing": false,
+      "net_deg": 63.4,
+      "total_deg": 63.4
+    },
+    {
+      "event_id": "r004",
+      "clip": "VID00009",
+      "time": 956.97,
+      "clip_file": "clips/e007.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "SAME_DIRECTION",
+      "old_name": "LOOK",
+      "drawn_from_drawing": true,
+      "net_deg": 0,
+      "total_deg": 180
+    },
+    {
+      "event_id": "r005",
+      "clip": "VID00005",
+      "time": 419.44,
+      "clip_file": "clips/e042.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "DIFFERENT_DIRECTION",
+      "old_name": "TURN",
+      "drawn_from_drawing": true,
+      "net_deg": 90,
+      "total_deg": 323.1
+    },
+    {
+      "event_id": "r006",
+      "clip": "VID00001",
+      "time": 1095.94,
+      "clip_file": "clips/e033.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "SAME_DIRECTION",
+      "old_name": "LOOK",
+      "drawn_from_drawing": true,
+      "net_deg": 5.5,
+      "total_deg": 121.3
+    },
+    {
+      "event_id": "r007",
+      "clip": "VID00005",
+      "time": 986.2,
+      "clip_file": "clips/e038.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "DIFFERENT_DIRECTION",
+      "old_name": "TURN",
+      "drawn_from_drawing": true,
+      "net_deg": 180,
+      "total_deg": 623.8
+    },
+    {
+      "event_id": "r008",
+      "clip": "VID00009",
+      "time": 322.74,
+      "clip_file": "clips/e028.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "DIFFERENT_DIRECTION",
+      "old_name": "TURN",
+      "drawn_from_drawing": true,
+      "net_deg": 135,
+      "total_deg": 441.9
+    },
+    {
+      "event_id": "r009",
+      "clip": "VID00005",
+      "time": 673.0,
+      "clip_file": "clips/e034.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "NO_NET_DISPLACEMENT",
+      "old_name": "NO_LOCOMOTION",
+      "drawn_from_drawing": false,
+      "net_deg": 90,
+      "total_deg": 823.6
+    },
+    {
+      "event_id": "r010",
+      "clip": "VID00005",
+      "time": 422.87,
+      "clip_file": "clips/e030.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "DIFFERENT_DIRECTION",
+      "old_name": "TURN",
+      "drawn_from_drawing": true,
+      "net_deg": 180,
+      "total_deg": 749.9
+    },
+    {
+      "event_id": "r011",
+      "clip": "VID00009",
+      "time": 200.3,
+      "clip_file": "clips/e002.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "DIFFERENT_DIRECTION",
+      "old_name": "TURN",
+      "drawn_from_drawing": true,
+      "net_deg": 90,
+      "total_deg": 526.5
+    },
+    {
+      "event_id": "r012",
+      "clip": "VID00009",
+      "time": 317.89,
+      "clip_file": "clips/e004.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "DIFFERENT_DIRECTION",
+      "old_name": "TURN",
+      "drawn_from_drawing": true,
+      "net_deg": 90,
+      "total_deg": 531.2
+    },
+    {
+      "event_id": "r013",
+      "clip": "VID00006",
+      "time": 124.35,
+      "clip_file": "clips/e021.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "SAME_DIRECTION",
+      "old_name": "LOOK",
+      "drawn_from_drawing": false,
+      "net_deg": 45,
+      "total_deg": 429.9
+    },
+    {
+      "event_id": "r014",
+      "clip": "VID00005",
+      "time": 871.6,
+      "clip_file": "clips/e037.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "DIFFERENT_DIRECTION",
+      "old_name": "TURN",
+      "drawn_from_drawing": true,
+      "net_deg": 180,
+      "total_deg": 360
+    },
+    {
+      "event_id": "r015",
+      "clip": "VID00009",
+      "time": 1073.0,
+      "clip_file": "clips/e043.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "SAME_DIRECTION",
+      "old_name": "LOOK",
+      "drawn_from_drawing": true,
+      "net_deg": 0,
+      "total_deg": 306.9
+    },
+    {
+      "event_id": "r016",
+      "clip": "VID00001",
+      "time": 777.72,
+      "clip_file": "clips/e013.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "SAME_DIRECTION",
+      "old_name": "LOOK",
+      "drawn_from_drawing": true,
+      "net_deg": 0,
+      "total_deg": 90
+    },
+    {
+      "event_id": "r017",
+      "clip": "VID00009",
+      "time": 1177.36,
+      "clip_file": "clips/e056.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "NO_NET_DISPLACEMENT",
+      "old_name": "NO_LOCOMOTION",
+      "drawn_from_drawing": false,
+      "net_deg": null,
+      "total_deg": null
+    },
+    {
+      "event_id": "r018",
+      "clip": "VID00005",
+      "time": 845.79,
+      "clip_file": "clips/e036.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "SAME_DIRECTION",
+      "old_name": "LOOK",
+      "drawn_from_drawing": true,
+      "net_deg": 0,
+      "total_deg": 90
+    },
+    {
+      "event_id": "r019",
+      "clip": "VID00002",
+      "time": 1190.51,
+      "clip_file": "clips/e027.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "DIFFERENT_DIRECTION",
+      "old_name": "TURN",
+      "drawn_from_drawing": true,
+      "net_deg": 90,
+      "total_deg": 921.3
+    },
+    {
+      "event_id": "r020",
+      "clip": "VID00009",
+      "time": 738.16,
+      "clip_file": "clips/e019.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "DIFFERENT_DIRECTION",
+      "old_name": "TURN",
+      "drawn_from_drawing": true,
+      "net_deg": 180,
+      "total_deg": 306.9
+    },
+    {
+      "event_id": "r021",
+      "clip": "VID00005",
+      "time": 765.51,
+      "clip_file": "clips/e048.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "DIFFERENT_DIRECTION",
+      "old_name": "TURN",
+      "drawn_from_drawing": true,
+      "net_deg": 90,
+      "total_deg": 270
+    },
+    {
+      "event_id": "r022",
+      "clip": "VID00009",
+      "time": 252.15,
+      "clip_file": "clips/e009.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "SAME_DIRECTION",
+      "old_name": "LOOK",
+      "drawn_from_drawing": true,
+      "net_deg": 0,
+      "total_deg": 391.1
+    },
+    {
+      "event_id": "r023",
+      "clip": "VID00005",
+      "time": 426.48,
+      "clip_file": "clips/e031.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "NO_NET_DISPLACEMENT",
+      "old_name": "NO_LOCOMOTION",
+      "drawn_from_drawing": false,
+      "net_deg": 0,
+      "total_deg": 628.8
+    },
+    {
+      "event_id": "r024",
+      "clip": "VID00009",
+      "time": 135.72,
+      "clip_file": "clips/e058.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "SAME_DIRECTION",
+      "old_name": "LOOK",
+      "drawn_from_drawing": true,
+      "net_deg": 0,
+      "total_deg": 180
+    },
+    {
+      "event_id": "r025",
+      "clip": "VID00005",
+      "time": 380.13,
+      "clip_file": "clips/e008.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "NO_NET_DISPLACEMENT",
+      "old_name": "NO_LOCOMOTION",
+      "drawn_from_drawing": false,
+      "net_deg": 26.6,
+      "total_deg": 190.3
+    },
+    {
+      "event_id": "r026",
+      "clip": "VID00009",
+      "time": 172.77,
+      "clip_file": "clips/e055.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "NO_NET_DISPLACEMENT",
+      "old_name": "NO_LOCOMOTION",
+      "drawn_from_drawing": false,
+      "net_deg": 126.9,
+      "total_deg": 323.1
+    },
+    {
+      "event_id": "r027",
+      "clip": "VID00002",
+      "time": 172.8,
+      "clip_file": "clips/e016.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "NO_NET_DISPLACEMENT",
+      "old_name": "NO_LOCOMOTION",
+      "drawn_from_drawing": false,
+      "net_deg": null,
+      "total_deg": null
+    },
+    {
+      "event_id": "r028",
+      "clip": "VID00001",
+      "time": 503.58,
+      "clip_file": "clips/e039.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "DIFFERENT_DIRECTION",
+      "old_name": "TURN",
+      "drawn_from_drawing": true,
+      "net_deg": 90,
+      "total_deg": 216.9
+    },
+    {
+      "event_id": "r029",
+      "clip": "VID00009",
+      "time": 1207.21,
+      "clip_file": "clips/e044.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "NO_NET_DISPLACEMENT",
+      "old_name": "NO_LOCOMOTION",
+      "drawn_from_drawing": false,
+      "net_deg": null,
+      "total_deg": null
+    },
+    {
+      "event_id": "r030",
+      "clip": "VID00009",
+      "time": 1031.43,
+      "clip_file": "clips/e012.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "DIFFERENT_DIRECTION",
+      "old_name": "TURN",
+      "drawn_from_drawing": true,
+      "net_deg": 90,
+      "total_deg": 143.1
+    },
+    {
+      "event_id": "r031",
+      "clip": "VID00005",
+      "time": 459.98,
+      "clip_file": "clips/e041.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "NO_NET_DISPLACEMENT",
+      "old_name": "NO_LOCOMOTION",
+      "drawn_from_drawing": false,
+      "net_deg": null,
+      "total_deg": null
+    },
+    {
+      "event_id": "r032",
+      "clip": "VID00005",
+      "time": 477.96,
+      "clip_file": "clips/e052.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "NO_NET_DISPLACEMENT",
+      "old_name": "NO_LOCOMOTION",
+      "drawn_from_drawing": false,
+      "net_deg": null,
+      "total_deg": null
+    },
+    {
+      "event_id": "r033",
+      "clip": "VID00005",
+      "time": 630.71,
+      "clip_file": "clips/e015.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "DIFFERENT_DIRECTION",
+      "old_name": "TURN",
+      "drawn_from_drawing": true,
+      "net_deg": 90,
+      "total_deg": 360
+    },
+    {
+      "event_id": "r034",
+      "clip": "VID00006",
+      "time": 14.84,
+      "clip_file": "clips/e025.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "SAME_DIRECTION",
+      "old_name": "LOOK",
+      "drawn_from_drawing": true,
+      "net_deg": 0,
+      "total_deg": 106.3
+    },
+    {
+      "event_id": "r035",
+      "clip": "VID00009",
+      "time": 471.25,
+      "clip_file": "clips/e032.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "NO_NET_DISPLACEMENT",
+      "old_name": "NO_LOCOMOTION",
+      "drawn_from_drawing": false,
+      "net_deg": 0,
+      "total_deg": 360
+    },
+    {
+      "event_id": "r036",
+      "clip": "VID00009",
+      "time": 48.77,
+      "clip_file": "clips/e059.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "SAME_DIRECTION",
+      "old_name": "LOOK",
+      "drawn_from_drawing": false,
+      "net_deg": 153.4,
+      "total_deg": 582.8
+    },
+    {
+      "event_id": "r037",
+      "clip": "VID00002",
+      "time": 589.27,
+      "clip_file": "clips/e018.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "SAME_DIRECTION",
+      "old_name": "LOOK",
+      "drawn_from_drawing": true,
+      "net_deg": 0,
+      "total_deg": 180
+    },
+    {
+      "event_id": "r038",
+      "clip": "VID00009",
+      "time": 70.44,
+      "clip_file": "clips/e003.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "DIFFERENT_DIRECTION",
+      "old_name": "TURN",
+      "drawn_from_drawing": false,
+      "net_deg": 26.6,
+      "total_deg": 386.6
+    },
+    {
+      "event_id": "r039",
+      "clip": "VID00005",
+      "time": 346.9,
+      "clip_file": "clips/e050.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "NO_NET_DISPLACEMENT",
+      "old_name": "NO_LOCOMOTION",
+      "drawn_from_drawing": false,
+      "net_deg": 180,
+      "total_deg": 613.7
+    },
+    {
+      "event_id": "r040",
+      "clip": "VID00006",
+      "time": 113.66,
+      "clip_file": "clips/e049.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "DIFFERENT_DIRECTION",
+      "old_name": "TURN",
+      "drawn_from_drawing": true,
+      "net_deg": 90,
+      "total_deg": 450
+    },
+    {
+      "event_id": "r041",
+      "clip": "VID00002",
+      "time": 601.01,
+      "clip_file": "clips/e006.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "DIFFERENT_DIRECTION",
+      "old_name": "TURN",
+      "drawn_from_drawing": true,
+      "net_deg": 90,
+      "total_deg": 500.3
+    },
+    {
+      "event_id": "r042",
+      "clip": "VID00009",
+      "time": 115.03,
+      "clip_file": "clips/e024.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "NO_NET_DISPLACEMENT",
+      "old_name": "NO_LOCOMOTION",
+      "drawn_from_drawing": false,
+      "net_deg": 90,
+      "total_deg": 863.1
+    },
+    {
+      "event_id": "r043",
+      "clip": "VID00006",
+      "time": 245.9,
+      "clip_file": "clips/e047.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "SAME_DIRECTION",
+      "old_name": "LOOK",
+      "drawn_from_drawing": true,
+      "net_deg": 0,
+      "total_deg": 0
+    },
+    {
+      "event_id": "r044",
+      "clip": "VID00005",
+      "time": 535.85,
+      "clip_file": "clips/e051.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "DIFFERENT_DIRECTION",
+      "old_name": "TURN",
+      "drawn_from_drawing": true,
+      "net_deg": 90,
+      "total_deg": 196.3
+    },
+    {
+      "event_id": "r045",
+      "clip": "VID00009",
+      "time": 713.18,
+      "clip_file": "clips/e029.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "DIFFERENT_DIRECTION",
+      "old_name": "TURN",
+      "drawn_from_drawing": true,
+      "net_deg": 90,
+      "total_deg": 523.7
+    },
+    {
+      "event_id": "r046",
+      "clip": "VID00005",
+      "time": 689.72,
+      "clip_file": "clips/e005.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "NO_NET_DISPLACEMENT",
+      "old_name": "NO_LOCOMOTION",
+      "drawn_from_drawing": false,
+      "net_deg": null,
+      "total_deg": null
+    },
+    {
+      "event_id": "r047",
+      "clip": "VID00009",
+      "time": 450.08,
+      "clip_file": "clips/e040.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "NO_NET_DISPLACEMENT",
+      "old_name": "NO_LOCOMOTION",
+      "drawn_from_drawing": false,
+      "net_deg": null,
+      "total_deg": null
+    },
+    {
+      "event_id": "r048",
+      "clip": "VID00005",
+      "time": 502.13,
+      "clip_file": "clips/e017.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "NO_NET_DISPLACEMENT",
+      "old_name": "NO_LOCOMOTION",
+      "drawn_from_drawing": false,
+      "net_deg": 90,
+      "total_deg": 376.3
+    },
+    {
+      "event_id": "r049",
+      "clip": "VID00005",
+      "time": 972.56,
+      "clip_file": "clips/e053.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "SAME_DIRECTION",
+      "old_name": "LOOK",
+      "drawn_from_drawing": true,
+      "net_deg": 26.6,
+      "total_deg": 490.8
+    },
+    {
+      "event_id": "r050",
+      "clip": "VID00005",
+      "time": 913.18,
+      "clip_file": "clips/e045.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "DIFFERENT_DIRECTION",
+      "old_name": "TURN",
+      "drawn_from_drawing": true,
+      "net_deg": 116.6,
+      "total_deg": 699.1
+    },
+    {
+      "event_id": "r051",
+      "clip": "VID00005",
+      "time": 875.95,
+      "clip_file": "clips/e022.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "SAME_DIRECTION",
+      "old_name": "LOOK",
+      "drawn_from_drawing": true,
+      "net_deg": 0,
+      "total_deg": 53.1
+    },
+    {
+      "event_id": "r052",
+      "clip": "VID00009",
+      "time": 257.91,
+      "clip_file": "clips/e020.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "DIFFERENT_DIRECTION",
+      "old_name": "TURN",
+      "drawn_from_drawing": true,
+      "net_deg": 90,
+      "total_deg": 143.1
+    },
+    {
+      "event_id": "r053",
+      "clip": "VID00005",
+      "time": 356.68,
+      "clip_file": "clips/e011.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "DIFFERENT_DIRECTION",
+      "old_name": "TURN",
+      "drawn_from_drawing": false,
+      "net_deg": 26.6,
+      "total_deg": 497.2
+    },
+    {
+      "event_id": "r054",
+      "clip": "VID00001",
+      "time": 478.17,
+      "clip_file": "clips/e026.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "SAME_DIRECTION",
+      "old_name": "LOOK",
+      "drawn_from_drawing": false,
+      "net_deg": 90,
+      "total_deg": 376.3
+    },
+    {
+      "event_id": "r055",
+      "clip": "VID00005",
+      "time": 671.0,
+      "clip_file": "clips/e010.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "NO_NET_DISPLACEMENT",
+      "old_name": "NO_LOCOMOTION",
+      "drawn_from_drawing": false,
+      "net_deg": 180,
+      "total_deg": 466.3
+    },
+    {
+      "event_id": "r056",
+      "clip": "VID00001",
+      "time": 1179.4,
+      "clip_file": "clips/e014.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "SAME_DIRECTION",
+      "old_name": "LOOK",
+      "drawn_from_drawing": false,
+      "net_deg": 63.4,
+      "total_deg": 329.1
+    },
+    {
+      "event_id": "r057",
+      "clip": "VID00009",
+      "time": 72.71,
+      "clip_file": "clips/e054.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "NO_NET_DISPLACEMENT",
+      "old_name": "NO_LOCOMOTION",
+      "drawn_from_drawing": false,
+      "net_deg": 53.1,
+      "total_deg": 643.6
+    },
+    {
+      "event_id": "r058",
+      "clip": "VID00005",
+      "time": 672.01,
+      "clip_file": "clips/e023.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "NO_NET_DISPLACEMENT",
+      "old_name": "NO_LOCOMOTION",
+      "drawn_from_drawing": false,
+      "net_deg": 180,
+      "total_deg": 180
+    },
+    {
+      "event_id": "r059",
+      "clip": "VID00009",
+      "time": 532.49,
+      "clip_file": "clips/e057.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "NO_NET_DISPLACEMENT",
+      "old_name": "NO_LOCOMOTION",
+      "drawn_from_drawing": false,
+      "net_deg": 90,
+      "total_deg": 512.6
+    },
+    {
+      "event_id": "r060",
+      "clip": "VID00009",
+      "time": 614.43,
+      "clip_file": "clips/e001.mp4",
+      "clip_offset_s": 5.0,
+      "narrow": [
+        2.0,
+        12.0
+      ],
+      "category": "NO_NET_DISPLACEMENT",
+      "old_name": "NO_LOCOMOTION",
+      "drawn_from_drawing": false,
+      "net_deg": 116.6,
+      "total_deg": 492.8
+    }
+  ],
+  "sources": {
+    "review_set": {
+      "path": "data/p095/review_set_v2.json",
+      "sha256_16": "d5cca7cbd371acda"
+    },
+    "human_labels_v2": {
+      "path": "data/p095/human_labels_v2.json",
+      "sha256_16": "d578bf49afa5ed32"
+    }
+  },
+  "frozen": {
+    "route_algorithm": "P08.6 (multi-hypothesis at a fork, unchanged)",
+    "look_turn_filter": "P09.2 — НЕ ИСПОЛЬЗУЕТСЯ. Снят в P09.5D; в P10 не возвращается.",
+    "visual_encoder": "не менялся",
+    "graph": "не менялась",
+    "cells": "не менялись",
+    "thresholds": "не менялись"
+  },
+  "rule_of_the_phase": "только диагностика: ни одна клетка, вес, порог, encoder или граф не меняются, пока не найден уровень, на котором различие исчезает"
+}

@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<title>Старт VID00001</title>
+<title>Старт трекера</title>
 <style>
   :root{
     --bg:#0b0d12; --panel:#141821; --line:#252b3a; --fg:#eef2f8; --dim:#8a94a8;
@@ -23,7 +23,14 @@
   .pane:last-child{border-right:none}
   .pane h2{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--dim);
     padding:8px 12px;border-bottom:1px solid var(--line)}
-  #videoWrap{flex:1;display:flex;align-items:center;justify-content:center;background:#000;min-height:0}
+  #videoCol{display:flex;flex-direction:column;min-height:0;flex:1}
+  #videoWrap{flex:1;min-height:100px;display:flex;align-items:center;justify-content:center;background:#000}
+  #flyBlock{flex:none;border-top:1px solid var(--line);background:#0a0c10}
+  #flyBlock h3{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--dim);
+    padding:6px 12px;border-bottom:1px solid var(--line)}
+  #flyPlayer{height:232px;background:#000}
+  #flyView{display:block;width:100%;height:100%}
+  #flyLabel{font-size:11px;color:var(--dim);padding:6px 12px 8px;line-height:1.45;border-top:1px solid var(--line)}
   video{max-width:100%;max-height:100%}
   #wait{color:var(--dim);padding:24px;text-align:center}
   #planWrap{flex:1;position:relative;background:#06080c;min-height:0;cursor:crosshair;touch-action:none}
@@ -41,6 +48,8 @@
   #go{background:#1e3a6e;border-color:var(--accent);color:#fff;font-weight:600}
   #go:disabled{background:#1a1f2b;border-color:var(--line);font-weight:400}
   #readout{flex:1;min-width:220px;font-size:13px;color:var(--dim)}
+  #legend3{font-size:12px;line-height:1.5;color:var(--dim);min-width:150px}
+  #legend3 b{color:var(--fg)}
   #readout b{color:var(--fg)}
   #log{max-height:140px;overflow:auto;padding:8px 12px;font:12px/1.4 ui-monospace,monospace;
     color:var(--dim);white-space:pre-wrap;border-top:1px solid var(--line)}
@@ -49,18 +58,30 @@
 <body>
 <div id="app">
   <header>
-    <h1>Старт VID00001</h1>
+    <h1 id="title">Старт</h1>
     <span id="note"></span>
-    <a href="/final">К траекториям</a>
+    <a href="/app">← Ролики</a>
+    <a id="toFinal" href="/final">Разбор</a>
   </header>
   <main>
     <section class="pane">
       <h2>Видео</h2>
-      <div id="videoWrap"><div id="wait">Собираю видео для браузера…</div>
-        <video id="vid" controls playsinline hidden></video></div>
+      <div id="videoCol">
+        <div id="videoWrap"><div id="wait">Собираю видео для браузера…</div>
+          <video id="vid" controls playsinline hidden></video></div>
+        <div id="flyBlock">
+          <h3>Сигнал мухи — куда поворачивает камера</h3>
+          <div id="flyPlayer"><canvas id="flyView"></canvas></div>
+          <div id="flyLabel">—</div>
+        </div>
+        <div id="modelSync" style="padding:8px 12px;border-top:1px solid var(--line);font-size:12px;color:var(--dim)">
+          Сдвиг модели (сек): <b id="offVal">0</b>
+          <input type="range" id="modelOffset" min="0" max="120" step="1" value="0" style="width:100%;margin-top:6px">
+        </div>
+      </div>
     </section>
     <section class="pane">
-      <h2>Точка и направление на графе</h2>
+      <h2 id="planTitle">Точка и направление на графе</h2>
       <div id="planWrap">
         <canvas id="plan"></canvas>
         <div id="hint"><b>Клик по линии графа</b> ставит старт. Потом выберите, куда человек идёт.
@@ -70,6 +91,15 @@
         <button type="button" id="fit">Вся карта</button>
         <button type="button" id="dirA" hidden></button>
         <button type="button" id="dirB" hidden></button>
+        <select id="verSel" title="версия трекера">
+          <option value="all">Все (V1–V5)</option>
+          <option value="v5">V5 — маршрут V1, стоит по мухе и шагам</option>
+          <option value="v4">V4 — развилки V1 + стоит по мухе и шагам</option>
+          <option value="v3">V3 — стоит по мухе и шагам</option>
+          <option value="v2">V2 — стоит по пикселям</option>
+          <option value="v1">V1 — первая замороженная</option>
+        </select>
+        <div id="legend3"></div>
         <button type="button" id="go" disabled>Старт</button>
         <div id="readout">Кликните на ребро графа.</div>
       </div>
@@ -77,11 +107,40 @@
     </section>
   </main>
 </div>
+<script src="/playback_sync.js"></script>
+<script src="/fly_panel.js"></script>
 <script>
 const $ = id => document.getElementById(id);
+let trajRows = [], playT = null, startPin = null, trackDur = 1e9, modelOffset = 0;
+const VER_COLORS = {v1: '#c084fc', v2: '#38bdf8', v3: '#22c55e', v4: '#f43f5e', v5: '#facc15'};
+let runs = {};
+function modelTime(videoT){
+  return Math.max(0, Math.min(+videoT - modelOffset, trackDur));
+}
+function syncPlan(videoT){
+  playT = modelTime(videoT);
+  flyPanel.draw(playT);
+  draw();
+}
+const flyPanel = FlyMotionPanel.bind({
+  canvasId: 'flyView', labelId: 'flyLabel', videoId: 'vid',
+  getRows: () => trajRows,
+  onTime(t){ syncPlan(t); },
+});
+const CLIP = (() => {
+  if (location.pathname === '/start5' || location.pathname === '/start5.html') return 'VID00020';
+  const q = new URLSearchParams(location.search).get('clip');
+  return q || 'VID00001';
+})();
+$('toFinal').href = '/final?clip=' + CLIP + '&full=1';
 let graph = null, planImg = null, segs = [];
+let trackerReady = false;
 let scale = 1, offX = 0, offY = 0, space = false, panning = false, lastPan = null;
-let click = null, place = null, toward = null, polling = null, route = [];
+let click = null, place = null, toward = null, polling = null;
+
+function sampleTrajAt(t){
+  return PlaybackSync.sampleTraj(trajRows, t);
+}
 
 function indexGraph(g){
   const nodes = {};
@@ -140,24 +199,30 @@ function draw(){
   for(const s of segs){
     ctx.beginPath(); ctx.moveTo(s.ax, s.ay); ctx.lineTo(s.bx, s.by); ctx.stroke();
   }
-  if(route.length){
-    ctx.strokeStyle = '#1f77ff';
-    ctx.lineWidth = Math.max(2.4, 4.5 / scale);
+  const shown = Object.keys(runs);
+  shown.forEach((v, k) => {
+    const pts = runs[v].route;
+    // небольшой сдвиг, чтобы совпадающие линии не закрывали друг друга
+    const d = (k - (shown.length - 1) / 2) * 3 / scale;
+    ctx.strokeStyle = VER_COLORS[v];
+    ctx.globalAlpha = 0.85;
+    ctx.lineWidth = Math.max(2, 3.5 / scale);
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
     ctx.beginPath();
     let prev = null;
-    for(const p of route){
+    for(const p of pts){
       const jump = prev && Math.hypot(p[0] - prev[0], p[1] - prev[1]) > 30;
       if(!prev || jump){
         if(prev) ctx.stroke();
         ctx.beginPath();
-        ctx.moveTo(p[0], p[1]);
-      } else ctx.lineTo(p[0], p[1]);
+        ctx.moveTo(p[0] + d, p[1] + d);
+      } else ctx.lineTo(p[0] + d, p[1] + d);
       prev = p;
     }
     ctx.stroke();
-  }
+    ctx.globalAlpha = 1;
+  });
   if(place){
     const ends = place.ends || [];
     const dest = ends.find(n => n.id === toward);
@@ -176,7 +241,35 @@ function draw(){
     ctx.arc(place.x, place.y, Math.max(10, 16 / scale), 0, Math.PI * 2);
     ctx.stroke();
   }
+  if(startPin){
+    ctx.fillStyle = '#f59e0b';
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = Math.max(1.8, 3 / scale);
+    ctx.beginPath();
+    ctx.arc(startPin.x, startPin.y, Math.max(7, 12 / scale), 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+  }
+  const legend = [];
+  shown.forEach((v, k) => {
+    const cur = playT != null ? PlaybackSync.sampleTraj(runs[v].rows, playT) : null;
+    const stopped = cur && (cur.is_stop === '1' || cur.is_stop === 1);
+    legend.push(`<span style="color:${VER_COLORS[v]}">● ${v.toUpperCase()}</span> ${runs[v].meters} м`
+      + (cur ? ` · <b>${stopped ? 'СТОИТ' : 'ИДЁТ'}</b>` : ''));
+    if(!cur) return;
+    ctx.fillStyle = VER_COLORS[v];
+    ctx.strokeStyle = stopped ? '#f59e0b' : '#ffffff';
+    ctx.lineWidth = Math.max(2, (stopped ? 5 : 3) / scale);
+    ctx.beginPath();
+    ctx.arc(+cur.x, +cur.y, Math.max(6, 10 / scale), 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#eef2f8';
+    ctx.font = `${Math.max(10, 14 / scale)}px sans-serif`;
+    ctx.fillText(v.toUpperCase(), +cur.x + 12 / scale, +cur.y - (10 - k * 14) / scale);
+  });
   ctx.restore();
+  $('legend3').innerHTML = legend.join('<br>')
+    + (playT != null && shown.length ? `<br><span style="color:#8a94a8">t=${playT.toFixed(1)} с · оранжевая обводка = стоит</span>` : '');
 }
 function showDirs(p){
   const buttons = [$('dirA'), $('dirB')];
@@ -194,6 +287,11 @@ function readout(){
     $('readout').innerHTML = `Ребро <b>${place.edge}</b>. Выберите, куда идёт человек.`;
     return;
   }
+  if(!trackerReady){
+    $('readout').innerHTML = `Точка выбрана (ребро <b>${place.edge}</b>, к <b>${toward}</b>). `
+      + `<b>«Старт»</b> включится, когда досчитаются brain и yaw для этого ролика (обычно 10–40 мин).`;
+    return;
+  }
   const behind = place.start_from;
   $('readout').innerHTML = `Ребро <b>${place.edge}</b>, идёт к <b>${toward}</b>, `
     + `<b>${place.progress_m} м</b> от ${behind}.`;
@@ -206,7 +304,7 @@ async function commit(x, y, dir){
   place = j;
   if(dir) toward = dir;
   showDirs(j);
-  $('go').disabled = !toward;
+  $('go').disabled = !toward || !trackerReady;
   readout();
   draw();
 }
@@ -221,29 +319,64 @@ async function poll(){
   $('go').disabled = false;
   if(j.state === 'done'){
     await loadRoute();
-    $('readout').innerHTML = 'Готово, линия на плане. <a href="/final?clip=VID00001&full=1" style="color:#5b8def">Только это видео</a>';
+    const v = VER() === 'all' ? 'v5' : VER();
+    $('readout').innerHTML = 'Готово, линии на плане. Запусти видео — точки поедут. <a href="/final?clip=' + CLIP + '&ver=' + v + '&full=1" style="color:#5b8def">Разбор по одной версии</a>';
   } else {
     $('readout').textContent = j.error || 'трекер остановился';
   }
 }
 async function loadRoute(){
-  const r = await fetch('/api/final/tracks');
-  const data = await r.json();
-  const tr = (data.tracks || []).find(t => t.id === 'VID00001');
-  route = tr && tr.points ? tr.points : [];
+  const want = VER() === 'all' ? ['v1', 'v2', 'v3', 'v4', 'v5'] : [VER()];
+  const next = {};
+  for(const v of want){
+    try{
+      const r = await fetch('/api/final/state?clip=' + encodeURIComponent(CLIP) + '&ver=' + v);
+      const j = await r.json();
+      if(!j.ok || j.version !== v || !j.trajectory || !j.trajectory.length) continue;
+      next[v] = {
+        rows: j.trajectory,
+        route: j.trajectory.map(p => [+p.x, +p.y]),
+        meters: j.report && j.report.stats ? j.report.stats.route_meters : '?',
+      };
+      trackDur = j.tracker_duration != null ? +j.tracker_duration : +j.duration || 1e9;
+      startPin = j.start_xy || {x:+j.trajectory[0].x, y:+j.trajectory[0].y};
+    }catch(_e){ /* нет прогона этой версии */ }
+  }
+  runs = next;
+  const main = runs.v5 || runs.v4 || runs.v3 || runs.v2 || runs.v1;
+  trajRows = main ? main.rows : [];
+  if(main){
+    modelOffset = +localStorage.getItem('model_offset_' + CLIP) || 0;
+    $('modelOffset').value = modelOffset;
+    $('offVal').textContent = modelOffset;
+    $('planTitle').textContent = 'Граф: оранж = старт, цветные точки = версии трекера';
+  }
   draw();
 }
+$('modelOffset').addEventListener('input', e => {
+  modelOffset = +e.target.value;
+  $('offVal').textContent = modelOffset;
+  localStorage.setItem('model_offset_' + CLIP, String(modelOffset));
+  syncPlan($('vid').currentTime || 0);
+});
+const VER = () => $('verSel').value;
+$('verSel').value = localStorage.getItem('start_ver') || 'all';
+if(!$('verSel').value) $('verSel').value = 'all';
+$('verSel').addEventListener('change', () => {
+  localStorage.setItem('start_ver', VER());
+  loadRoute();
+});
 $('fit').onclick = fit;
 $('dirA').onclick = () => { if(click){ toward = $('dirA').dataset.id; commit(click.x, click.y, toward); } };
 $('dirB').onclick = () => { if(click){ toward = $('dirB').dataset.id; commit(click.x, click.y, toward); } };
 $('go').onclick = async () => {
   if(!click || !toward) return;
   $('go').disabled = true;
-  route = [];
+  runs = {};
   draw();
-  $('readout').textContent = 'Запускаю трекер…';
+  $('readout').textContent = VER() === 'all' ? 'Запускаю V1–V5 по очереди…' : 'Запускаю трекер…';
   const r = await fetch('/api/start/run', {method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({x: click.x, y: click.y, toward})});
+    body: JSON.stringify({x: click.x, y: click.y, toward, clip: CLIP, ver: VER()})});
   const j = await r.json();
   if(!j.ok){ $('go').disabled = false; $('readout').textContent = j.error || 'не запустилось'; return; }
   if(polling) clearInterval(polling);
@@ -284,15 +417,30 @@ canvas.addEventListener('wheel', e => {
 window.addEventListener('resize', fit);
 
 async function loadVideo(){
-  const r = await fetch('/api/start/state');
+  const r = await fetch('/api/start/state?clip=' + encodeURIComponent(CLIP));
   const j = await r.json();
+  if(j.title) $('title').textContent = j.title;
   $('note').textContent = j.note || '';
-  if(!j.video_url){ setTimeout(loadVideo, 2000); return; }
+  trackerReady = !!j.tracker_ready;
+  if(place && toward) $('go').disabled = !trackerReady;
+  if(!j.video_url){
+    setTimeout(loadVideo, 2500);
+    return;
+  }
   $('wait').hidden = true;
   const v = $('vid');
   v.hidden = false;
-  v.src = j.video_url;
-  v.load();
+  const want = j.video_url;
+  if(v.getAttribute('src') !== want){
+    v.src = want;
+    v.load();
+  }
+  flyPanel.load(CLIP).catch(() => {});
+  if(!v._syncBound){
+    v._syncBound = true;
+    v.addEventListener('seeked', () => syncPlan(v.currentTime));
+  }
+  if(!trackerReady) setTimeout(loadVideo, 2500);
 }
 async function boot(){
   const [gs] = await Promise.all([
