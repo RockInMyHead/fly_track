@@ -14,3 +14,7 @@ data/
 dist/
 !desktop/seed/data/
 !desktop/seed/output/
+node_modules/
+desktop/runtime/
+desktop/release/
+desktop/assets/shot*

@@ -90,7 +90,13 @@ def main() -> int:
         print(f"  камера: {names}")
         if names != ["VID00001.AVI"]:
             sys.exit(f"FAIL: ожидался один VID00001.AVI, найдено {names}")
-        r = call(base, "/api/camera/import", {"paths": [files[0]["path"]]})
+        g = json.loads((app / "data" / "p08" / "graph.json").read_text(encoding="utf-8"))
+        nodes = {n["id"]: n for n in g["nodes"]}
+        e = g["edges"][0]
+        p, q = nodes[e["from"]], nodes[e["to"]]
+        start = {"x": (p["x"] + q["x"]) / 2 * g["img_w"], "y": (p["y"] + q["y"]) / 2 * g["img_h"],
+                 "toward": e["to"]}
+        r = call(base, "/api/camera/import", {"paths": [files[0]["path"]], "start": start})
         if not r.get("ok"):
             sys.exit(f"FAIL: импорт не начался: {r}")
 
@@ -115,24 +121,14 @@ def main() -> int:
                 f"{c.get('status')} {c.get('step') or ''}"
         wait(f"обработка {clip}", processed, 1800)
 
-        g = json.loads((app / "data" / "p08" / "graph.json").read_text(encoding="utf-8"))
-        nodes = {n["id"]: n for n in g["nodes"]}
-        e = g["edges"][0]
-        p, q = nodes[e["from"]], nodes[e["to"]]
-        x = (p["x"] + q["x"]) / 2 * g["img_w"]
-        y = (p["y"] + q["y"]) / 2 * g["img_h"]
-        r = call(base, "/api/start/run", {"clip": clip, "x": x, "y": y, "toward": e["to"], "ver": "all"})
-        if not r.get("ok"):
-            sys.exit(f"FAIL: старт трекеров: {r}")
-
         def trackers():
-            s = call(base, "/api/start/status")
-            if s.get("state") == "running":
-                return None, "running"
-            if s.get("state") != "done" or s.get("code") not in (0, None):
-                sys.exit(f"FAIL: трекеры: {s.get('state')} {s.get('error')}\n{s.get('log', '')[-3000:]}")
-            return True, "done"
-        wait("трекеры V1–V5", trackers, 1800)
+            c = next(x for x in call(base, "/api/app/clips")["clips"] if x["id"] == clip)
+            st = c.get("track_status")
+            if st == "error":
+                log = call(base, "/api/start/status").get("log", "")
+                sys.exit(f"FAIL: трекеры: {c.get('track_error')}\n{log[-3000:]}")
+            return (True if st == "done" else None), str(st)
+        wait("маршрут V1–V5 (сам после обработки)", trackers, 1800)
 
         bad = []
         for v in ("v1", "v2", "v3", "v4", "v5"):

@@ -11,7 +11,7 @@ permissions:
 
 env:
   PY_NUGET: "3.12.10"
-  STAGE: dist\win\FlyTrack
+  RT: desktop\runtime
   PYTHONUTF8: "1"
   PYTHONIOENCODING: utf-8
 
@@ -25,35 +25,38 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+
       - name: Version
         run: |
           if ("${{ github.ref_type }}" -eq "tag") { $v = "${{ github.ref_name }}".TrimStart("v") }
-          else { $v = "0.1.${{ github.run_number }}" }
+          else { $v = "1.0.${{ github.run_number }}" }
           "APP_VERSION=$v" >> $env:GITHUB_ENV
 
-      - name: Portable Python (NuGet)
+      - name: Portable Python (NuGet) with packages
         run: |
-          New-Item -ItemType Directory -Force $env:STAGE | Out-Null
+          New-Item -ItemType Directory -Force $env:RT | Out-Null
           Invoke-WebRequest "https://www.nuget.org/api/v2/package/python/$env:PY_NUGET" -OutFile py.zip
           Expand-Archive py.zip -DestinationPath py_nuget
-          Move-Item py_nuget\tools "$env:STAGE\python"
-          foreach ($exe in "python.exe", "pythonw.exe") {
-            if (-not (Test-Path "$env:STAGE\python\$exe")) { throw "no $exe in NuGet python" }
-          }
-          & "$env:STAGE\python\python.exe" -m ensurepip --upgrade
-          & "$env:STAGE\python\python.exe" -m pip install --no-warn-script-location -U pip
-          & "$env:STAGE\python\python.exe" -m pip install --no-warn-script-location -r desktop\windows\requirements-win.txt
-          & "$env:STAGE\python\python.exe" -c "import numpy, scipy, numba, cv2, matplotlib, flybrain, webview, clr; from webview.platforms import winforms; print('imports ok', numpy.__version__, numba.__version__)"
+          Move-Item py_nuget\tools "$env:RT\python"
+          $py = "$env:RT\python\python.exe"
+          & $py -m ensurepip --upgrade
+          & $py -m pip install --no-warn-script-location -U pip
+          & $py -m pip install --no-warn-script-location -r desktop\windows\requirements-win.txt
+          & $py -c "import numpy, scipy, numba, cv2, matplotlib, flybrain; print('imports ok', numpy.__version__, numba.__version__)"
 
       - name: ffmpeg
         run: |
           Invoke-WebRequest "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip" -OutFile ff.zip
           Expand-Archive ff.zip -DestinationPath ff
-          New-Item -ItemType Directory -Force "$env:STAGE\ffmpeg" | Out-Null
+          New-Item -ItemType Directory -Force "$env:RT\ffmpeg" | Out-Null
           $bin = Get-ChildItem ff -Recurse -Filter ffmpeg.exe | Select-Object -First 1
-          Copy-Item "$($bin.DirectoryName)\ffmpeg.exe", "$($bin.DirectoryName)\ffprobe.exe" "$env:STAGE\ffmpeg\"
-          Copy-Item (Get-ChildItem ff -Recurse -Filter LICENSE.txt | Select-Object -First 1).FullName "$env:STAGE\ffmpeg\LICENSE.txt"
-          & "$env:STAGE\ffmpeg\ffprobe.exe" -version | Select-Object -First 1
+          Copy-Item "$($bin.DirectoryName)\ffmpeg.exe", "$($bin.DirectoryName)\ffprobe.exe" "$env:RT\ffmpeg\"
+          Copy-Item (Get-ChildItem ff -Recurse -Filter LICENSE.txt | Select-Object -First 1).FullName "$env:RT\ffmpeg\LICENSE.txt"
 
       - name: Brain files cache
         uses: actions/cache@v4
@@ -61,66 +64,78 @@ jobs:
           path: malecns
           key: malecns-brain-v1
 
+      - name: Brain files
+        run: |
+          if (-not (Test-Path malecns\weights.npz)) {
+            & "$env:RT\python\python.exe" -c "from flybrain import data; data.download('malecns')"
+          }
+          New-Item -ItemType Directory -Force "$env:RT\malecns" | Out-Null
+          Copy-Item malecns\brain.npz, malecns\weights.npz "$env:RT\malecns\"
+
+      - name: Interface
+        working-directory: desktop
+        run: |
+          npm ci --no-audit --no-fund
+          npm version $env:APP_VERSION --no-git-tag-version --allow-same-version
+          npx tsc --noEmit
+          npm run build:ui
+
       - name: App folder
         run: |
-          $py = "$env:STAGE\python\python.exe"
-          if (-not (Test-Path malecns\weights.npz)) {
-            & $py -c "from flybrain import data; data.download('malecns')"
-          }
-          & $py desktop\build_bundle.py --dest "$env:STAGE\app" --malecns malecns
-          Get-ChildItem "$env:STAGE\app\data\malecns" | Format-Table Name, Length
+          & "$env:RT\python\python.exe" desktop\build_bundle.py --dest "$env:RT\app"
+          "${{ github.sha }}-${{ github.run_number }}" | Set-Content "$env:RT\app\BUILD.txt" -NoNewline
 
-      - name: Smoke test (copy of the app folder)
+      - name: Smoke test of the calculation (copy of the app folder)
         run: |
           $smoke = "$env:RUNNER_TEMP\smoke\app"
-          Copy-Item "$env:STAGE\app" $smoke -Recurse
-          $env:PATH = "$((Resolve-Path "$env:STAGE\ffmpeg").Path);$env:PATH"
-          $py = (Resolve-Path "$env:STAGE\python\python.exe").Path
+          Copy-Item "$env:RT\app" $smoke -Recurse
+          $env:PATH = "$((Resolve-Path "$env:RT\ffmpeg").Path);$env:PATH"
+          $env:FLY_DATA = (Resolve-Path "$env:RT\malecns").Path
+          $py = (Resolve-Path "$env:RT\python\python.exe").Path
           & $py desktop\smoke_test.py --app $smoke --python $py --seconds 12
           if ($LASTEXITCODE -ne 0) {
             Get-Content "$smoke\output\smoke_server.log" -Tail 80
             exit 1
           }
 
-      - name: Remove bytecode caches from stage
+      - name: Package (electron-builder)
+        working-directory: desktop
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
         run: |
-          Get-ChildItem $env:STAGE -Recurse -Directory -Filter __pycache__ |
-            Where-Object { $_.FullName -notlike "*\python\Lib\*" } | Remove-Item -Recurse -Force
+          npx electron-builder --win --x64 --publish never
+          Get-ChildItem release -File | Format-Table Name, Length
 
-      - name: Installer
+      - name: Launch packaged Fly Track.exe
         run: |
-          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
-          if (-not (Test-Path $iscc)) { choco install innosetup -y --no-progress; }
-          & $iscc "/DStage=$((Resolve-Path $env:STAGE).Path)" "/DAppVersion=$env:APP_VERSION" desktop\windows\installer.iss
-          if ($LASTEXITCODE -ne 0) { exit 1 }
-          Get-ChildItem dist\FlyTrack-Setup-*.exe | Format-Table Name, Length
-
-      - name: Silent install check
-        run: |
-          $exe = (Get-ChildItem dist\FlyTrack-Setup-*.exe).FullName
-          Start-Process $exe -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/MERGETASKS=!desktopicon", "/DIR=$env:RUNNER_TEMP\FlyTrackInstalled" -Wait
-          $inst = "$env:RUNNER_TEMP\FlyTrackInstalled"
-          foreach ($p in "python\pythonw.exe", "ffmpeg\ffmpeg.exe", "app\desktop\fly_track_app.py", "app\data\malecns\weights.npz") {
-            if (-not (Test-Path "$inst\$p")) { throw "installed copy has no $p" }
-          }
-          $proc = Start-Process "$inst\python\python.exe" -ArgumentList "-X", "utf8", "$inst\app\desktop\fly_track_app.py", "--headless", "--port", "8798" -WorkingDirectory "$inst\app" -PassThru
-          $ok = $false
-          foreach ($i in 1..60) {
-            Start-Sleep 2
-            try { if ((Invoke-RestMethod http://127.0.0.1:8798/api/app/clips).ok) { $ok = $true; break } } catch {}
-          }
-          Stop-Process $proc -Force
-          if (-not $ok) { throw "installed app did not answer" }
-          "installed app answered"
+          $exe = "desktop\release\win-unpacked\Fly Track.exe"
+          if (-not (Test-Path $exe)) { throw "no packaged exe" }
+          $env:FLY_WORKSPACE = "$env:RUNNER_TEMP\ws"
+          $env:FLY_SHOT = "$env:RUNNER_TEMP\window.png"
+          $env:FLY_SHOT_QUIT = "1"
+          $env:FLY_SHOT_DELAY_MS = "8000"
+          $p = Start-Process $exe -ArgumentList "--disable-gpu" -PassThru
+          if (-not $p.WaitForExit(240000)) { Stop-Process $p -Force; throw "app did not finish its self-check" }
+          $log = "$env:APPDATA\Fly Track\logs\backend.log"
+          if (Test-Path $log) { Get-Content $log -Tail 30 }
+          if (-not (Test-Path $env:FLY_SHOT)) { throw "app window was not captured" }
+          if (-not (Select-String -Path $log -Pattern "READY http" -Quiet)) { throw "backend did not start" }
+          New-Item -ItemType Directory -Force desktop\release\check | Out-Null
+          Copy-Item $env:FLY_SHOT desktop\release\check\window.png
 
       - uses: actions/upload-artifact@v4
         with:
-          name: FlyTrack-Setup-${{ env.APP_VERSION }}
-          path: dist/FlyTrack-Setup-*.exe
+          name: FlyTrack-${{ env.APP_VERSION }}
+          path: |
+            desktop/release/FlyTrack-Setup-*.exe
+            desktop/release/FlyTrack-Portable-*.zip
+            desktop/release/check/window.png
           compression-level: 0
 
       - name: Release
         if: github.ref_type == 'tag'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "${{ github.ref_name }}" (Get-ChildItem dist\FlyTrack-Setup-*.exe).FullName --title "Fly Track ${{ github.ref_name }}" --notes "Установщик для Windows 10/11 (64-bit)."
+        run: |
+          $files = (Get-ChildItem desktop\release\FlyTrack-Setup-*.exe, desktop\release\FlyTrack-Portable-*.zip).FullName
+          gh release create "${{ github.ref_name }}" $files --title "Fly Track ${{ github.ref_name }}" --notes "Fly Track для Windows 10/11 (64-bit): установщик и portable-архив."

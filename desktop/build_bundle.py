@@ -38,7 +38,8 @@ CODE_DIRS = {
     "scripts": ("*.py",),
     "webapp": ("*.py", "*.html", "*.js", "*.css"),
     "desktop": ("*.py",),
-    "desktop/assets": ("*",),
+    "desktop/assets": ("fly_track.*",),
+    "desktop/ui/dist": ("**/*",),
 }
 EMPTY_DIRS = ["data/p01r", "data/app", "webapp/media", "output/final_tracker/cache"]
 MALECNS = ("brain.npz", "weights.npz")
@@ -56,6 +57,8 @@ def snapshot() -> None:
 
 
 def build(dest: Path, malecns: Path | None, download: bool) -> None:
+    if not (ROOT / "desktop" / "ui" / "dist" / "index.html").exists():
+        sys.exit("нет desktop/ui/dist: сначала соберите интерфейс (cd desktop && npm run build:ui)")
     dest.mkdir(parents=True, exist_ok=True)
     for d, patterns in CODE_DIRS.items():
         src = ROOT / d
@@ -64,7 +67,7 @@ def build(dest: Path, malecns: Path | None, download: bool) -> None:
         for pat in patterns:
             for f in src.glob(pat):
                 if f.is_file() and "__pycache__" not in f.parts:
-                    out = dest / d / f.name
+                    out = dest / d / f.relative_to(src)
                     out.parent.mkdir(parents=True, exist_ok=True)
                     shutil.copy2(f, out)
     for rel in SEED_FILES:

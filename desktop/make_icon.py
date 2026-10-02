@@ -41,7 +41,11 @@ def main() -> None:
     im = draw()
     im.save(OUT / "fly_track.ico", sizes=[(16, 16), (24, 24), (32, 32), (48, 48), (64, 64),
                                           (128, 128), (256, 256)])
-    im.resize((256, 256), Image.LANCZOS).save(OUT / "fly_track.png")
+    im.resize((512, 512), Image.LANCZOS).save(OUT / "fly_track.png")
+    ui_public = OUT.parent / "ui" / "public"
+    ui_public.mkdir(parents=True, exist_ok=True)
+    im.resize((128, 128), Image.LANCZOS).save(ui_public / "favicon.png")
+    im.resize((256, 256), Image.LANCZOS).save(OUT.parent / "electron" / "icon.png")
     print(f"wrote {OUT / 'fly_track.ico'}")
 
 

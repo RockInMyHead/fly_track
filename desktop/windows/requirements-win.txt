@@ -6,4 +6,3 @@ opencv-python-headless==5.0.0.93
 matplotlib==3.11.2
 pillow==12.3.0
 flybrain==0.1.0
-pywebview==6.2.1

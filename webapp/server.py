@@ -200,6 +200,9 @@ MIME = {
     ".png": "image/png",
     ".jpg": "image/jpeg",
     ".webm": "video/webm",
+    ".svg": "image/svg+xml",
+    ".ico": "image/x-icon",
+    ".woff2": "font/woff2",
 }
 
 
@@ -308,6 +311,75 @@ def _run_tracker(place: dict, clip: str, ver: str, lines: list[str]) -> int:
         return 1
 
 
+def _track_hook(clip: str, start: dict) -> tuple[int, str]:
+    """Run V1..V5 from a plan start for the clip pipeline; waits if a manual run is going."""
+    place = snap_on_graph(float(start["x"]), float(start["y"]), str(start["toward"]))
+    if not place.get("ok"):
+        return 1, place.get("error") or "старт не на графе"
+    while True:
+        with _START_LOCK:
+            if _START_JOB["state"] != "running":
+                _START_JOB.update(state="running", log="запуск…\n", error="",
+                                  place=place, code=None, clip=clip, ver="all")
+                break
+        time.sleep(1.0)
+    _start_worker(place, clip, "all")
+    with _START_LOCK:
+        return int(_START_JOB.get("code") or 0), str(_START_JOB.get("error") or "")
+
+
+app_backend.track_hook = _track_hook
+
+
+def _runs_summary(clip: str) -> dict:
+    out = {}
+    for v in _versions(clip):
+        rep = read_json(RUN_BASES[v] / clip / "report.json", {})
+        stats = rep.get("stats") or {}
+        out[v] = {"meters": stats.get("route_meters"), "stop_fraction": stats.get("stop_fraction"),
+                  "start": rep.get("start")}
+    return out
+
+
+def _diagnostics() -> dict:
+    import platform
+    import shutil as sh
+
+    checks = []
+
+    def add(cid, title, ok, message):
+        checks.append({"id": cid, "title": title, "ok": bool(ok), "message": message})
+
+    add("backend", "Локальный сервер", True, f"Python {platform.python_version()}, {platform.system()} {platform.release()}")
+    for tool in ("ffmpeg", "ffprobe"):
+        where = sh.which(tool)
+        add(tool, tool, where, where or "не найден — переустановите программу")
+    brain_dir = Path(os.environ.get("FLY_DATA") or PROJECT / "data" / "malecns")
+    for name, min_mb in (("brain.npz", 40), ("weights.npz", 150)):
+        f = brain_dir / name
+        mb = f.stat().st_size / 1e6 if f.exists() else 0
+        add(name, f"Мозг мухи: {name}", mb >= min_mb, f"{mb:.0f} МБ" if mb else f"нет файла в {brain_dir}")
+    try:
+        import numba  # noqa: F401
+        import numpy  # noqa: F401
+        import scipy  # noqa: F401
+        import flybrain  # noqa: F401
+        add("packages", "Пакеты расчёта", True, f"numpy {numpy.__version__}, numba {numba.__version__}")
+    except Exception as e:
+        add("packages", "Пакеты расчёта", False, str(e))
+    add("graph", "План и граф цеха", P08_GRAPH.exists(), str(P08_GRAPH.name) if P08_GRAPH.exists() else "нет графа")
+    free = sh.disk_usage(PROJECT).free / 1e9
+    add("disk", "Свободное место", free > 5, f"{free:.1f} ГБ (нужно ~2 ГБ на час видео)")
+    cams = app_backend.scan_camera().get("cameras", [])
+    add("camera", "Камера", bool(cams),
+        ", ".join(f"{c['label']}: {len(c['files'])} AVI" for c in cams) if cams else "не подключена (это нормально, если загружаете файл)")
+    return {"ok": all(c["ok"] for c in checks if c["id"] != "camera"), "checks": checks,
+            "workspace": str(PROJECT)}
+
+
+UI_DIST = PROJECT / "desktop" / "ui" / "dist"
+
+
 def final_video_url(clip: str) -> str:
     """The file the tracker page should play.
 
@@ -389,13 +461,27 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:  # noqa: N802
         path = self.path.split("?", 1)[0]
 
+        if path == "/ui" or path.startswith("/ui/"):
+            rel = path[len("/ui"):].lstrip("/") or "index.html"
+            target = (UI_DIST / rel).resolve()
+            if not str(target).startswith(str(UI_DIST.resolve())) or not target.is_file():
+                target = UI_DIST / "index.html"
+            return self._serve(target)
         if path in ("/app", "/app.html") or (path == "/" and os.environ.get("FLY_APP") == "1"):
             return self._serve(ROOT / "app.html")
         if path == "/api/app/clips":
             app_backend.ensure_worker()
-            return self._json({"ok": True, "clips": app_backend.clips_overview(_tracker_inputs_ready),
+            clips = app_backend.clips_overview(_tracker_inputs_ready)
+            for c in clips:
+                c["runs"] = _runs_summary(c["id"])
+            return self._json({"ok": True, "clips": clips,
                                "import": app_backend.import_status(),
+                               "tracker": {k: _START_JOB.get(k) for k in ("state", "clip", "error")},
                                "app_mode": os.environ.get("FLY_APP") == "1"})
+        if path == "/api/app/graph":
+            return self._json({"ok": True, "graph": read_json(P08_GRAPH, {}), "plan_url": "/api/p08/plan"})
+        if path == "/api/app/diagnostics":
+            return self._json(_diagnostics())
         if path == "/api/camera/scan":
             return self._json(app_backend.scan_camera())
         if path == "/api/camera/import":
@@ -901,8 +987,29 @@ class Handler(BaseHTTPRequestHandler):
             paths = payload.get("paths") or []
             if not isinstance(paths, list):
                 return self._json({"ok": False, "error": "paths: список файлов"}, 400)
-            res = app_backend.start_import([str(p) for p in paths])
+            start = payload.get("start")
+            if start is not None:
+                try:
+                    start = {"x": float(start["x"]), "y": float(start["y"]), "toward": str(start["toward"])}
+                except (KeyError, TypeError, ValueError):
+                    return self._json({"ok": False, "error": "start: нужны x, y и toward"}, 400)
+                place = snap_on_graph(start["x"], start["y"], start["toward"])
+                if not place.get("ok"):
+                    return self._json(place, 400)
+            res = app_backend.start_import([str(p) for p in paths], start)
             return self._json(res, 200 if res.get("ok") else 409)
+        if path == "/api/app/track":
+            clip = str(payload.get("clip") or "")
+            if not re.fullmatch(r"VID[0-9]{5}", clip):
+                return self._json({"ok": False, "error": "bad clip id"}, 400)
+            try:
+                start = {"x": float(payload["x"]), "y": float(payload["y"]), "toward": str(payload["toward"])}
+            except (KeyError, TypeError, ValueError):
+                return self._json({"ok": False, "error": "нужны x, y и toward"}, 400)
+            place = snap_on_graph(start["x"], start["y"], start["toward"])
+            if not place.get("ok"):
+                return self._json(place, 400)
+            return self._json(app_backend.request_track(clip, start))
         if path == "/api/app/retry":
             clip = str(payload.get("clip") or "")
             if not re.fullmatch(r"VID[0-9]{5}", clip):

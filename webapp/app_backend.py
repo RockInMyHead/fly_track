@@ -57,6 +57,8 @@ _PROCS: set[subprocess.Popen] = set()
 _IMPORT = {"state": "idle", "file": "", "done_bytes": 0, "total_bytes": 0,
            "files_done": 0, "files_total": 0, "error": "", "imported": []}
 _worker_started = False
+# set by server.py: track_hook(cid, start) -> (code, error); runs V1..V5 from a plan start
+track_hook = None
 
 
 # --------------------------------------------------------------------------- helpers
@@ -268,7 +270,13 @@ def _copy_verified(src: Path, dst: Path) -> str:
     return src_hash
 
 
-def _import_worker(paths: list[str]) -> None:
+def _track_fields(start: dict | None) -> dict:
+    if not start:
+        return {}
+    return {"start": start, "track_status": "queued", "track_error": ""}
+
+
+def _import_worker(paths: list[str], start: dict | None = None) -> None:
     known = _imported_fingerprints()
     try:
         for p in map(Path, paths):
@@ -276,9 +284,13 @@ def _import_worker(paths: list[str]) -> None:
                 _IMPORT["file"] = p.name
             fp = fingerprint(p)
             if fp in known:
+                if start:
+                    _save_clip(known[fp], **_track_fields(start))
+                    _WAKE.set()
                 with _LOCK:
                     _IMPORT["done_bytes"] += p.stat().st_size
                     _IMPORT["files_done"] += 1
+                    _IMPORT["imported"].append(known[fp])
                 continue
             free = shutil.disk_usage(P01R).free
             if free < p.stat().st_size * 1.3 + 500_000_000:
@@ -290,7 +302,7 @@ def _import_worker(paths: list[str]) -> None:
                        source_mtime=st.st_mtime,
                        source_mtime_text=time.strftime("%d.%m.%Y %H:%M", time.localtime(st.st_mtime)),
                        fingerprint=fp, sha256=sha, imported_at=time.time(),
-                       status="queued", step=None, error="", log="")
+                       status="queued", step=None, error="", log="", **_track_fields(start))
             known[fp] = cid
             with _LOCK:
                 _IMPORT["files_done"] += 1
@@ -304,7 +316,7 @@ def _import_worker(paths: list[str]) -> None:
             _IMPORT["error"] = str(e)
 
 
-def start_import(paths: list[str]) -> dict:
+def start_import(paths: list[str], start: dict | None = None) -> dict:
     with _LOCK:
         if _IMPORT["state"] == "running":
             return {"ok": False, "error": "копирование уже идёт"}
@@ -315,7 +327,7 @@ def start_import(paths: list[str]) -> dict:
         _IMPORT.update(state="running", file="", done_bytes=0,
                        total_bytes=sum(Path(p).stat().st_size for p in good),
                        files_done=0, files_total=len(good), error="", imported=[])
-    threading.Thread(target=_import_worker, args=(good,), daemon=True).start()
+    threading.Thread(target=_import_worker, args=(good, start), daemon=True).start()
     ensure_worker()
     return {"ok": True}
 
@@ -483,21 +495,50 @@ def _process(cid: str) -> None:
     _save_clip(cid, status="done", step=None, finished_at=time.time())
 
 
+def _track(cid: str) -> None:
+    rec = clip_record(cid) or {}
+    if track_hook is None or not rec.get("start") or rec.get("track_status") not in ("queued", "running"):
+        return
+    _save_clip(cid, track_status="running", track_error="", track_started=time.time())
+    try:
+        code, err = track_hook(cid, rec["start"])
+    except Exception as e:
+        code, err = 1, str(e)
+    _save_clip(cid, track_status="done" if code == 0 else "error",
+               track_error="" if code == 0 else (err or f"код {code}"), track_finished=time.time())
+
+
 def _worker() -> None:
     while True:
-        todo = [cid for cid, r in sorted(_clips()["clips"].items())
-                if r.get("status") in ("queued", "running")]
-        if not todo:
+        clips = sorted(_clips()["clips"].items())
+        todo = [cid for cid, r in clips if r.get("status") in ("queued", "running")]
+        to_track = [cid for cid, r in clips
+                    if r.get("status") == "done" and r.get("track_status") in ("queued", "running")]
+        if not todo and not to_track:
             _WAKE.wait(5.0)
             _WAKE.clear()
             continue
-        cid = todo[0]
-        try:
-            if not (P01R / f"{cid}.AVI").exists():
-                raise RuntimeError(f"нет файла data/p01r/{cid}.AVI")
-            _process(cid)
-        except Exception as e:
-            _save_clip(cid, status="error", error=str(e))
+        if todo:
+            cid = todo[0]
+            try:
+                if not (P01R / f"{cid}.AVI").exists():
+                    raise RuntimeError(f"нет файла data/p01r/{cid}.AVI")
+                _process(cid)
+            except Exception as e:
+                _save_clip(cid, status="error", error=str(e))
+                continue
+        else:
+            cid = to_track[0]
+        _track(cid)
+
+
+def request_track(cid: str, start: dict) -> dict:
+    if not clip_record(cid):
+        _save_clip(cid, status="done", external=True)
+    _save_clip(cid, **_track_fields(start))
+    _WAKE.set()
+    ensure_worker()
+    return {"ok": True}
 
 
 def ensure_worker() -> None:
