@@ -1,4 +1,4 @@
-; Fly Track installer (Inno Setup 6).
+﻿; Fly Track installer (Inno Setup 6).
 ;   iscc /DStage=dist\win\FlyTrack /DAppVersion=1.0.0 desktop\windows\installer.iss
 ; Stage holds python\, ffmpeg\ and app\ (see .github/workflows/windows-app.yml).
 ; Per-user install: the app folder must stay writable (camera videos, brain records, routes).
@@ -68,6 +68,6 @@ begin
   if CurUninstallStep = usPostUninstall then
     if DirExists(ExpandConstant('{app}\app\data\app')) then
       if MsgBox('Удалить и загруженные с камеры видео, записи мозга и маршруты?' + #13#10 +
-                ExpandConstant('{app}\app'), mbConfirmation, MB_YESNO or MB_DEFAULTBUTTON2) = IDYES then
+                ExpandConstant('{app}\app'), mbConfirmation, MB_YESNO or MB_DEFBUTTON2) = IDYES then
         DelTree(ExpandConstant('{app}'), True, True, True);
 end;
