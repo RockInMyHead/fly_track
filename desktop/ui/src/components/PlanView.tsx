@@ -133,7 +133,7 @@ export default function PlanView({
     }
 
     if (place) {
-      const end = toward ? place.ends.find((e) => e.id === toward) : null;
+      const end = toward && mode === "view" ? place.ends.find((e) => e.id === toward) : null;
       if (end) {
         const dx = end.x - place.x;
         const dy = end.y - place.y;

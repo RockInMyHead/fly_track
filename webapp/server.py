@@ -207,6 +207,7 @@ MIME = {
 
 
 _GRAPH_CACHE: tuple[float, object] | None = None
+_SNAP_MAX_PX = 200.0
 
 
 def _public_error(msg: str) -> str:
@@ -273,7 +274,7 @@ def snap_on_graph(x: float, y: float, toward: str | None = None) -> dict:
             best = {"edge": eid, "from_node": e["from"], "to_node": e["to"],
                     "t": t, "x": px, "y": py, "node": node, "dist": dist,
                     "ax": ax, "ay": ay, "bx": bx, "by": by}
-    if best is None or best["dist"] > 120:
+    if best is None or best["dist"] > _SNAP_MAX_PX:
         return {"ok": False, "error": _public_error("кликните ближе к линии графа")}
     ends = [
         {"id": best["from_node"], "x": best["ax"], "y": best["ay"]},
@@ -297,6 +298,44 @@ def snap_on_graph(x: float, y: float, toward: str | None = None) -> dict:
     return out
 
 
+def _project_on_edge(g, edge_id: str, x: float, y: float) -> dict | None:
+    """Snap (x,y) to a known passage segment (keeps start edge when picking direction)."""
+    e = g.edges.get(edge_id)
+    if not e:
+        return None
+    ax, ay = g.pos(e["from"])
+    bx, by = g.pos(e["to"])
+    dx, dy = bx - ax, by - ay
+    span = dx * dx + dy * dy
+    if span < 1e-6:
+        return None
+    t = max(0.0, min(1.0, ((x - ax) * dx + (y - ay) * dy) / span))
+    px, py = ax + dx * t, ay + dy * t
+    node = None
+    if math.hypot(px - ax, py - ay) <= 10:
+        t, px, py, node = 0.0, ax, ay, e["from"]
+    elif math.hypot(px - bx, py - by) <= 10:
+        t, px, py, node = 1.0, bx, by, e["to"]
+    dist = math.hypot(x - px, y - py)
+    if dist > _SNAP_MAX_PX:
+        return None
+    return {
+        "ok": True,
+        "edge": edge_id,
+        "x": round(px, 2),
+        "y": round(py, 2),
+        "dist_px": round(dist, 1),
+        "ends": [
+            {"id": e["from"], "x": ax, "y": ay},
+            {"id": e["to"], "x": bx, "y": by},
+        ],
+        "on_node": node,
+        "_t": t,
+        "_from": e["from"],
+        "_to": e["to"],
+    }
+
+
 def _edge_between(g, n1: str, n2: str) -> str | None:
     for eid in g.edges_at(n1):
         e = g.edges[eid]
@@ -309,7 +348,7 @@ def _place_with_toward(g, edge_id: str, toward: str, t: float = 0.07) -> dict:
     """Build a validated start on edge_id, facing toward (no global re-snap)."""
     e = g.edges.get(edge_id)
     if not e:
-        return {"ok": False, "error": _public_error("edge missing")}
+        return {"ok": False, "error": "Не удалось зафиксировать старт на проходе — задайте точку заново."}
     a, b = e["from"], e["to"]
     if toward not in (a, b):
         return {"ok": False, "error": _public_error(f"узел {toward} не на ребре {edge_id}")}
@@ -337,12 +376,23 @@ def _place_with_toward(g, edge_id: str, toward: str, t: float = 0.07) -> dict:
     }
 
 
-def direction_from_click(sx: float, sy: float, cx: float, cy: float) -> dict:
+def direction_from_click(
+    sx: float, sy: float, cx: float, cy: float, edge_id: str | None = None
+) -> dict:
     """From a fixed start on the plan, pick the passage that best matches the click bearing."""
-    base = snap_on_graph(sx, sy, None)
+    try:
+        g = _load_graph()
+    except OSError:
+        return {"ok": False, "error": _public_error("permission denied plan")}
+    except (ValueError, Exception):
+        return {"ok": False, "error": "План цеха повреждён или не установлен. Переустановите Fly Track."}
+    base = None
+    if edge_id:
+        base = _project_on_edge(g, str(edge_id), sx, sy)
+    if not base:
+        base = snap_on_graph(sx, sy, None)
     if not base.get("ok"):
         return base
-    g = _load_graph()
     px, py = float(base["x"]), float(base["y"])
     vx, vy = cx - px, cy - py
     vl = math.hypot(vx, vy)
@@ -1250,8 +1300,11 @@ class Handler(BaseHTTPRequestHandler):
                 cx, cy = float(payload["click_x"]), float(payload["click_y"])
             except (KeyError, TypeError, ValueError):
                 return self._json({"ok": False, "error": "нужны координаты старта и клика"}, 400)
+            edge_hint = payload.get("edge")
+            if edge_hint is not None:
+                edge_hint = str(edge_hint)
             try:
-                out = direction_from_click(sx, sy, cx, cy)
+                out = direction_from_click(sx, sy, cx, cy, edge_hint)
             except Exception as e:
                 return self._json({"ok": False, "error": _public_error(str(e))}, 500)
             if not out.get("ok") and out.get("error"):

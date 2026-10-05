@@ -125,8 +125,14 @@ export const api = {
   clips: () => request<ClipsResponse>("/api/app/clips"),
   graph: () => request<{ graph: Graph; plan_url: string }>("/api/app/graph"),
   place: (x: number, y: number, toward?: string) => request<Place>("/api/start/place", { x, y, toward }),
-  placeDirection: (x: number, y: number, clickX: number, clickY: number) =>
-    request<Place>("/api/start/direction", { x, y, click_x: clickX, click_y: clickY }),
+  placeDirection: (place: Place, clickX: number, clickY: number) =>
+    request<Place>("/api/start/direction", {
+      x: place.x,
+      y: place.y,
+      edge: place.edge,
+      click_x: clickX,
+      click_y: clickY,
+    }),
   scanCamera: () => request<{ cameras: Camera[] }>("/api/camera/scan"),
   importFiles: (paths: string[], start: StartPoint) => request<{ ok: true }>("/api/camera/import", { paths, start }),
   track: (clip: string, start: StartPoint) => request<{ ok: true }>("/api/app/track", { clip, ...start }),

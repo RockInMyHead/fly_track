@@ -199,7 +199,7 @@ export default function App() {
           return;
         }
         if (mode === "direction") {
-          const p = await api.placeDirection(place.x, place.y, x, y);
+          const p = await api.placeDirection(place, x, y);
           setPlace(p);
           setToward(p.toward ?? null);
           setMode("view");
@@ -485,7 +485,14 @@ export default function App() {
             right={
               <div className="flex items-center gap-2">
                 <span className="mr-2 text-xs text-muted-foreground">{hint}</span>
-                <Button size="sm" variant={mode === "start" ? "default" : "outline"} onClick={() => setMode("start")}>
+                <Button
+                  size="sm"
+                  variant={mode === "start" ? "default" : "outline"}
+                  onClick={() => {
+                    setToward(null);
+                    setMode("start");
+                  }}
+                >
                   <MapPinned className="h-3.5 w-3.5" /> Старт
                 </Button>
                 <Button size="sm" variant={mode === "direction" ? "default" : "outline"} disabled={!place} onClick={() => { setToward(null); setMode("direction"); }}>
