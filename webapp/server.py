@@ -219,7 +219,7 @@ def _public_error(msg: str) -> str:
         if "ближе" in low or "dist" in low:
             return "Кликните ближе к проходу на плане (при необходимости увеличьте масштаб)."
         if "направлен" in low or "toward" in low:
-            return "Выберите направление кнопками «Вправo» или «Влевo»."
+            return "Кликните на план в сторону, куда пошёл человек."
         return "Точку нельзя поставить здесь — выберите проход на плане."
     if "нет маршрута" in low or "конца маршрута" in low:
         return msg.split(":")[0] if ":" in msg else "Сначала постройте маршрут для предыдущего ролика."
@@ -243,21 +243,6 @@ def _load_graph():
         raise ValueError("empty plan geometry")
     _GRAPH_CACHE = (mtime, g)
     return g
-
-
-def _toward_right(px: float, py: float, ax: float, ay: float, bx: float, by: float,
-                  from_id: str, to_id: str, ref_dx: float, ref_dy: float) -> str:
-    fn = math.hypot(ref_dx, ref_dy) or 1.0
-    fx, fy = ref_dx / fn, ref_dy / fn
-    rx, ry = fy, -fx
-    best, best_score = from_id, -1e9
-    for nid, nx, ny in ((from_id, ax, ay), (to_id, bx, by)):
-        vx, vy = nx - px, ny - py
-        vl = math.hypot(vx, vy) or 1.0
-        score = (vx / vl) * rx + (vy / vl) * ry
-        if score > best_score:
-            best_score, best = score, nid
-    return best
 
 
 def snap_on_graph(x: float, y: float, toward: str | None = None) -> dict:
@@ -297,11 +282,6 @@ def snap_on_graph(x: float, y: float, toward: str | None = None) -> dict:
     out = {"ok": True, "edge": best["edge"], "x": round(best["x"], 2), "y": round(best["y"], 2),
            "dist_px": round(best["dist"], 1), "ends": ends, "on_node": best["node"]}
     if not toward:
-        right = _toward_right(best["x"], best["y"], best["ax"], best["ay"], best["bx"], best["by"],
-                              best["from_node"], best["to_node"], 0.0, -1.0)
-        left = best["to_node"] if right == best["from_node"] else best["from_node"]
-        out["right_toward"] = right
-        out["left_toward"] = left
         return out
     if toward not in (best["from_node"], best["to_node"]):
         return {"ok": False, "error": _public_error(f"узел {toward} не на ребре {best['edge']}")}

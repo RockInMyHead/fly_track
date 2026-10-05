@@ -188,21 +188,6 @@ export default function App() {
 
   const start: StartPoint | null = place && toward ? { x: place.x, y: place.y, toward } : null;
 
-  const pickToward = useCallback(
-    async (nodeId: string) => {
-      if (!place) return;
-      try {
-        const p = await api.place(place.x, place.y, nodeId);
-        setPlace(p);
-        setToward(nodeId);
-        setMode("view");
-      } catch (e) {
-        toast.error((e as Error).message);
-      }
-    },
-    [place],
-  );
-
   const onPlanClick = useCallback(
     async (x: number, y: number) => {
       try {
@@ -309,7 +294,7 @@ export default function App() {
     mode === "start"
       ? "Кликните по проходу там, где человек начал путь"
       : mode === "direction"
-        ? "Нажмите «Вправо» или «Влево» (от точки старта), либо кликните на план"
+        ? "Кликните на план в сторону, куда пошёл человек"
         : start
           ? "Старт и направление заданы"
           : "";
@@ -521,24 +506,6 @@ export default function App() {
                 <Button size="sm" variant={mode === "direction" ? "default" : "outline"} disabled={!place} onClick={() => { setToward(null); setMode("direction"); }}>
                   <Navigation className="h-3.5 w-3.5" /> Направление
                 </Button>
-                {place && mode === "direction" && place.right_toward && place.left_toward && (
-                  <>
-                    <Button
-                      size="sm"
-                      variant={toward === place.right_toward ? "default" : "secondary"}
-                      onClick={() => void pickToward(place.right_toward!)}
-                    >
-                      <Compass className="h-3.5 w-3.5" /> Вправо → {place.right_toward}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant={toward === place.left_toward ? "default" : "secondary"}
-                      onClick={() => void pickToward(place.left_toward!)}
-                    >
-                      Влево → {place.left_toward}
-                    </Button>
-                  </>
-                )}
                 <Button size="sm" variant="ghost" onClick={resetStart}>
                   <RotateCcw className="h-3.5 w-3.5" /> Сбросить
                 </Button>

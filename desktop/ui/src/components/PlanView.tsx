@@ -133,30 +133,6 @@ export default function PlanView({
     }
 
     if (place) {
-      if (mode === "direction" && !toward && place.right_toward && place.left_toward) {
-        for (const [id, color] of [
-          [place.right_toward, "#22c55e"],
-          [place.left_toward, "#94a3b8"],
-        ] as const) {
-          const end = place.ends.find((e) => e.id === id);
-          if (!end) continue;
-          const dx = end.x - place.x;
-          const dy = end.y - place.y;
-          const len = Math.hypot(dx, dy) || 1;
-          const L = px(38);
-          const ux = dx / len, uy = dy / len;
-          ctx.strokeStyle = color;
-          ctx.globalAlpha = 0.85;
-          ctx.lineWidth = px(3);
-          ctx.setLineDash([px(6), px(5)]);
-          ctx.beginPath();
-          ctx.moveTo(place.x, place.y);
-          ctx.lineTo(place.x + ux * L, place.y + uy * L);
-          ctx.stroke();
-          ctx.setLineDash([]);
-          ctx.globalAlpha = 1;
-        }
-      }
       const end = toward ? place.ends.find((e) => e.id === toward) : null;
       if (end) {
         const dx = end.x - place.x;
