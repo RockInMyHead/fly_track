@@ -63,6 +63,9 @@ export type Place = {
   x: number;
   y: number;
   ends: { id: string; x: number; y: number }[];
+  /** «Вправо» / «влево» от точки старта, если «вперёд» = вверх по плану (как на камере). */
+  right_toward?: string;
+  left_toward?: string;
   toward?: string;
   start_from?: string;
 };

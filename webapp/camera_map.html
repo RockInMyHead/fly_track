@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Камера — карта маршрутов</title>
+<style>
+  :root { --bg:#0c0e14; --panel:#141922; --line:#2a3142; --fg:#eef1f7; --dim:#8b95a8; --accent:#5b8def; --ok:#34d399; --warn:#fbbf24; --bad:#f87171; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { height:100%; }
+  body { background:var(--bg); color:var(--fg); font:15px/1.45 system-ui,sans-serif; display:flex; flex-direction:column; }
+  header { flex:none; display:flex; align-items:center; gap:12px; padding:12px 16px; background:var(--panel); border-bottom:1px solid var(--line); }
+  header h1 { font-size:17px; }
+  header p { color:var(--dim); font-size:13px; }
+  header .grow { flex:1; }
+  button { font:inherit; color:var(--fg); background:#1c2230; border:1px solid var(--line); border-radius:8px; padding:8px 12px; cursor:pointer; }
+  main { flex:1; display:grid; grid-template-columns:300px 1fr; min-height:0; }
+  aside { border-right:1px solid var(--line); overflow:auto; padding:8px; background:var(--panel); }
+  .item { padding:10px; border-radius:8px; cursor:pointer; margin-bottom:4px; border:1px solid transparent; }
+  .item.on { border-color:var(--accent); background:#1a2540; }
+  .item .sub { font-size:12px; color:var(--dim); }
+  #mapWrap { position:relative; min-height:0; background:#06080c; }
+  canvas { width:100%; height:100%; display:block; touch-action:none; }
+  #hint { position:absolute; left:12px; bottom:12px; padding:10px; background:rgba(12,14,20,.9); border:1px solid var(--line); border-radius:8px; font-size:13px; color:var(--dim); max-width:400px; }
+</style>
+</head>
+<body>
+<header>
+  <div><h1>Маршруты с камеры</h1><p>План и траектории V5</p></div>
+  <div class="grow"></div>
+  <button id="btnReload">Обновить</button>
+</header>
+<main>
+  <aside id="list"></aside>
+  <div id="mapWrap"><canvas id="cv"></canvas><div id="hint">Загрузка…</div></div>
+</main>
+<script>
+(() => {
+  const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
+  const listEl = document.getElementById("list"), hint = document.getElementById("hint"), wrap = document.getElementById("mapWrap");
+  const COLORS = Array.from({length:15}, (_,i) => `hsl(${i*24},72%,58%)`);
+  let graph, img, clips = [], selected = null, view = null, drag = null;
+
+  function size() {
+    const r = wrap.getBoundingClientRect(), d = devicePixelRatio||1;
+    cv.width = r.width*d; cv.height = r.height*d;
+    ctx.setTransform(d,0,0,d,0,0);
+    return {w:r.width,h:r.height};
+  }
+  function nodes() {
+    const m = new Map(), iw = graph?.img_w||1, ih = graph?.img_h||1;
+    (graph?.nodes||[]).forEach(n => m.set(n.id, {x:n.x*iw, y:n.y*ih}));
+    return m;
+  }
+  function toS(x,y) { return {x:x*view.s+view.tx, y:y*view.s+view.ty}; }
+  function fit(pts) {
+    const {w,h} = size(), nm = nodes(), all = pts?.length ? pts : [...nm.values()];
+    if (!all.length) return;
+    const xs = all.map(p=>p.x), ys = all.map(p=>p.y);
+    const minX=Math.min(...xs), maxX=Math.max(...xs), minY=Math.min(...ys), maxY=Math.max(...ys);
+    const pad = Math.max(maxX-minX,maxY-minY)*0.08+40, s = Math.min(w/(maxX-minX+pad*2), h/(maxY-minY+pad*2));
+    view = {s, tx:(w-(maxX+minX)*s)/2, ty:(h-(maxY+minY)*s)/2};
+    draw();
+  }
+  function draw() {
+    if (!view) return;
+    const {w,h} = size();
+    ctx.fillStyle="#06080c"; ctx.fillRect(0,0,w,h);
+    if (img) { const a=toS(0,0), b=toS(img.width,img.height); ctx.drawImage(img,a.x,a.y,b.x-a.x,b.y-a.y); }
+    const nm = nodes(), edges = Array.isArray(graph?.edges) ? graph.edges : Object.values(graph?.edges||{});
+    ctx.strokeStyle="rgba(120,140,180,.35)"; ctx.lineWidth=2; ctx.beginPath();
+    edges.forEach(e => { const A=nm.get(e.from), B=nm.get(e.to); if(!A||!B)return; const a=toS(A.x,A.y), b=toS(B.x,B.y); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); });
+    ctx.stroke();
+    clips.forEach((c,i) => {
+      if (!c.visible || !c.trajectory?.length) return;
+      ctx.strokeStyle=COLORS[i]; ctx.lineWidth=c.id===selected?4:2.5; ctx.beginPath();
+      c.trajectory.forEach((p,j)=>{ const s=toS(p.x,p.y); j?ctx.lineTo(s.x,s.y):ctx.moveTo(s.x,s.y); });
+      ctx.stroke();
+    });
+  }
+  async function load() {
+    const data = await (await fetch("/api/camera/map")).json();
+    graph = data.graph;
+    clips = data.clips.map(c => ({...c, visible: !!c.trajectory?.length}));
+    selected = clips.find(c=>c.trajectory?.length)?.id || clips[0]?.id;
+    await new Promise((res,rej)=>{ const im=new Image(); im.onload=()=>{img=im;res();}; im.onerror=rej; im.src=data.plan_url; });
+    listEl.innerHTML = clips.map((c,i)=>`<div class="item ${c.id===selected?'on':''}" data-id="${c.id}">
+      <div><b>${c.id}</b> ${c.meters!=null?c.meters+' м':''}</div><div class="sub">${c.source_name||''}</div></div>`).join("");
+    listEl.querySelectorAll(".item").forEach(el => el.onclick = () => { selected=el.dataset.id; clips.forEach(c=>c.visible=true); listEl.querySelectorAll(".item").forEach(x=>x.classList.toggle("on",x.dataset.id===selected)); const c=clips.find(x=>x.id===selected); hint.innerHTML=`<b>${c.id}</b> ${c.meters||'—'} м`; fit(c?.trajectory); draw(); });
+    hint.textContent = "Клик по списку — выделить. Колёсико — масштаб.";
+    fit(clips.flatMap(c=>c.trajectory||[]));
+  }
+  cv.onwheel = e => { e.preventDefault(); if(!view)return; const r=cv.getBoundingClientRect(), mx=e.clientX-r.left, my=e.clientY-r.top, k=e.deltaY>0?0.9:1.1;
+    const wx=(mx-view.tx)/view.s, wy=(my-view.ty)/view.s; view.s*=k; view.tx=mx-wx*view.s; view.ty=my-wy*view.s; draw(); };
+  cv.onpointerdown = e => { drag={x:e.clientX,y:e.clientY,tx:view.tx,ty:view.ty}; cv.setPointerCapture(e.pointerId); };
+  cv.onpointermove = e => { if(!drag)return; view.tx=drag.tx+e.clientX-drag.x; view.ty=drag.ty+e.clientY-drag.y; draw(); };
+  cv.onpointerup = () => drag=null;
+  document.getElementById("btnReload").onclick = load;
+  load().catch(e => hint.textContent = "Ошибка: "+e.message);
+})();
+</script>
+</body>
+</html>

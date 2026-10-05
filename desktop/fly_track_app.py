@@ -114,6 +114,7 @@ def main() -> int:
     threading.Thread(target=srv.serve_forever, daemon=True, name="http").start()
     url = f"http://127.0.0.1:{port}/app"
     print(f"сервер {url}", flush=True)
+    print(f"карта камеры http://127.0.0.1:{port}/camera", flush=True)
 
     try:
         if a.headless:

@@ -245,6 +245,11 @@ def snap_on_graph(x: float, y: float, toward: str | None = None) -> dict:
     out = {"ok": True, "edge": best["edge"], "x": round(best["x"], 2), "y": round(best["y"], 2),
            "dist_px": round(best["dist"], 1), "ends": ends, "on_node": best["node"]}
     if not toward:
+        right = _toward_right(best["x"], best["y"], best["ax"], best["ay"], best["bx"], best["by"],
+                              best["from_node"], best["to_node"], 0.0, -1.0)
+        left = best["to_node"] if right == best["from_node"] else best["from_node"]
+        out["right_toward"] = right
+        out["left_toward"] = left
         return out
     if toward not in (best["from_node"], best["to_node"]):
         return {"ok": False, "error": f"узел {toward} не на ребре {best['edge']}"}
@@ -370,6 +375,40 @@ def _runs_summary(clip: str) -> dict:
         out[v] = {"meters": stats.get("route_meters"), "stop_fraction": stats.get("stop_fraction"),
                   "start": rep.get("start")}
     return out
+
+
+CAMERA_CLIP_IDS = [f"VID100{i:02d}" for i in range(2, 17)]
+
+
+def _camera_map_payload() -> dict:
+    app_backend.ensure_worker()
+    graph = read_json(P08_GRAPH, {})
+    clips = []
+    for cid in CAMERA_CLIP_IDS:
+        rec = app_backend.clip_record(cid) or {"id": cid}
+        ver, run_dir = _run_dir(cid, "v5")
+        traj_path = run_dir / "trajectory.csv"
+        if not traj_path.exists():
+            ver, run_dir = _run_dir(cid, None)
+            traj_path = run_dir / "trajectory.csv"
+        points: list[dict] = []
+        meters = None
+        if traj_path.exists():
+            for row in csv.DictReader(traj_path.open(encoding="utf-8")):
+                points.append({"x": float(row["x"]), "y": float(row["y"]), "t": float(row["time"])})
+            rep = read_json(run_dir / "report.json", {})
+            meters = (rep.get("stats") or {}).get("route_meters")
+        clips.append({
+            "id": cid,
+            "source_name": rec.get("source_name") or "",
+            "track_status": rec.get("track_status"),
+            "track_error": rec.get("track_error") or "",
+            "meters": meters,
+            "version": ver if points else None,
+            "start": rec.get("start"),
+            "trajectory": points,
+        })
+    return {"ok": True, "plan_url": "/api/p08/plan", "graph": graph, "clips": clips}
 
 
 def _diagnostics() -> dict:
@@ -517,6 +556,11 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(app_backend.scan_camera())
         if path == "/api/camera/import":
             return self._json(app_backend.import_status())
+        if path == "/api/camera/map":
+            return self._json(_camera_map_payload())
+
+        if path in ("/camera", "/camera.html", "/map", "/camera_map.html"):
+            return self._serve(ROOT / "camera_map.html")
 
         if path in ("/", "/index.html"):
             return self._serve(ROOT / "index.html")
