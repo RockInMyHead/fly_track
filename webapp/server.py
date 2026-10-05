@@ -206,16 +206,68 @@ MIME = {
 }
 
 
+_GRAPH_CACHE: tuple[float, object] | None = None
+
+
+def _public_error(msg: str) -> str:
+    """User-facing text: no graph/topology jargon."""
+    low = (msg or "").lower()
+    if any(w in low for w in ("permission", "access is denied", "errno 13", "failed to access")):
+        return ("Не удалось прочитать файлы плана. Закройте Fly Track, "
+                "откройте «Проверка системы» или переустановите программу.")
+    if "граф" in low or "graph" in low or "ребр" in low or "узел" in low or "edge" in low:
+        if "ближе" in low or "dist" in low:
+            return "Кликните ближе к проходу на плане (при необходимости увеличьте масштаб)."
+        if "направлен" in low or "toward" in low:
+            return "Выберите направление кнопками «Вправo» или «Влевo»."
+        return "Точку нельзя поставить здесь — выберите проход на плане."
+    if "нет маршрута" in low or "конца маршрута" in low:
+        return msg.split(":")[0] if ":" in msg else "Сначала постройте маршрут для предыдущего ролика."
+    return msg
+
+
 def _load_graph():
+    global _GRAPH_CACHE
     sys.path.insert(0, str(PROJECT))
     sys.path.insert(0, str(PROJECT / "scripts"))
     from p08_graph import Graph
-    return Graph.load(P08_GRAPH)
+
+    try:
+        mtime = P08_GRAPH.stat().st_mtime
+    except OSError as e:
+        raise OSError(f"plan files: {e}") from e
+    if _GRAPH_CACHE and _GRAPH_CACHE[0] == mtime:
+        return _GRAPH_CACHE[1]
+    g = Graph.load(P08_GRAPH)
+    if not g.nodes:
+        raise ValueError("empty plan geometry")
+    _GRAPH_CACHE = (mtime, g)
+    return g
+
+
+def _toward_right(px: float, py: float, ax: float, ay: float, bx: float, by: float,
+                  from_id: str, to_id: str, ref_dx: float, ref_dy: float) -> str:
+    fn = math.hypot(ref_dx, ref_dy) or 1.0
+    fx, fy = ref_dx / fn, ref_dy / fn
+    rx, ry = fy, -fx
+    best, best_score = from_id, -1e9
+    for nid, nx, ny in ((from_id, ax, ay), (to_id, bx, by)):
+        vx, vy = nx - px, ny - py
+        vl = math.hypot(vx, vy) or 1.0
+        score = (vx / vl) * rx + (vy / vl) * ry
+        if score > best_score:
+            best_score, best = score, nid
+    return best
 
 
 def snap_on_graph(x: float, y: float, toward: str | None = None) -> dict:
-    """Stick a plan-pixel click to the nearest edge and, if asked, face one end."""
-    g = _load_graph()
+    """Stick a plan-pixel click to the nearest passage on the floor plan."""
+    try:
+        g = _load_graph()
+    except OSError:
+        return {"ok": False, "error": _public_error("permission denied plan")}
+    except (ValueError, Exception):
+        return {"ok": False, "error": "План цеха повреждён или не установлен. Переустановите Fly Track."}
     best = None
     for eid, e in g.edges.items():
         ax, ay = g.pos(e["from"])
@@ -236,8 +288,8 @@ def snap_on_graph(x: float, y: float, toward: str | None = None) -> dict:
             best = {"edge": eid, "from_node": e["from"], "to_node": e["to"],
                     "t": t, "x": px, "y": py, "node": node, "dist": dist,
                     "ax": ax, "ay": ay, "bx": bx, "by": by}
-    if best is None or best["dist"] > 80:
-        return {"ok": False, "error": "кликните ближе к линии графа"}
+    if best is None or best["dist"] > 120:
+        return {"ok": False, "error": _public_error("кликните ближе к линии графа")}
     ends = [
         {"id": best["from_node"], "x": best["ax"], "y": best["ay"]},
         {"id": best["to_node"], "x": best["bx"], "y": best["by"]},
@@ -252,7 +304,7 @@ def snap_on_graph(x: float, y: float, toward: str | None = None) -> dict:
         out["left_toward"] = left
         return out
     if toward not in (best["from_node"], best["to_node"]):
-        return {"ok": False, "error": f"узел {toward} не на ребре {best['edge']}"}
+        return {"ok": False, "error": _public_error(f"узел {toward} не на ребре {best['edge']}")}
     start_from = best["to_node"] if toward == best["from_node"] else best["from_node"]
     length = g.length_m(best["edge"])
     progress = (best["t"] if start_from == best["from_node"] else 1.0 - best["t"]) * float(length)
@@ -320,7 +372,7 @@ def _track_hook(clip: str, start: dict) -> tuple[int, str]:
     """Run V1..V5 from a plan start for the clip pipeline; waits if a manual run is going."""
     place = snap_on_graph(float(start["x"]), float(start["y"]), str(start["toward"]))
     if not place.get("ok"):
-        return 1, place.get("error") or "старт не на графе"
+        return 1, _public_error(place.get("error") or "старт не на графе")
     while True:
         with _START_LOCK:
             if _START_JOB["state"] != "running":
@@ -359,7 +411,7 @@ def _chain_start(clip: str) -> tuple[dict | None, str]:
              "from_clip": clip, "edge": last_edge["edge"]}
     place = snap_on_graph(start["x"], start["y"], b)
     if not place.get("ok"):
-        return None, place.get("error") or "конец маршрута не на графе"
+        return None, _public_error(place.get("error") or "конец маршрута не на графе")
     return start, ""
 
 
@@ -437,7 +489,9 @@ def _diagnostics() -> dict:
         add("packages", "Пакеты расчёта", True, f"numpy {numpy.__version__}, numba {numba.__version__}")
     except Exception as e:
         add("packages", "Пакеты расчёта", False, str(e))
-    add("graph", "План и граф цеха", P08_GRAPH.exists(), str(P08_GRAPH.name) if P08_GRAPH.exists() else "нет графа")
+    plan_ok = P08_GRAPH.exists() and P08_PLAN_STEM.with_suffix(".png").exists()
+    add("plan", "План цеха", plan_ok,
+        "загружен" if plan_ok else "нет данных — переустановите Fly Track")
     free = sh.disk_usage(PROJECT).free / 1e9
     add("disk", "Свободное место", free > 5, f"{free:.1f} ГБ (нужно ~2 ГБ на час видео)")
     cams = app_backend.scan_camera().get("cameras", [])
@@ -1070,7 +1124,7 @@ class Handler(BaseHTTPRequestHandler):
                     return self._json({"ok": False, "error": "start: нужны x, y и toward"}, 400)
                 place = snap_on_graph(start["x"], start["y"], start["toward"])
                 if not place.get("ok"):
-                    return self._json(place, 400)
+                    return self._json({**place, "error": _public_error(place.get("error", ""))}, 400)
             res = app_backend.start_import([str(p) for p in paths], start,
                                            chain=bool(payload.get("chain", True)))
             return self._json(res, 200 if res.get("ok") else 409)
@@ -1084,7 +1138,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json({"ok": False, "error": "нужны x, y и toward"}, 400)
             place = snap_on_graph(start["x"], start["y"], start["toward"])
             if not place.get("ok"):
-                return self._json(place, 400)
+                return self._json({**place, "error": _public_error(place.get("error", ""))}, 400)
             return self._json(app_backend.request_track(clip, start))
         if path == "/api/app/retry":
             clip = str(payload.get("clip") or "")
@@ -1100,7 +1154,13 @@ class Handler(BaseHTTPRequestHandler):
             toward = payload.get("toward") or None
             if toward is not None:
                 toward = str(toward)
-            return self._json(snap_on_graph(x, y, toward))
+            try:
+                out = snap_on_graph(x, y, toward)
+            except Exception as e:
+                return self._json({"ok": False, "error": _public_error(str(e))}, 500)
+            if not out.get("ok") and out.get("error"):
+                out = {**out, "error": _public_error(str(out["error"]))}
+            return self._json(out)
 
         if path == "/api/start/run":
             try:
@@ -1125,7 +1185,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json({"ok": False, "error": "ver: v1…v5 или all"}, 400)
             place = snap_on_graph(x, y, toward)
             if not place.get("ok"):
-                return self._json(place, 400)
+                return self._json({**place, "error": _public_error(place.get("error", ""))}, 400)
             with _START_LOCK:
                 if _START_JOB["state"] == "running":
                     return self._json({"ok": False, "error": "прогон уже идёт"}, 409)

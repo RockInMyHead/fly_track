@@ -74,6 +74,27 @@ function syncWorkspace(L, log) {
   fs.mkdirSync(L.workspace, { recursive: true });
   fs.cpSync(L.appSource, L.workspace, { recursive: true, force: true });
   fs.writeFileSync(stampFile, want);
+  if (IS_WIN) clearReadOnly(L.workspace);
+}
+
+function clearReadOnly(root) {
+  const walk = (p) => {
+    let st;
+    try {
+      st = fs.statSync(p);
+    } catch {
+      return;
+    }
+    try {
+      fs.chmodSync(p, st.isDirectory() ? 0o755 : 0o666);
+    } catch {
+      /* ignore */
+    }
+    if (st.isDirectory()) {
+      for (const name of fs.readdirSync(p)) walk(path.join(p, name));
+    }
+  };
+  walk(root);
 }
 
 function childEnv(L) {

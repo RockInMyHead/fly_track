@@ -90,15 +90,36 @@ export type Camera = { root: string; label: string; files: CameraFile[] };
 
 export type Check = { id: string; title: string; ok: boolean; message: string };
 
+function userFacingError(msg: string): string {
+  const m = msg.trim();
+  const low = m.toLowerCase();
+  if (!m || low.includes("failed to fetch") || low.includes("networkerror")) {
+    return "Нет связи с программой. Перезапустите Fly Track.";
+  }
+  if (low.includes("access") && (low.includes("denied") || low.includes("file"))) {
+    return "Не удалось открыть файлы плана. Перезапустите программу или переустановите Fly Track.";
+  }
+  if (/граф|graph|ребр|узел|edge|node/i.test(m)) {
+    if (/ближе|dist|click/i.test(m)) return "Кликните ближе к проходу на плане.";
+    return "Точку нельзя поставить здесь — выберите проход на плане.";
+  }
+  return m;
+}
+
 async function request<T>(path: string, body?: unknown): Promise<T> {
-  const res = await fetch(path, {
-    method: body === undefined ? "GET" : "POST",
-    headers: body === undefined ? undefined : { "Content-Type": "application/json" },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
+  let res: Response;
+  try {
+    res = await fetch(path, {
+      method: body === undefined ? "GET" : "POST",
+      headers: body === undefined ? undefined : { "Content-Type": "application/json" },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+  } catch (e) {
+    throw new Error(userFacingError(String((e as Error).message)));
+  }
   const data = await res.json().catch(() => ({}));
   if (!res.ok || data.ok === false) {
-    throw new Error(data.error || `Ошибка ${res.status}`);
+    throw new Error(userFacingError(String(data.error || `Ошибка ${res.status}`)));
   }
   return data as T;
 }
