@@ -55,8 +55,15 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.cjs'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: true,
+      sandbox: false,
     },
+  });
+  mainWindow.webContents.on('render-process-gone', (_event, details) => {
+    console.error('RENDER GONE', details.reason, details.exitCode);
+    if (quitting || !baseUrl) return;
+    const clip = process.env.FLY_OPEN_CLIP;
+    const url = `${baseUrl}/ui/${clip ? `?clip=${encodeURIComponent(clip)}` : ''}`;
+    mainWindow?.loadURL(url);
   });
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     if (!isInternal(url)) shell.openExternal(url);
@@ -200,5 +207,14 @@ app.on('before-quit', () => {
 });
 
 app.on('window-all-closed', () => {
-  app.quit();
+  if (process.platform !== 'darwin') app.quit();
+});
+
+app.on('activate', () => {
+  if (mainWindow) {
+    mainWindow.show();
+    mainWindow.focus();
+  } else if (baseUrl) {
+    createWindow();
+  }
 });

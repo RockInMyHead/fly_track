@@ -297,6 +297,108 @@ def snap_on_graph(x: float, y: float, toward: str | None = None) -> dict:
     return out
 
 
+def _edge_between(g, n1: str, n2: str) -> str | None:
+    for eid in g.edges_at(n1):
+        e = g.edges[eid]
+        if n2 in (e["from"], e["to"]):
+            return eid
+    return None
+
+
+def _place_with_toward(g, edge_id: str, toward: str, t: float = 0.07) -> dict:
+    """Build a validated start on edge_id, facing toward (no global re-snap)."""
+    e = g.edges.get(edge_id)
+    if not e:
+        return {"ok": False, "error": _public_error("edge missing")}
+    a, b = e["from"], e["to"]
+    if toward not in (a, b):
+        return {"ok": False, "error": _public_error(f"узел {toward} не на ребре {edge_id}")}
+    start_from = b if toward == a else a
+    ax, ay = g.pos(start_from)
+    bx, by = g.pos(toward)
+    t = max(0.03, min(0.25, t))
+    px, py = ax + (bx - ax) * t, ay + (by - ay) * t
+    length = float(g.length_m(edge_id) or 0.0)
+    return {
+        "ok": True,
+        "edge": edge_id,
+        "x": round(px, 2),
+        "y": round(py, 2),
+        "dist_px": 0.0,
+        "ends": [
+            {"id": a, "x": g.pos(a)[0], "y": g.pos(a)[1]},
+            {"id": b, "x": g.pos(b)[0], "y": g.pos(b)[1]},
+        ],
+        "on_node": None,
+        "toward": toward,
+        "start_from": start_from,
+        "progress_m": round(t * length, 3),
+        "length_m": round(length, 3),
+    }
+
+
+def direction_from_click(sx: float, sy: float, cx: float, cy: float) -> dict:
+    """From a fixed start on the plan, pick the passage that best matches the click bearing."""
+    base = snap_on_graph(sx, sy, None)
+    if not base.get("ok"):
+        return base
+    g = _load_graph()
+    px, py = float(base["x"]), float(base["y"])
+    vx, vy = cx - px, cy - py
+    vl = math.hypot(vx, vy)
+    if vl < 8:
+        return {"ok": False, "error": "Кликните дальше от точки старта, чтобы указать направление."}
+    ux, uy = vx / vl, vy / vl
+
+    hub, hub_d = None, 1e9
+    for nid in g.nodes:
+        nx, ny = g.pos(nid)
+        d = math.hypot(px - nx, py - ny)
+        if d < hub_d:
+            hub_d, hub = d, nid
+
+    candidates: list[tuple[str, float]] = []
+
+    def score_node(nid: str) -> None:
+        nx, ny = g.pos(nid)
+        dx, dy = nx - px, ny - py
+        dl = math.hypot(dx, dy) or 1.0
+        candidates.append((nid, (dx / dl) * ux + (dy / dl) * uy))
+
+    if hub is not None and hub_d <= 45:
+        for eid in g.edges_at(hub):
+            e = g.edges[eid]
+            other = e["to"] if e["from"] == hub else e["from"]
+            if other != hub:
+                score_node(other)
+    else:
+        for end in base["ends"]:
+            score_node(end["id"])
+
+    if not candidates:
+        return {"ok": False, "error": _public_error("направление")}
+    toward_id = max(candidates, key=lambda c: c[1])[0]
+    if toward_id == hub and hub is not None:
+        toward_id = max((c for c in candidates if c[0] != hub), key=lambda c: c[1], default=candidates[0])[0]
+
+    if hub is not None and hub_d <= 45:
+        branch = _edge_between(g, hub, toward_id)
+        if branch:
+            return _place_with_toward(g, branch, toward_id, 0.07)
+
+    e = g.edges[base["edge"]]
+    ax, ay = g.pos(e["from"])
+    bx, by = g.pos(e["to"])
+    dx, dy = bx - ax, by - ay
+    span = dx * dx + dy * dy or 1.0
+    t_line = max(0.03, min(0.97, ((px - ax) * dx + (py - ay) * dy) / span))
+    if toward_id == e["to"]:
+        t_use = t_line
+    else:
+        t_use = max(0.03, min(0.97, 1.0 - t_line))
+    return _place_with_toward(g, base["edge"], toward_id, t_use)
+
+
 TRACKER_SCRIPTS = {"v1": "final_tracker.py", "v2": "final_tracker_v2.py",
                    "v3": "final_tracker_v3.py", "v4": "final_tracker_v4.py",
                    "v5": "final_tracker_v5.py"}
@@ -1136,6 +1238,20 @@ class Handler(BaseHTTPRequestHandler):
                 toward = str(toward)
             try:
                 out = snap_on_graph(x, y, toward)
+            except Exception as e:
+                return self._json({"ok": False, "error": _public_error(str(e))}, 500)
+            if not out.get("ok") and out.get("error"):
+                out = {**out, "error": _public_error(str(out["error"]))}
+            return self._json(out)
+
+        if path == "/api/start/direction":
+            try:
+                sx, sy = float(payload["x"]), float(payload["y"])
+                cx, cy = float(payload["click_x"]), float(payload["click_y"])
+            except (KeyError, TypeError, ValueError):
+                return self._json({"ok": False, "error": "нужны координаты старта и клика"}, 400)
+            try:
+                out = direction_from_click(sx, sy, cx, cy)
             except Exception as e:
                 return self._json({"ok": False, "error": _public_error(str(e))}, 500)
             if not out.get("ok") and out.get("error"):

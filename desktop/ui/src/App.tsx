@@ -199,24 +199,9 @@ export default function App() {
           return;
         }
         if (mode === "direction") {
-          const vx = x - place.x;
-          const vy = y - place.y;
-          const vl = Math.hypot(vx, vy) || 1;
-          let best = place.ends[0];
-          let bestDot = -2;
-          for (const e of place.ends) {
-            const ex = e.x - place.x;
-            const ey = e.y - place.y;
-            const el = Math.hypot(ex, ey) || 1;
-            const dot = (vx * ex + vy * ey) / (vl * el);
-            if (dot > bestDot) {
-              bestDot = dot;
-              best = e;
-            }
-          }
-          const p = await api.place(place.x, place.y, best.id);
+          const p = await api.placeDirection(place.x, place.y, x, y);
           setPlace(p);
-          setToward(best.id);
+          setToward(p.toward ?? null);
           setMode("view");
         }
       } catch (e) {
