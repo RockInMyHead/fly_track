@@ -113,8 +113,24 @@ export default function PlanView({
       ctx.globalAlpha = 0.9;
       ctx.drawImage(img, 0, 0, graph.img_w, graph.img_h);
       ctx.globalAlpha = 1;
-      ctx.fillStyle = "rgba(7, 17, 31, 0.62)";
+      const placing = mode === "start" || mode === "direction";
+      ctx.fillStyle = placing ? "rgba(7, 17, 31, 0.38)" : "rgba(7, 17, 31, 0.62)";
       ctx.fillRect(0, 0, graph.img_w, graph.img_h);
+
+      if (placing && graph.edges?.length) {
+        ctx.strokeStyle = "rgba(74, 222, 128, 0.72)";
+        ctx.lineWidth = px(6);
+        ctx.lineJoin = "round";
+        for (const e of graph.edges) {
+          const a = nodes.get(e.from);
+          const b = nodes.get(e.to);
+          if (!a || !b) continue;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        }
+      }
     }
 
     ctx.lineCap = "round";

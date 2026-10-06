@@ -207,7 +207,7 @@ MIME = {
 
 
 _GRAPH_CACHE: tuple[float, object] | None = None
-_SNAP_MAX_PX = 200.0
+_SNAP_MAX_PX = 480.0
 
 
 def _public_error(msg: str) -> str:
@@ -274,8 +274,15 @@ def snap_on_graph(x: float, y: float, toward: str | None = None) -> dict:
             best = {"edge": eid, "from_node": e["from"], "to_node": e["to"],
                     "t": t, "x": px, "y": py, "node": node, "dist": dist,
                     "ax": ax, "ay": ay, "bx": bx, "by": by}
-    if best is None or best["dist"] > _SNAP_MAX_PX:
-        return {"ok": False, "error": _public_error("кликните ближе к линии графа")}
+    if best is None:
+        return {"ok": False, "error": "Проходы на плане не загрузились. Откройте «Проверка системы» или переустановите Fly Track."}
+    if best["dist"] > _SNAP_MAX_PX:
+        d = int(round(best["dist"]))
+        return {
+            "ok": False,
+            "error": f"Клик слишком далеко от прохода ({d} px). Кликните по зелёной линии на плане или увеличьте масштаб (+).",
+            "dist_px": d,
+        }
     ends = [
         {"id": best["from_node"], "x": best["ax"], "y": best["ay"]},
         {"id": best["to_node"], "x": best["bx"], "y": best["by"]},
@@ -437,16 +444,22 @@ def direction_from_click(
             return _place_with_toward(g, branch, toward_id, 0.07)
 
     e = g.edges[base["edge"]]
-    ax, ay = g.pos(e["from"])
-    bx, by = g.pos(e["to"])
-    dx, dy = bx - ax, by - ay
-    span = dx * dx + dy * dy or 1.0
-    t_line = max(0.03, min(0.97, ((px - ax) * dx + (py - ay) * dy) / span))
-    if toward_id == e["to"]:
-        t_use = t_line
-    else:
-        t_use = max(0.03, min(0.97, 1.0 - t_line))
-    return _place_with_toward(g, base["edge"], toward_id, t_use)
+    if toward_id in (e["from"], e["to"]):
+        ax, ay = g.pos(e["from"])
+        bx, by = g.pos(e["to"])
+        dx, dy = bx - ax, by - ay
+        span = dx * dx + dy * dy or 1.0
+        t_line = max(0.03, min(0.97, ((px - ax) * dx + (py - ay) * dy) / span))
+        t_use = t_line if toward_id == e["to"] else max(0.03, min(0.97, 1.0 - t_line))
+        return _place_with_toward(g, base["edge"], toward_id, t_use)
+
+    for anchor in (hub, e["from"], e["to"]):
+        if not anchor:
+            continue
+        branch = _edge_between(g, anchor, toward_id)
+        if branch:
+            return _place_with_toward(g, branch, toward_id, 0.07)
+    return {"ok": False, "error": "Кликните дальше от старта, в сторону хода по проходу."}
 
 
 TRACKER_SCRIPTS = {"v1": "final_tracker.py", "v2": "final_tracker_v2.py",
