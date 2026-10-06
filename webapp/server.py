@@ -207,7 +207,7 @@ MIME = {
 
 
 _GRAPH_CACHE: tuple[float, object] | None = None
-_SNAP_MAX_PX = 480.0
+_JUNCTION_PX = 140.0
 
 
 def _public_error(msg: str) -> str:
@@ -276,13 +276,6 @@ def snap_on_graph(x: float, y: float, toward: str | None = None) -> dict:
                     "ax": ax, "ay": ay, "bx": bx, "by": by}
     if best is None:
         return {"ok": False, "error": "Проходы на плане не загрузились. Откройте «Проверка системы» или переустановите Fly Track."}
-    if best["dist"] > _SNAP_MAX_PX:
-        d = int(round(best["dist"]))
-        return {
-            "ok": False,
-            "error": f"Клик слишком далеко от прохода ({d} px). Кликните по зелёной линии на плане или увеличьте масштаб (+).",
-            "dist_px": d,
-        }
     ends = [
         {"id": best["from_node"], "x": best["ax"], "y": best["ay"]},
         {"id": best["to_node"], "x": best["bx"], "y": best["by"]},
@@ -292,7 +285,14 @@ def snap_on_graph(x: float, y: float, toward: str | None = None) -> dict:
     if not toward:
         return out
     if toward not in (best["from_node"], best["to_node"]):
-        return {"ok": False, "error": _public_error(f"узел {toward} не на ребре {best['edge']}")}
+        anchors = [best["from_node"], best["to_node"]]
+        if best.get("node"):
+            anchors.insert(0, best["node"])
+        for anchor in anchors:
+            branch = _edge_between(g, anchor, toward)
+            if branch:
+                return _place_with_toward(g, branch, toward, 0.07)
+        return {"ok": False, "error": "Не удалось согласовать направление с планом — задайте старт и направление заново."}
     start_from = best["to_node"] if toward == best["from_node"] else best["from_node"]
     length = g.length_m(best["edge"])
     progress = (best["t"] if start_from == best["from_node"] else 1.0 - best["t"]) * float(length)
@@ -324,8 +324,6 @@ def _project_on_edge(g, edge_id: str, x: float, y: float) -> dict | None:
     elif math.hypot(px - bx, py - by) <= 10:
         t, px, py, node = 1.0, bx, by, e["to"]
     dist = math.hypot(x - px, y - py)
-    if dist > _SNAP_MAX_PX:
-        return None
     return {
         "ok": True,
         "edge": edge_id,
@@ -358,7 +356,7 @@ def _place_with_toward(g, edge_id: str, toward: str, t: float = 0.07) -> dict:
         return {"ok": False, "error": "Не удалось зафиксировать старт на проходе — задайте точку заново."}
     a, b = e["from"], e["to"]
     if toward not in (a, b):
-        return {"ok": False, "error": _public_error(f"узел {toward} не на ребре {edge_id}")}
+        return {"ok": False, "error": "Не удалось зафиксировать направление — нажмите «Сбросить» и задайте старт заново."}
     start_from = b if toward == a else a
     ax, ay = g.pos(start_from)
     bx, by = g.pos(toward)
@@ -386,7 +384,7 @@ def _place_with_toward(g, edge_id: str, toward: str, t: float = 0.07) -> dict:
 def direction_from_click(
     sx: float, sy: float, cx: float, cy: float, edge_id: str | None = None
 ) -> dict:
-    """From a fixed start on the plan, pick the passage that best matches the click bearing."""
+    """From a fixed start, pick the nearest passage branch that best matches the click bearing."""
     try:
         g = _load_graph()
     except OSError:
@@ -403,8 +401,9 @@ def direction_from_click(
     px, py = float(base["x"]), float(base["y"])
     vx, vy = cx - px, cy - py
     vl = math.hypot(vx, vy)
-    if vl < 8:
-        return {"ok": False, "error": "Кликните дальше от точки старта, чтобы указать направление."}
+    if vl < 1e-6:
+        vx, vy = 1.0, 0.0
+        vl = 1.0
     ux, uy = vx / vl, vy / vl
 
     hub, hub_d = None, 1e9
@@ -414,52 +413,49 @@ def direction_from_click(
         if d < hub_d:
             hub_d, hub = d, nid
 
-    candidates: list[tuple[str, float]] = []
+    # (score, edge_id, toward_node_id)
+    options: list[tuple[float, str, str]] = []
 
-    def score_node(nid: str) -> None:
-        nx, ny = g.pos(nid)
-        dx, dy = nx - px, ny - py
+    def add_option(eid: str, toward_nid: str) -> None:
+        tx, ty = g.pos(toward_nid)
+        dx, dy = tx - px, ty - py
         dl = math.hypot(dx, dy) or 1.0
-        candidates.append((nid, (dx / dl) * ux + (dy / dl) * uy))
+        score = (dx / dl) * ux + (dy / dl) * uy
+        options.append((score, eid, toward_nid))
 
-    if hub is not None and hub_d <= 45:
+    if hub is not None and hub_d <= _JUNCTION_PX:
         for eid in g.edges_at(hub):
             e = g.edges[eid]
             other = e["to"] if e["from"] == hub else e["from"]
             if other != hub:
-                score_node(other)
+                add_option(eid, other)
     else:
-        for end in base["ends"]:
-            score_node(end["id"])
+        e = g.edges[base["edge"]]
+        add_option(base["edge"], e["from"])
+        add_option(base["edge"], e["to"])
 
-    if not candidates:
-        return {"ok": False, "error": _public_error("направление")}
-    toward_id = max(candidates, key=lambda c: c[1])[0]
+    if not options:
+        return {"ok": False, "error": "На плане нет прохода рядом со стартом — выберите другую точку старта."}
+
+    _, pick_edge, toward_id = max(options, key=lambda o: o[0])
     if toward_id == hub and hub is not None:
-        toward_id = max((c for c in candidates if c[0] != hub), key=lambda c: c[1], default=candidates[0])[0]
+        alt = [o for o in options if o[2] != hub]
+        if alt:
+            _, pick_edge, toward_id = max(alt, key=lambda o: o[0])
 
-    if hub is not None and hub_d <= 45:
-        branch = _edge_between(g, hub, toward_id)
-        if branch:
-            return _place_with_toward(g, branch, toward_id, 0.07)
-
-    e = g.edges[base["edge"]]
-    if toward_id in (e["from"], e["to"]):
-        ax, ay = g.pos(e["from"])
-        bx, by = g.pos(e["to"])
-        dx, dy = bx - ax, by - ay
-        span = dx * dx + dy * dy or 1.0
-        t_line = max(0.03, min(0.97, ((px - ax) * dx + (py - ay) * dy) / span))
-        t_use = t_line if toward_id == e["to"] else max(0.03, min(0.97, 1.0 - t_line))
-        return _place_with_toward(g, base["edge"], toward_id, t_use)
-
-    for anchor in (hub, e["from"], e["to"]):
-        if not anchor:
-            continue
-        branch = _edge_between(g, anchor, toward_id)
-        if branch:
-            return _place_with_toward(g, branch, toward_id, 0.07)
-    return {"ok": False, "error": "Кликните дальше от старта, в сторону хода по проходу."}
+    e = g.edges[pick_edge]
+    ax, ay = g.pos(e["from"])
+    bx, by = g.pos(e["to"])
+    dx, dy = bx - ax, by - ay
+    span = dx * dx + dy * dy or 1.0
+    t_line = max(0.03, min(0.97, ((px - ax) * dx + (py - ay) * dy) / span))
+    if toward_id == e["to"]:
+        t_use = t_line
+    elif toward_id == e["from"]:
+        t_use = max(0.03, min(0.97, 1.0 - t_line))
+    else:
+        t_use = 0.07
+    return _place_with_toward(g, pick_edge, toward_id, t_use)
 
 
 TRACKER_SCRIPTS = {"v1": "final_tracker.py", "v2": "final_tracker_v2.py",

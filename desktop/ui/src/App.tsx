@@ -196,6 +196,7 @@ export default function App() {
           setPlace(p);
           setToward(null);
           setMode("direction");
+          toast.success("Старт на проходе — укажите направление");
           return;
         }
         if (mode === "direction") {
@@ -203,6 +204,7 @@ export default function App() {
           setPlace(p);
           setToward(p.toward ?? null);
           setMode("view");
+          toast.success("Направление задано");
         }
       } catch (e) {
         toast.error((e as Error).message);
@@ -277,9 +279,9 @@ export default function App() {
 
   const hint =
     mode === "start"
-      ? "Клик по зелёной линии прохода (центр коридора), не по стене офиса"
+      ? "Кликните примерно где человек стоял — точку перенесёт к ближайшему проходу"
       : mode === "direction"
-        ? "Клик в сторону хода — от оранжевой точки вдоль зелёной линии"
+        ? "Кликните куда угодно на плане в сторону хода — проход выберется сам"
         : start
           ? "Старт и направление заданы"
           : "";

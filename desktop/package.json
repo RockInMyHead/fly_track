@@ -2,7 +2,7 @@
   "name": "fly-track",
   "productName": "Fly Track",
   "private": true,
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "Fly Track — маршрут человека по видео с камеры через мозг мухи",
   "author": "Fly Track",
   "main": "electron/main.cjs",
