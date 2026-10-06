@@ -96,10 +96,8 @@ function userFacingError(msg: string): string {
   if (low.includes("access") && (low.includes("denied") || low.includes("file"))) {
     return "Не удалось открыть файлы плана. Перезапустите программу или переустановите Fly Track.";
   }
-  if (/[а-яА-ЯёЁ]/.test(m)) return m;
   if (/граф|graph|ребр|узел|\bedge\b|\bnode\b/i.test(m)) {
-    if (/ближе|dist|click|далеко|зелён/i.test(m)) return m;
-    return "Точку нельзя поставить здесь — выберите проход на плане.";
+    return "Не удалось задать старт — нажмите «Сбросить» и попробуйте ещё раз.";
   }
   return m;
 }
