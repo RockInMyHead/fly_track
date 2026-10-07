@@ -136,6 +136,7 @@ export const api = {
   importFiles: (paths: string[], start: StartPoint) => request<{ ok: true }>("/api/camera/import", { paths, start }),
   track: (clip: string, start: StartPoint) => request<{ ok: true }>("/api/app/track", { clip, ...start }),
   retry: (clip: string) => request<{ ok: true }>("/api/app/retry", { clip }),
+  retryTrack: (clip: string) => request<{ ok: true }>("/api/app/retry-track", { clip }),
   diagnostics: () => request<{ ok: boolean; checks: Check[]; workspace: string }>("/api/app/diagnostics"),
   async run(clip: string, ver: Version): Promise<RunState | null> {
     const j = await request<any>(`/api/final/state?clip=${clip}&ver=${ver}`);

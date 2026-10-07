@@ -10,8 +10,9 @@ Everything a fresh machine needs to go from a camera card to "Старт тре�
 The camera AVI header overstates the frame count (45000 declared, 36837 real on VID00010),
 so duration always comes from counted packets, never from the header.
 
-State lives in data/app/clips.json; every step is skipped when its output already exists,
-so an interrupted chain resumes where it stopped after the app is restarted.
+State lives in data/app/clips.json. A camera import always re-copies the AVI and wipes
+pipeline/tracker outputs for that clip, then queues full processing from step one.
+(If the app stops mid-run, «Повторить» still skips steps whose outputs remain on disk.)
 """
 
 from __future__ import annotations
@@ -289,27 +290,37 @@ def _import_worker(paths: list[str], start: dict | None = None, chain: bool = Tr
                 _IMPORT["file"] = p.name
             fp = fingerprint(p)
             fields = _track_fields(start, prev if chain and start else None)
-            if fp in known:
-                if fields:
-                    _save_clip(known[fp], **fields)
-                    _WAKE.set()
-                prev = known[fp]
-                with _LOCK:
-                    _IMPORT["done_bytes"] += p.stat().st_size
-                    _IMPORT["files_done"] += 1
-                    _IMPORT["imported"].append(known[fp])
-                continue
             free = shutil.disk_usage(P01R).free
             if free < p.stat().st_size * 1.3 + 500_000_000:
                 raise IOError(f"мало места на диске для {p.name}: свободно {free / 1e9:.1f} ГБ")
-            cid = _next_id()
             st = p.stat()
+            if fp in known:
+                cid = known[fp]
+                _wipe_pipeline_artifacts(cid)
+            else:
+                cid = _next_id()
             sha = _copy_verified(p, P01R / f"{cid}.AVI")
-            _save_clip(cid, source_name=p.name, source_path=str(p), size=st.st_size,
-                       source_mtime=st.st_mtime,
-                       source_mtime_text=time.strftime("%d.%m.%Y %H:%M", time.localtime(st.st_mtime)),
-                       fingerprint=fp, sha256=sha, imported_at=time.time(),
-                       status="queued", step=None, error="", log="", **fields)
+            with _LOCK:
+                doc = _clips()
+                rec = doc["clips"].setdefault(cid, {"id": cid})
+                _clear_clip_run_state(rec)
+                rec.update(
+                    source_name=p.name,
+                    source_path=str(p),
+                    size=st.st_size,
+                    source_mtime=st.st_mtime,
+                    source_mtime_text=time.strftime("%d.%m.%Y %H:%M", time.localtime(st.st_mtime)),
+                    fingerprint=fp,
+                    sha256=sha,
+                    imported_at=time.time(),
+                    status="queued",
+                    **fields,
+                )
+                if not fields:
+                    rec.pop("start", None)
+                    rec.pop("chain_from", None)
+                    rec.pop("track_status", None)
+                _write(CLIPS_JSON, doc)
             known[fp] = cid
             prev = cid
             with _LOCK:
@@ -348,8 +359,66 @@ def import_status() -> dict:
 
 # --------------------------------------------------------------------------- pipeline
 
+_TRACKER_OUTS = (
+    "final_tracker",
+    "final_tracker_v2",
+    "final_tracker_v3",
+    "final_tracker_v4",
+    "final_tracker_v5",
+)
+
+
 def _tag(cid: str) -> str:
     return cid.lower()
+
+
+def _wipe_pipeline_artifacts(cid: str) -> None:
+    """Remove outputs so the next _process run redoes every step."""
+    tag = _tag(cid)
+    targets: list[Path] = [
+        FRAMES_CACHE / f"frames_{cid}.json",
+        MEDIA / f"{cid}_fixed.mp4",
+        MEDIA / f"{cid}_fixed.tmp.mp4",
+        APP_DATA / f"warm_{cid}.done",
+        PROJECT / "output" / "p07" / f"yaw_signal_{cid}.csv",
+        PROJECT / "output" / "p10" / f"brain_{cid}.npz",
+        PROJECT / "output" / f"p06_neurons_{tag}",
+        PROJECT / "output" / "p10" / f"chunks_brain_{cid}",
+        PROJECT / "output" / "app_warm" / cid,
+    ]
+    for name in _TRACKER_OUTS:
+        targets.append(PROJECT / "output" / name / cid)
+    for path in targets:
+        try:
+            if path.is_dir():
+                shutil.rmtree(path)
+            elif path.is_file():
+                path.unlink()
+        except OSError:
+            pass
+
+
+def _clear_clip_run_state(rec: dict) -> None:
+    for key in (
+        "step",
+        "step_index",
+        "step_started",
+        "started_at",
+        "finished_at",
+        "frames",
+        "declared_frames",
+        "fps",
+        "resolution",
+        "duration_s",
+        "mp4_progress",
+        "warm_warning",
+        "track_started",
+        "track_finished",
+        "log",
+    ):
+        rec.pop(key, None)
+    rec["error"] = ""
+    rec["track_error"] = ""
 
 
 def _frames(cid: str) -> dict:
@@ -506,7 +575,15 @@ def _process(cid: str) -> None:
 
 def _track(cid: str) -> None:
     rec = clip_record(cid) or {}
-    if track_hook is None or not rec.get("start") or rec.get("track_status") not in ("queued", "running"):
+    if track_hook is None or rec.get("track_status") not in ("queued", "running"):
+        return
+    if not rec.get("start"):
+        _save_clip(
+            cid,
+            track_status="error",
+            track_error="Задайте старт и направление на плане, затем «Построить маршрут».",
+            track_finished=time.time(),
+        )
         return
     _save_clip(cid, track_status="running", track_error="", track_started=time.time())
     try:
@@ -518,23 +595,65 @@ def _track(cid: str) -> None:
     _advance_chain(cid, ok=code == 0)
 
 
+def _chain_handoff(from_clip: str) -> tuple[dict | None, str]:
+    try:
+        if chain_start_hook:
+            return chain_start_hook(from_clip)
+        return None, "расчёт конца маршрута недоступен"
+    except Exception as e:
+        return None, str(e)
+
+
+def _stale_chain_error(msg: str) -> bool:
+    low = (msg or "").lower()
+    return "не построен" in low or "нет конца маршрута" in low
+
+
 def _advance_chain(cid: str, ok: bool) -> None:
     """Hand the end of a finished clip to the clip that continues it."""
     for nxt, r in sorted(_clips()["clips"].items()):
-        if r.get("chain_from") != cid or r.get("track_status") != "waiting":
+        if r.get("chain_from") != cid:
+            continue
+        stale = r.get("track_status") == "error" and _stale_chain_error(r.get("track_error") or "")
+        if r.get("track_status") not in ("waiting",) and not stale:
             continue
         if not ok:
-            _save_clip(nxt, track_status="error",
-                       track_error=f"маршрут предыдущего ролика {cid} не построен — задайте старт вручную")
+            if r.get("track_status") == "waiting":
+                _save_clip(
+                    nxt,
+                    track_status="error",
+                    track_error=f"Маршрут {cid} не готов — задайте старт на плане или повторите позже.",
+                )
             continue
-        try:
-            start, err = chain_start_hook(cid) if chain_start_hook else (None, "нет расчёта конца маршрута")
-        except Exception as e:
-            start, err = None, str(e)
+        start, err = _chain_handoff(cid)
         if start:
             _save_clip(nxt, start=start, track_status="queued", track_error="")
         else:
-            _save_clip(nxt, track_status="error", track_error=f"нет конца маршрута {cid}: {err}")
+            _save_clip(
+                nxt,
+                track_status="error",
+                track_error=f"Не удалось продолжить с конца {cid}: {err}",
+            )
+    _WAKE.set()
+
+
+def _heal_stale_chain_errors() -> None:
+    """Re-queue chain clips stuck after a later successful run of the previous clip."""
+    clips = _clips()["clips"]
+    for cid, r in sorted(clips.items()):
+        prev = r.get("chain_from")
+        if not prev or r.get("track_status") != "error":
+            continue
+        if not _stale_chain_error(r.get("track_error") or ""):
+            continue
+        prev_rec = clips.get(prev) or {}
+        if prev_rec.get("track_status") != "done":
+            continue
+        start, err = _chain_handoff(prev)
+        if start:
+            _save_clip(cid, start=start, track_status="queued", track_error="")
+        elif err:
+            _save_clip(cid, track_status="error", track_error=f"Не удалось продолжить с конца {prev}: {err}")
     _WAKE.set()
 
 
@@ -577,6 +696,7 @@ def ensure_worker() -> None:
         if _worker_started:
             return
         _worker_started = True
+    _heal_stale_chain_errors()
     threading.Thread(target=_worker, daemon=True, name="clip-pipeline").start()
 
 
@@ -585,6 +705,34 @@ def retry(cid: str) -> dict:
     if not rec:
         return {"ok": False, "error": f"нет ролика {cid}"}
     _save_clip(cid, status="queued", error="")
+    _WAKE.set()
+    ensure_worker()
+    return {"ok": True}
+
+
+def retry_track(cid: str) -> dict:
+    rec = clip_record(cid)
+    if not rec:
+        return {"ok": False, "error": f"нет ролика {cid}"}
+    if rec.get("status") != "done":
+        return {"ok": False, "error": "Сначала дождитесь обработки видео."}
+    start = rec.get("start")
+    prev = rec.get("chain_from")
+    if not start and prev:
+        prev_rec = clip_record(prev) or {}
+        if prev_rec.get("track_status") != "done":
+            return {"ok": False, "error": f"Сначала постройте маршрут для {prev}."}
+        start, err = _chain_handoff(prev)
+        if not start:
+            return {"ok": False, "error": err or f"Не удалось взять старт с конца {prev}."}
+        _save_clip(cid, start=start, track_status="queued", track_error="")
+    elif start:
+        _save_clip(cid, track_status="queued", track_error="")
+    else:
+        return {
+            "ok": False,
+            "error": "Задайте старт и направление на плане, затем «Построить маршрут».",
+        }
     _WAKE.set()
     ensure_worker()
     return {"ok": True}

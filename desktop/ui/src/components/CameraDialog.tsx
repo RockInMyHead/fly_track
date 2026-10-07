@@ -24,7 +24,7 @@ export default function CameraDialog({
     try {
       const r = await api.scanCamera();
       setCams(r.cameras);
-      setPicked(new Set(r.cameras.flatMap((c) => c.files.filter((f) => !f.imported_as).map((f) => f.path))));
+      setPicked(new Set(r.cameras.flatMap((c) => c.files.map((f) => f.path))));
     } catch (e) {
       setError(String((e as Error).message));
       setCams([]);
@@ -110,7 +110,11 @@ export default function CameraDialog({
                 <span className="w-36 text-muted-foreground">{f.mtime_text}</span>
                 <span className="w-20 text-right tabular-nums text-muted-foreground">{formatBytes(f.size)}</span>
                 <span className="w-28 text-right">
-                  {f.imported_as ? <Badge>уже есть · {f.imported_as}</Badge> : <Badge tone="primary">новый</Badge>}
+                  {f.imported_as ? (
+                    <Badge tone="warning">перезагрузка · {f.imported_as}</Badge>
+                  ) : (
+                    <Badge tone="primary">новый</Badge>
+                  )}
                 </span>
               </label>
             ))}

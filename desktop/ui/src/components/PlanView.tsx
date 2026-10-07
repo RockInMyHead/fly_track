@@ -89,11 +89,16 @@ export default function PlanView({
 
   const runsKey = runs.map((r) => `${r.version}:${r.rows.length}`).join(",");
   useEffect(() => {
-    if (!runs.length) return;
+    if (!runs.length || mode !== "view" || !toward) return;
     const pts = runs.flatMap((r) => r.rows.map((p) => ({ x: p.x, y: p.y })));
-    fit(pts);
+    if (pts.length > 1) fit(pts);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [runsKey]);
+  }, [runsKey, mode, toward]);
+
+  useEffect(() => {
+    if ((mode === "start" || mode === "direction") && nodes.size) fit();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode]);
 
   useEffect(() => {
     const cv = canvasRef.current;
@@ -125,9 +130,17 @@ export default function PlanView({
       ctx.lineWidth = px(r.version === "v5" ? 5 : 3);
       ctx.lineJoin = "round";
       ctx.globalAlpha = r.version === "v5" || runs.length === 1 ? 1 : 0.75;
+      let prev: TrajRow | null = null;
       ctx.beginPath();
-      ctx.moveTo(r.rows[0].x, r.rows[0].y);
-      for (const p of r.rows) ctx.lineTo(p.x, p.y);
+      for (const p of r.rows) {
+        const jump = prev && Math.hypot(p.x - prev.x, p.y - prev.y) > 80;
+        if (!prev || jump) {
+          if (prev) ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+        } else ctx.lineTo(p.x, p.y);
+        prev = p;
+      }
       ctx.stroke();
       ctx.globalAlpha = 1;
     }

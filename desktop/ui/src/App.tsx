@@ -130,7 +130,12 @@ export default function App() {
         setToward(s.toward);
         setMode("view");
       })
-      .catch(() => undefined);
+      .catch((e) => {
+        toast.error((e as Error).message || "Старт из записи ролика не подошёл к плану");
+        setPlace(null);
+        setToward(null);
+        setMode("start");
+      });
     return () => {
       alive = false;
     };
@@ -248,6 +253,16 @@ export default function App() {
     }
   };
 
+  const retryTrack = async () => {
+    if (!clip) return;
+    try {
+      await api.retryTrack(clip.id);
+      toast.success(`Снова строим маршрут ${clip.id}`);
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  };
+
   const openClip = async (id: string) => {
     setActiveId(id);
     setHistoryOpen(false);
@@ -259,8 +274,11 @@ export default function App() {
         setPlace(p);
         setToward(c.start.toward);
         setMode("view");
-      } catch {
-        /* старт из старой версии графа — пользователь задаст заново */
+      } catch (e) {
+        toast.error((e as Error).message || "Старт из записи ролика не подошёл к плану");
+        setPlace(null);
+        setToward(null);
+        setMode("start");
       }
     }
   };
@@ -426,7 +444,14 @@ export default function App() {
                     Старт: продолжение {clip.start?.from_clip ?? clip.chain_from} — с конца его маршрута V3 и в том же направлении
                   </div>
                 )}
-                {clip?.track_status === "error" && <div className="rounded-md bg-destructive/10 p-3 text-xs text-destructive">{clip.track_error}</div>}
+                {clip?.track_status === "error" && (
+                  <div className="rounded-md bg-destructive/10 p-3 text-xs text-destructive">
+                    {clip.track_error}
+                    <Button size="sm" variant="destructive" className="mt-2" onClick={() => void retryTrack()}>
+                      <RefreshCw className="h-3.5 w-3.5" /> Повторить маршрут
+                    </Button>
+                  </div>
+                )}
 
                 {clip && (startChanged || (clip.tracker_ready && !runs.length && !tracking && start)) && (
                   <Button className="w-full" variant="accent" onClick={() => void rebuild()}>

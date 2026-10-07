@@ -221,7 +221,7 @@ def _public_error(msg: str) -> str:
             return "Кликните ближе к проходу на плане (при необходимости увеличьте масштаб)."
         if "направлен" in low or "toward" in low:
             return "Кликните на план в сторону, куда пошёл человек."
-        return "Точку нельзя поставить здесь — выберите проход на плане."
+        return "Не удалось поставить точку — нажмите «Сбросить» и кликните снова."
     if "нет маршрута" in low or "конца маршрута" in low:
         return msg.split(":")[0] if ":" in msg else "Сначала постройте маршрут для предыдущего ролика."
     return msg
@@ -463,6 +463,24 @@ TRACKER_SCRIPTS = {"v1": "final_tracker.py", "v2": "final_tracker_v2.py",
                    "v5": "final_tracker_v5.py"}
 
 
+def _tracker_failure_message(lines: list[str]) -> str:
+    """Turn tracker stdout into a short user-facing reason (no version codes)."""
+    for line in reversed(lines):
+        s = line.strip()
+        if "СТОП:" not in s:
+            continue
+        detail = s.split("СТОП:", 1)[-1].strip()
+        low = detail.lower()
+        if "короче окна" in low or "короче окна признаков" in low:
+            return "Ролик слишком короткий для маршрута — нужно примерно от 10 секунд записи."
+        if "net_displacement" in low:
+            return "Для этого ролика не хватает данных — маршрут не построен."
+        if len(detail) > 160:
+            detail = detail[:157] + "…"
+        return f"Маршрут не построен: {detail}"
+    return "Маршрут не построен — откройте «Проверка системы» или повторите позже."
+
+
 def _start_worker(place: dict, clip: str, ver: str = "v5") -> None:
     vers = list(TRACKER_SCRIPTS) if ver == "all" else [ver]
     lines: list[str] = []
@@ -481,8 +499,7 @@ def _start_worker(place: dict, clip: str, ver: str = "v5") -> None:
             _START_JOB["error"] = ""
         else:
             _START_JOB["state"] = "error"
-            text = "".join(lines).strip().splitlines()
-            _START_JOB["error"] = text[-1] if text else "трекер остановился"
+            _START_JOB["error"] = _tracker_failure_message(lines)
 
 
 def _run_tracker(place: dict, clip: str, ver: str, lines: list[str]) -> int:
@@ -1286,6 +1303,11 @@ class Handler(BaseHTTPRequestHandler):
             if not re.fullmatch(r"VID[0-9]{5}", clip):
                 return self._json({"ok": False, "error": "bad clip id"}, 400)
             return self._json(app_backend.retry(clip))
+        if path == "/api/app/retry-track":
+            clip = str(payload.get("clip") or "")
+            if not re.fullmatch(r"VID[0-9]{5}", clip):
+                return self._json({"ok": False, "error": "bad clip id"}, 400)
+            return self._json(app_backend.retry_track(clip))
 
         if path == "/api/start/place":
             try:
@@ -1299,8 +1321,10 @@ class Handler(BaseHTTPRequestHandler):
                 out = snap_on_graph(x, y, toward)
             except Exception as e:
                 return self._json({"ok": False, "error": _public_error(str(e))}, 500)
-            if not out.get("ok") and out.get("error"):
-                out = {**out, "error": _public_error(str(out["error"]))}
+            if not out.get("ok"):
+                print(f"  start/place fail: {out.get('error')}")
+                if out.get("error"):
+                    out = {**out, "error": _public_error(str(out["error"]))}
             return self._json(out)
 
         if path == "/api/start/direction":
@@ -1316,8 +1340,10 @@ class Handler(BaseHTTPRequestHandler):
                 out = direction_from_click(sx, sy, cx, cy, edge_hint)
             except Exception as e:
                 return self._json({"ok": False, "error": _public_error(str(e))}, 500)
-            if not out.get("ok") and out.get("error"):
-                out = {**out, "error": _public_error(str(out["error"]))}
+            if not out.get("ok"):
+                print(f"  start/direction fail: {out.get('error')}")
+                if out.get("error"):
+                    out = {**out, "error": _public_error(str(out["error"]))}
             return self._json(out)
 
         if path == "/api/start/run":
