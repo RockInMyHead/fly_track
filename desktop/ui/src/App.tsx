@@ -34,6 +34,7 @@ import { cn, formatBytes, formatDuration } from "@/lib/utils";
 import PlanView, { type PlanMode } from "./components/PlanView";
 import CameraDialog from "./components/CameraDialog";
 import HistoryPanel, { clipBadge } from "./components/HistoryPanel";
+import BatchProgressCard from "./components/BatchProgressCard";
 import DiagnosticsDialog from "./components/DiagnosticsDialog";
 import { Badge, Button, Card, CardHeader, Progress } from "./components/ui";
 
@@ -56,6 +57,9 @@ export default function App() {
 
   const [activeId, setActiveId] = useState<string | null>(null);
   const [awaitingImport, setAwaitingImport] = useState(false);
+  const [batchIds, setBatchIds] = useState<string[]>([]);
+  const [batchFilesTotal, setBatchFilesTotal] = useState(0);
+  const [batchDismissed, setBatchDismissed] = useState(false);
   const [runs, setRuns] = useState<RunState[]>([]);
   const [hidden, setHidden] = useState<Set<Version>>(new Set());
   const [videoUrl, setVideoUrl] = useState("");
@@ -105,11 +109,26 @@ export default function App() {
 
   const imp = data?.import;
   useEffect(() => {
-    if (awaitingImport && imp?.imported?.length) {
-      setActiveId(imp.imported[0]);
-      setAwaitingImport(false);
+    if (!data?.import?.imported?.length || batchIds.length) return;
+    if (data.import.state === "running" || data.import.state === "done") {
+      setBatchIds(data.import.imported);
+      setBatchFilesTotal(data.import.files_total);
     }
-    if (awaitingImport && imp?.state === "error") {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data?.import?.state, data?.import?.imported?.length]);
+
+  useEffect(() => {
+    if (!imp) return;
+    if (imp.imported?.length) {
+      setBatchIds((prev) => {
+        const next = [...prev];
+        for (const id of imp.imported) if (!next.includes(id)) next.push(id);
+        return next;
+      });
+    }
+    if (imp.files_total) setBatchFilesTotal(imp.files_total);
+    if (awaitingImport && imp.state === "done") setAwaitingImport(false);
+    if (awaitingImport && imp.state === "error") {
       setAwaitingImport(false);
       toast.error(imp.error || "Копирование остановилось");
     }
@@ -227,11 +246,15 @@ export default function App() {
   const importPaths = async (paths: string[]) => {
     if (!start) return;
     try {
-      await api.importFiles(paths, start);
+      setBatchIds([]);
+      setBatchFilesTotal(paths.length);
+      setBatchDismissed(false);
       setActiveId(null);
+      setRuns([]);
+      await api.importFiles(paths, start);
       setAwaitingImport(true);
       setHistoryOpen(false);
-      toast.success("Копируем видео — после обработки маршрут появится на плане");
+      toast.success("Копируем видео — прогресс в блоке «Загрузка с камеры»");
     } catch (e) {
       toast.error((e as Error).message);
     }
@@ -265,6 +288,7 @@ export default function App() {
 
   const openClip = async (id: string) => {
     setActiveId(id);
+    setBatchDismissed(true);
     setHistoryOpen(false);
     setTime(null);
     const c = data?.clips.find((x) => x.id === id);
@@ -285,6 +309,8 @@ export default function App() {
 
   const importing = imp?.state === "running";
   const importPct = imp && imp.total_bytes ? (imp.done_bytes / imp.total_bytes) * 100 : 0;
+  const batchPanelOpen =
+    !batchDismissed && (importing || awaitingImport || batchIds.length > 0) && !!imp;
   const processing = clip && (clip.status === "queued" || clip.status === "running");
   const tracking = clip && (clip.track_status === "waiting" || clip.track_status === "queued" || clip.track_status === "running");
   const shownRuns = runs.filter((r) => !hidden.has(r.version));
@@ -359,30 +385,31 @@ export default function App() {
             </div>
           </Card>
 
-          {(importing || awaitingImport || clip) && (
+          {batchPanelOpen && imp && (
+            <BatchProgressCard
+              imp={imp}
+              clips={data?.clips ?? []}
+              batchIds={batchIds}
+              filesTotal={batchFilesTotal}
+              onOpenClip={(id) => void openClip(id)}
+              onDismiss={() => {
+                if (batchIds[0]) void openClip(batchIds[0]);
+                else setBatchDismissed(true);
+              }}
+            />
+          )}
+
+          {!batchPanelOpen && clip && (
             <Card>
               <CardHeader
-                title={clip ? clip.id : "Загрузка"}
+                title={clip.id}
                 icon={<Route className="h-4 w-4" />}
-                right={clip ? clipBadge(clip) : undefined}
+                right={clipBadge(clip)}
               />
               <div className="space-y-5 p-5">
-                {clip && <div className="-mt-1 text-xs text-muted-foreground">{clip.title}{clip.duration_s ? ` · ${formatDuration(clip.duration_s)}` : ""}</div>}
+                <div className="-mt-1 text-xs text-muted-foreground">{clip.title}{clip.duration_s ? ` · ${formatDuration(clip.duration_s)}` : ""}</div>
 
-                {(importing || awaitingImport) && imp && (
-                  <div>
-                    <div className="mb-2 flex justify-between text-sm">
-                      <span className="font-medium">Загрузка</span>
-                      <span className="tabular-nums text-muted-foreground">
-                        {imp.files_done}/{imp.files_total} · {formatBytes(imp.done_bytes)} из {formatBytes(imp.total_bytes)}
-                      </span>
-                    </div>
-                    <Progress value={importPct} />
-                    <div className="mt-1.5 truncate text-xs text-muted-foreground">{imp.file} — копируем и сверяем контрольную сумму</div>
-                  </div>
-                )}
-
-                {clip && clip.status === "done" && (
+                {clip.status === "done" && (
                   <div className="flex items-center gap-2.5 text-sm">
                     <StepIcon state="done" />
                     <span className="font-medium">Обработка видео</span>
