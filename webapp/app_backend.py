@@ -140,7 +140,7 @@ def clip_title(cid: str) -> str:
     src = rec.get("source_name")
     when = rec.get("source_mtime_text")
     if src:
-        return f"{cid} — {src}" + (f", снято {when}" if when else "")
+        return f"Видео {rec.get("video_number") or (int(re.search(r"\d+", src).group()) + 1 if re.search(r"\d+", src) else 1)} — {src}" + (f", снято {when}" if when else "")
     return cid
 
 
@@ -285,7 +285,7 @@ def _import_worker(paths: list[str], start: dict | None = None, chain: bool = Tr
     known = _imported_fingerprints()
     prev = None
     try:
-        for p in map(Path, paths):
+        for video_number, p in enumerate(map(Path, paths), 1):
             with _LOCK:
                 _IMPORT["file"] = p.name
             fp = fingerprint(p)
@@ -306,6 +306,7 @@ def _import_worker(paths: list[str], start: dict | None = None, chain: bool = Tr
                 _clear_clip_run_state(rec)
                 rec.update(
                     source_name=p.name,
+                    video_number=video_number,
                     source_path=str(p),
                     size=st.st_size,
                     source_mtime=st.st_mtime,
@@ -573,6 +574,14 @@ def _process(cid: str) -> None:
     _save_clip(cid, status="done", step=None, finished_at=time.time())
 
 
+def _carry_short_clip(cid: str, rec: dict) -> None:
+    """A short clip adds no estimated movement; preserve its incoming position."""
+    _save_clip(cid, track_status="done", track_error="", track_skipped=True,
+               track_note="Короткое видео — сохранены предыдущая точка и направление",
+               track_finished=time.time())
+    _advance_chain(cid, ok=True)
+
+
 def _track(cid: str) -> None:
     rec = clip_record(cid) or {}
     if track_hook is None or rec.get("track_status") not in ("queued", "running"):
@@ -585,11 +594,17 @@ def _track(cid: str) -> None:
             track_finished=time.time(),
         )
         return
-    _save_clip(cid, track_status="running", track_error="", track_started=time.time())
+    if 0 < _duration(cid) < 10:
+        _carry_short_clip(cid, rec)
+        return
+    _save_clip(cid, track_status="running", track_skipped=False, track_error="", track_started=time.time())
     try:
         code, err = track_hook(cid, rec["start"])
     except Exception as e:
         code, err = 1, str(e)
+    if code and "Ролик слишком короткий" in (err or ""):
+        _carry_short_clip(cid, rec)
+        return
     _save_clip(cid, track_status="done" if code == 0 else "error",
                track_error="" if code == 0 else (err or f"код {code}"), track_finished=time.time())
     _advance_chain(cid, ok=code == 0)
@@ -597,6 +612,9 @@ def _track(cid: str) -> None:
 
 def _chain_handoff(from_clip: str) -> tuple[dict | None, str]:
     try:
+        rec = clip_record(from_clip) or {}
+        if rec.get("track_skipped") and rec.get("start"):
+            return dict(rec["start"]), ""
         if chain_start_hook:
             return chain_start_hook(from_clip)
         return None, "расчёт конца маршрута недоступен"
@@ -606,7 +624,7 @@ def _chain_handoff(from_clip: str) -> tuple[dict | None, str]:
 
 def _stale_chain_error(msg: str) -> bool:
     low = (msg or "").lower()
-    return "не построен" in low or "нет конца маршрута" in low
+    return "не построен" in low or "нет конца маршрута" in low or "маршрут" in low and "не готов" in low
 
 
 def _advance_chain(cid: str, ok: bool) -> None:
@@ -639,6 +657,10 @@ def _advance_chain(cid: str, ok: bool) -> None:
 
 def _heal_stale_chain_errors() -> None:
     """Re-queue chain clips stuck after a later successful run of the previous clip."""
+    clips = _clips()["clips"]
+    for cid, r in sorted(clips.items()):
+        if r.get("track_status") == "error" and "Ролик слишком короткий" in (r.get("track_error") or "") and r.get("start"):
+            _carry_short_clip(cid, r)
     clips = _clips()["clips"]
     for cid, r in sorted(clips.items()):
         prev = r.get("chain_from")

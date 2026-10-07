@@ -34,7 +34,7 @@ jobs:
       - name: Version
         run: |
           if ("${{ github.ref_type }}" -eq "tag") { $v = "${{ github.ref_name }}".TrimStart("v") }
-          else { $v = "1.0.${{ github.run_number }}" }
+          else { $v = (Get-Content desktop/package.json | ConvertFrom-Json).version }
           "APP_VERSION=$v" >> $env:GITHUB_ENV
 
       - name: Portable Python (NuGet) with packages

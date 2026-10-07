@@ -1,5 +1,5 @@
 import { CheckCircle2, Circle, Loader2, XCircle } from "lucide-react";
-import type { Clip, ImportStatus } from "@/lib/api";
+import { type Clip, type ImportStatus } from "@/lib/api";
 import { cn, formatBytes, formatDuration } from "@/lib/utils";
 import { Badge, Button, Card, CardHeader, Progress } from "./ui";
 
@@ -29,10 +29,10 @@ function trackState(c: Clip): "done" | "active" | "waiting" | "queued" | "error"
 
 function trackLabel(c: Clip): string {
   const t = trackState(c);
-  if (t === "done") return "маршрут готов";
+  if (t === "done") return c.track_skipped ? "короткое видео — сохранена предыдущая точка" : "маршрут готов";
   if (t === "active") return "считаем маршрут…";
   if (t === "queued") return "маршрут в очереди";
-  if (t === "waiting") return `ждёт ${c.chain_from ?? "предшественника"}`;
+  if (t === "waiting") return "ждёт предыдущего видео";
   if (t === "error") return "маршрут: ошибка";
   if (c.status !== "done") return "после анализа";
   return "нет старта";
@@ -169,7 +169,7 @@ export default function BatchProgressCard({
 
         {batchClips.length > 0 && (
           <div className="max-h-52 overflow-y-auto rounded-md border">
-            {batchClips.map((c) => {
+            {batchClips.map((c, index) => {
               const ps = procState(c);
               const ts = trackState(c);
               return (
@@ -192,7 +192,7 @@ export default function BatchProgressCard({
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-semibold text-foreground">{c.id}</span>
+                      <span className="font-semibold text-foreground">{`Видео ${index + 1}`}</span>
                       {c.source_name && <span className="truncate text-muted-foreground">{c.source_name}</span>}
                       {c.duration_s != null && (
                         <Badge tone="muted">{formatDuration(c.duration_s)}</Badge>

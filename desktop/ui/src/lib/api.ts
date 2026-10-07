@@ -31,6 +31,8 @@ export type Clip = {
   start?: StartPoint;
   track_status?: "waiting" | "queued" | "running" | "done" | "error";
   track_error?: string;
+  track_skipped?: boolean;
+  track_note?: string;
   chain_from?: string | null;
   runs: Partial<Record<Version, RunSummary>>;
 };
@@ -169,3 +171,5 @@ type DesktopBridge = {
 };
 
 export const desktop: DesktopBridge | null = (window as any).flytrack ?? null;
+
+export function clipLabel(c: Clip): string { return c.title?.split(" — ")[0] || c.source_name || "Видео"; }

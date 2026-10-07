@@ -2,7 +2,7 @@
   "name": "fly-track",
   "productName": "Fly Track",
   "private": true,
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "Fly Track — маршрут человека по видео с камеры через мозг мухи",
   "author": "Fly Track",
   "main": "electron/main.cjs",
@@ -50,12 +50,17 @@
       {
         "from": "runtime",
         "to": "runtime",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       }
     ],
     "asar": true,
     "win": {
-      "target": ["nsis", "zip"],
+      "target": [
+        "nsis",
+        "zip"
+      ],
       "icon": "assets/fly_track.ico",
       "artifactName": "FlyTrack-Portable-${version}.${ext}"
     },
@@ -70,7 +75,9 @@
       "artifactName": "FlyTrack-Setup-${version}.${ext}"
     },
     "mac": {
-      "target": ["dir"],
+      "target": [
+        "dir"
+      ],
       "icon": "assets/fly_track.png"
     }
   }

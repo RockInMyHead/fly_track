@@ -1,3 +1,4 @@
+import { clipLabel } from "@/lib/api";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -270,7 +271,7 @@ export default function App() {
     if (!clip || !start) return;
     try {
       await api.track(clip.id, start);
-      toast.success(`Строим маршрут ${clip.id} с нового старта`);
+      toast.success(`Строим маршрут ${clipLabel(clip)} с нового старта`);
     } catch (e) {
       toast.error((e as Error).message);
     }
@@ -280,7 +281,7 @@ export default function App() {
     if (!clip) return;
     try {
       await api.retryTrack(clip.id);
-      toast.success(`Снова строим маршрут ${clip.id}`);
+      toast.success(`Снова строим маршрут ${clipLabel(clip)}`);
     } catch (e) {
       toast.error((e as Error).message);
     }
@@ -402,7 +403,7 @@ export default function App() {
           {!batchPanelOpen && clip && (
             <Card>
               <CardHeader
-                title={clip.id}
+                title={clipLabel(clip)}
                 icon={<Route className="h-4 w-4" />}
                 right={clipBadge(clip)}
               />
@@ -458,7 +459,7 @@ export default function App() {
                     />
                     <span className="font-medium">Маршрут V1–V5</span>
                     <span className="ml-auto text-xs text-muted-foreground">
-                      {clip.track_status === "waiting" && `ждёт конца маршрута ${clip.chain_from}`}
+                      {clip.track_status === "waiting" && "ждёт конца маршрута предыдущего видео"}
                       {clip.track_status === "queued" && (processing ? "после обработки" : "в очереди")}
                       {clip.track_status === "running" && "считаем…"}
                       {clip.track_status === "error" && "ошибка"}
@@ -468,7 +469,7 @@ export default function App() {
                 )}
                 {clip && (clip.chain_from || clip.start?.from_clip) && (
                   <div className="text-xs text-muted-foreground">
-                    Старт: продолжение {clip.start?.from_clip ?? clip.chain_from} — с конца его маршрута V3 и в том же направлении
+                    Старт: продолжение предыдущего видео — с конца его маршрута V3 и в том же направлении
                   </div>
                 )}
                 {clip?.track_status === "error" && (
